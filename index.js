@@ -24,6 +24,7 @@ app.get('/api/recipes', async (req, res) => {
     if (tag) { sql += ' AND JSON_CONTAINS(tags, ?)'; p.push(JSON.stringify(tag)) }
     const [r] = await pool.query(sql + ' ORDER BY id DESC', p)
     r.forEach(x => {
+      try { x.tags = JSON.parse(x.tags || '[]') } catch (e) { x.tags = [] }
       try { x.ingredients = JSON.parse(x.ingredients || '[]') } catch (e) { x.ingredients = [] }
       try { x.steps = JSON.parse(x.steps || '[]') } catch (e) { x.steps = [] }
     })
