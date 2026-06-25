@@ -6,7 +6,7 @@ app.use(cors())
 app.use(express.json({ limit: '10mb' }))
 
 const pool = mysql.createPool({
-  host: 'localhost', port: 3306, user: 'root', password: '123456',
+  host: '10.32.100.251', port: 3306, user: 'root', password: 'XjYwcMb9',
   database: 'shiguang', waitForConnections: true, connectionLimit: 10,
 })
 
