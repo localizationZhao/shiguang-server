@@ -23,8 +23,11 @@ app.get('/api/recipes', async (req, res) => {
     if (keyword) { sql += ' AND name LIKE ?'; p.push('%' + keyword + '%') }
     if (tag) { sql += ' AND JSON_CONTAINS(tags, ?)'; p.push(JSON.stringify(tag)) }
     const [r] = await pool.query(sql + ' ORDER BY id DESC', p)
+    const TAG_MAP: any = {1:['午餐','晚餐','荤菜'],2:['午餐','晚餐','素菜'],3:['素菜','风味小吃'],4:['午餐','晚餐','汤羹'],5:['午餐','主食'],6:['甜点','风味小吃']}
+const SPECIAL_TAGS: any = {'蛋炒饭':['早餐','午餐'],'牛肉拉面':['午餐','主食'],'皮蛋瘦肉粥':['早餐','荤菜'],'春卷':['午餐','风味小吃']}
     r.forEach(x => {
       try { x.tags = typeof x.tags === 'string' ? JSON.parse(x.tags) : (x.tags || []) } catch (e) { x.tags = [] }
+      if (!x.tags || x.tags.length === 0) x.tags = SPECIAL_TAGS[x.name] || TAG_MAP[x.category_id] || ['午餐','晚餐']
       try { x.ingredients = typeof x.ingredients === 'string' ? JSON.parse(x.ingredients) : (x.ingredients || []) } catch (e) { x.ingredients = [] }
       try { x.steps = typeof x.steps === 'string' ? JSON.parse(x.steps) : (x.steps || []) } catch (e) { x.steps = [] }
     })
@@ -171,5 +174,65 @@ async function autoSeed() {
   }
 }
 autoSeed()
+
+// PDF导出
+app.post('/api/export/pdf', async (req, res) => {
+  try {
+    const r = req.body
+    const PDFDocument = require('pdfkit')
+    const doc = new PDFDocument({ size: 'A4', margin: 30 })
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader('Content-Disposition', 'attachment; filename="' + encodeURIComponent(r.name || 'recipe') + '.pdf"')
+    doc.pipe(res)
+
+    // 粉色标题
+    doc.rect(0, 0, 595, 50).fill('#ffa3cb')
+    doc.fillColor('#ffffff').fontSize(20).text(r.name || '食光菜谱', 30, 15)
+    doc.moveDown(3)
+
+    // 基本信息
+    doc.fillColor('#3f2c15').fontSize(12).text((r.category || '') + ' · ¥' + (r.price || '免费'))
+    doc.moveDown(1)
+
+    // 食材
+    doc.fillColor('#ffa3cb').fontSize(14).text('🥬 食材清单')
+    doc.moveDown(0.5)
+    doc.fillColor('#3f2c15').fontSize(11)
+    ;(r.ingredients || []).forEach((i: any) => doc.text('· ' + i.name + '  ' + (i.amount || '')))
+    doc.moveDown(1)
+
+    // 步骤
+    doc.fillColor('#ffa3cb').fontSize(14).text('👨‍🍳 烹饪步骤')
+    doc.moveDown(0.5)
+    doc.fillColor('#3f2c15').fontSize(11)
+    ;(r.steps || []).forEach((s: any, idx: number) => doc.text((idx + 1) + '. ' + s.text, { indent: 10 }))
+    if (r.reference) { doc.moveDown(1); doc.fillColor('#888').text('📎 ' + r.reference) }
+    if (r.notes) { doc.moveDown(0.5); doc.fillColor('#888').text('💬 ' + r.notes) }
+
+    doc.moveDown(2)
+    doc.fillColor('#ccc').fontSize(9).text('—— 来自「食光」小程序', { align: 'center' })
+    doc.end()
+  } catch (e) { res.status(500).json({ code: -1, msg: e.message }) }
+})
+
+// Word导出（简单HTML格式，可被Word打开）
+app.post('/api/export/word', async (req, res) => {
+  try {
+    const r = req.body
+    let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:'PingFang SC',sans-serif;color:#3f2c15}h1{color:#ffa3cb}h2{color:#ffa3cb;font-size:16px}p{font-size:12px;line-height:1.8}</style></head><body>`
+    html += '<h1>' + (r.name || '食光菜谱') + '</h1>'
+    html += '<p>' + (r.category || '') + ' · ¥' + (r.price || '免费') + '</p>'
+    html += '<h2>🥬 食材清单</h2>'
+    ;(r.ingredients || []).forEach((i: any) => html += '<p>· ' + i.name + '  ' + (i.amount || '') + '</p>')
+    html += '<h2>👨‍🍳 烹饪步骤</h2>'
+    ;(r.steps || []).forEach((s: any, idx: number) => html += '<p>' + (idx + 1) + '. ' + s.text + '</p>')
+    if (r.reference) html += '<p>📎 ' + r.reference + '</p>'
+    if (r.notes) html += '<p>💬 ' + r.notes + '</p>'
+    html += '<br/><p style="color:#ccc">—— 来自「食光」小程序</p></body></html>'
+    res.setHeader('Content-Type', 'application/msword')
+    res.setHeader('Content-Disposition', 'attachment; filename="' + encodeURIComponent(r.name || 'recipe') + '.doc"')
+    res.send(html)
+  } catch (e) { res.status(500).json({ code: -1, msg: e.message }) }
+})
 
 app.listen(3000, () => console.log('食光服务器: http://localhost:3000'))
