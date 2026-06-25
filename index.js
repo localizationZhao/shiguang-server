@@ -175,64 +175,120 @@ async function autoSeed() {
 }
 autoSeed()
 
-// PDF导出
+// PDF导出（生成真PDF，返回下载URL）
 app.post('/api/export/pdf', async (req, res) => {
   try {
     const r = req.body
     const PDFDocument = require('pdfkit')
-    const doc = new PDFDocument({ size: 'A4', margin: 30 })
-    res.setHeader('Content-Type', 'application/pdf')
-    res.setHeader('Content-Disposition', 'attachment; filename="' + encodeURIComponent(r.name || 'recipe') + '.pdf"')
-    doc.pipe(res)
+    const fs = require('fs')
+    const path = require('path')
+    const tmpDir = '/tmp'
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
+    const filename = (r.name || 'recipe').replace(/[^a-zA-Z0-9一-龥]/g, '_') + '_' + Date.now() + '.pdf'
+    const filepath = path.join(tmpDir, filename)
 
-    // 粉色标题
+    const doc = new PDFDocument({ size: 'A4', margin: 30 })
+    const stream = fs.createWriteStream(filepath)
+    doc.pipe(stream)
+
     doc.rect(0, 0, 595, 50).fill('#ffa3cb')
     doc.fillColor('#ffffff').fontSize(20).text(r.name || '食光菜谱', 30, 15)
     doc.moveDown(3)
-
-    // 基本信息
     doc.fillColor('#3f2c15').fontSize(12).text((r.category || '') + ' · ¥' + (r.price || '免费'))
     doc.moveDown(1)
-
-    // 食材
-    doc.fillColor('#ffa3cb').fontSize(14).text('🥬 食材清单')
+    doc.fillColor('#ffa3cb').fontSize(14).text('食材清单')
     doc.moveDown(0.5)
     doc.fillColor('#3f2c15').fontSize(11)
-    ;(r.ingredients || []).forEach((i: any) => doc.text('· ' + i.name + '  ' + (i.amount || '')))
+    ;(r.ingredients || []).forEach((i) => doc.text('· ' + i.name + '  ' + (i.amount || '')))
     doc.moveDown(1)
-
-    // 步骤
-    doc.fillColor('#ffa3cb').fontSize(14).text('👨‍🍳 烹饪步骤')
+    doc.fillColor('#ffa3cb').fontSize(14).text('烹饪步骤')
     doc.moveDown(0.5)
     doc.fillColor('#3f2c15').fontSize(11)
-    ;(r.steps || []).forEach((s: any, idx: number) => doc.text((idx + 1) + '. ' + s.text, { indent: 10 }))
+    ;(r.steps || []).forEach((s, idx) => {
+      doc.text((idx + 1) + '. ' + s.text, { indent: 10 })
+      if (s.img) {
+        doc.moveDown(0.3)
+        doc.image(s.img, { fit: [400, 200], align: 'center' })
+        doc.moveDown(0.3)
+      }
+    })
     if (r.reference) { doc.moveDown(1); doc.fillColor('#888').text('📎 ' + r.reference) }
     if (r.notes) { doc.moveDown(0.5); doc.fillColor('#888').text('💬 ' + r.notes) }
-
     doc.moveDown(2)
     doc.fillColor('#ccc').fontSize(9).text('—— 来自「食光」小程序', { align: 'center' })
     doc.end()
+
+    await new Promise((resolve) => stream.on('finish', resolve))
+    res.json({ code: 0, url: '/api/download/' + filename })
   } catch (e) { res.status(500).json({ code: -1, msg: e.message }) }
 })
 
-// Word导出（简单HTML格式，可被Word打开）
+// Word导出
 app.post('/api/export/word', async (req, res) => {
   try {
     const r = req.body
-    let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:'PingFang SC',sans-serif;color:#3f2c15}h1{color:#ffa3cb}h2{color:#ffa3cb;font-size:16px}p{font-size:12px;line-height:1.8}</style></head><body>`
+    const fs = require('fs')
+    const path = require('path')
+    const tmpDir = '/tmp'
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
+    const filename = (r.name || 'recipe').replace(/[^a-zA-Z0-9一-龥]/g, '_') + '_' + Date.now() + '.doc'
+    const filepath = path.join(tmpDir, filename)
+
+    let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:'PingFang SC',sans-serif;color:#3f2c15}h1{color:#ffa3cb}h2{color:#ffa3cb;font-size:16px}p{font-size:12px;line-height:1.8}img{max-width:300px}</style></head><body>`
     html += '<h1>' + (r.name || '食光菜谱') + '</h1>'
     html += '<p>' + (r.category || '') + ' · ¥' + (r.price || '免费') + '</p>'
-    html += '<h2>🥬 食材清单</h2>'
-    ;(r.ingredients || []).forEach((i: any) => html += '<p>· ' + i.name + '  ' + (i.amount || '') + '</p>')
-    html += '<h2>👨‍🍳 烹饪步骤</h2>'
-    ;(r.steps || []).forEach((s: any, idx: number) => html += '<p>' + (idx + 1) + '. ' + s.text + '</p>')
+    html += '<h2>食材清单</h2>'
+    ;(r.ingredients || []).forEach((i) => html += '<p>· ' + i.name + '  ' + (i.amount || '') + '</p>')
+    html += '<h2>烹饪步骤</h2>'
+    ;(r.steps || []).forEach((s, idx) => { html += '<p><b>' + (idx + 1) + '.</b> ' + s.text + '</p>'; if (s.img) html += '<img src="' + s.img + '"/>' })
     if (r.reference) html += '<p>📎 ' + r.reference + '</p>'
     if (r.notes) html += '<p>💬 ' + r.notes + '</p>'
     html += '<br/><p style="color:#ccc">—— 来自「食光」小程序</p></body></html>'
-    res.setHeader('Content-Type', 'application/msword')
-    res.setHeader('Content-Disposition', 'attachment; filename="' + encodeURIComponent(r.name || 'recipe') + '.doc"')
-    res.send(html)
+
+    fs.writeFileSync(filepath, html, 'utf-8')
+    res.json({ code: 0, url: '/api/download/' + filename })
   } catch (e) { res.status(500).json({ code: -1, msg: e.message }) }
+})
+
+// 菜谱浏览器页面
+app.get('/recipe/:name', async (req, res) => {
+  try {
+    const id = req.query.id
+    const [rows] = await pool.query('SELECT * FROM recipes WHERE id=?', [id])
+    const r = rows[0]
+    if (!r) return res.status(404).send('<h1>菜谱不存在</h1>')
+    const ingredients = typeof r.ingredients === 'string' ? JSON.parse(r.ingredients || '[]') : (r.ingredients || [])
+    const steps = typeof r.steps === 'string' ? JSON.parse(r.steps || '[]') : (r.steps || [])
+    const tags = typeof r.tags === 'string' ? JSON.parse(r.tags || '[]') : (r.tags || [])
+    let html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${r.name} - 食光</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'PingFang SC','Helvetica Neue',sans-serif;background:#ffecda;color:#3f2c15;max-width:600px;margin:0 auto;padding:20px;line-height:1.8}h1{font-size:24px;margin:16px 0}.tags{margin:8px 0}.tag{display:inline-block;padding:2px 10px;border:2px solid #6de192;color:#6de192;font-size:12px;margin-right:6px}.price{font-size:22px;color:#6de192;font-weight:bold;margin:12px 0}h2{font-size:16px;color:#6de192;margin:20px 0 10px;border-bottom:2px solid #6de192;padding-bottom:4px}.ing{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(0,0,0,.08)}.step{display:flex;gap:12px;margin:10px 0}.step-num{width:28px;height:28px;background:#6de192;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;border-radius:50%;flex-shrink:0;font-size:13px}.step-text{flex:1}.step img{max-width:100%;border-radius:8px;margin-top:6px}.footer{text-align:center;color:#ccc;font-size:12px;margin-top:30px;padding-top:16px;border-top:1px solid rgba(0,0,0,.06)}</style></head><body>`
+    html += '<h1>🍽️ ' + r.name + '</h1>'
+    if (tags.length) html += '<div class="tags">' + tags.map((t) => '<span class="tag">' + t + '</span>').join('') + '</div>'
+    html += '<p class="price">¥' + (r.price || '免费') + '</p>'
+    html += '<h2>🥬 食材清单</h2>'
+    ingredients.forEach((i) => html += '<div class="ing"><span>' + i.name + '</span><span>' + (i.amount || '') + '</span></div>')
+    html += '<h2>👨‍🍳 烹饪步骤</h2>'
+    steps.forEach((s, idx) => {
+      html += '<div class="step"><span class="step-num">' + (idx + 1) + '</span><div class="step-text"><p>' + s.text + '</p>'
+      if (s.img) html += '<img src="' + s.img + '" alt="步骤' + (idx + 1) + '"/>'
+      html += '</div></div>'
+    })
+    if (r.reference) html += '<p style="color:#999;margin-top:12px">📎 参考：' + r.reference + '</p>'
+    if (r.notes) html += '<p style="color:#999">💬 ' + r.notes + '</p>'
+    html += '<p class="footer">—— 来自「食光」小程序</p></body></html>'
+    res.send(html)
+  } catch (e) { res.status(500).send('<h1>服务器错误</h1>') }
+})
+
+// 下载生成的文件
+app.get('/api/download/:filename', (req, res) => {
+  const path = require('path')
+  const filepath = path.join('/tmp', req.params.filename)
+  const fs = require('fs')
+  if (fs.existsSync(filepath)) {
+    res.download(filepath)
+  } else {
+    res.status(404).json({ code: -1, msg: 'file not found' })
+  }
 })
 
 app.listen(3000, () => console.log('食光服务器: http://localhost:3000'))
