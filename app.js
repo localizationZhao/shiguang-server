@@ -1,0 +1,11 @@
+const express=require("express");const cors=require("cors");const app=express();const PORT=3000;
+app.use(cors());app.use(express.json({limit:"50mb"}));
+let recipes=[];let orders=[];
+app.get("/api/recipes",(req,res)=>{res.json({success:true,data:recipes})});
+app.post("/api/recipes",(req,res)=>{const r=req.body;r.id=Date.now();r.createdAt=new Date().toISOString().slice(0,10);recipes.unshift(r);res.json({success:true,data:r})});
+app.put("/api/recipes/:id",(req,res)=>{const idx=recipes.findIndex(r=>r.id===parseInt(req.params.id));if(idx>=0){recipes[idx]={...recipes[idx],...req.body};res.json({success:true,data:recipes[idx]})}else{res.status(404).json({success:false})}});
+app.delete("/api/recipes/:id",(req,res)=>{recipes=recipes.filter(r=>r.id!==parseInt(req.params.id));res.json({success:true})});
+app.get("/api/orders",(req,res)=>{res.json({success:true,data:orders})});
+app.post("/api/orders",(req,res)=>{const o=req.body;o.id=Date.now();o.status="pending";orders.unshift(o);res.json({success:true,data:o})});
+app.put("/api/orders/:id",(req,res)=>{const idx=orders.findIndex(o=>o.id===parseInt(req.params.id));if(idx>=0){orders[idx]={...orders[idx],...req.body};res.json({success:true,data:orders[idx]})}else{res.status(404).json({success:false})}});
+app.listen(PORT,()=>{console.log("\u98df\u5149API: http://localhost:"+PORT)});

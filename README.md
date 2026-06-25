@@ -1,0 +1,1 @@
+# 食光后端API\n\n## 启动\n```bash\ncd server\nnpm install\nnpm start\n```\n\n## API\n- GET /api/recipes - 获取菜谱列表\n- POST /api/recipes - 新建菜谱\n- PUT /api/recipes/:id - 更新菜谱\n- DELETE /api/recipes/:id - 删除菜谱\n- GET /api/orders - 获取订单\n- POST /api/orders - 新建订单\n- PUT /api/orders/:id - 更新订单\n
