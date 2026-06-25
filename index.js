@@ -148,4 +148,28 @@ app.get('/api/cooking-records', async (req, res) => {
   } catch (e) { res.json({ code: -1, msg: e.message }) }
 })
 
+// 自动建表+种子数据
+async function autoSeed() {
+  const [t] = await pool.query("SHOW TABLES LIKE 'recipes'")
+  if (t.length === 0) {
+    console.log('创建表结构...')
+    await pool.query(`CREATE TABLE IF NOT EXISTS recipes (id INT PRIMARY KEY AUTO_INCREMENT,name VARCHAR(50),category_id INT,color VARCHAR(10),price DECIMAL(8,2),ingredients JSON,steps JSON,tags JSON,cover_emoji VARCHAR(20),is_public TINYINT DEFAULT 1,is_draft TINYINT DEFAULT 0,user_id INT,created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`)
+  }
+  const [c] = await pool.query('SELECT COUNT(*) as n FROM recipes')
+  if (c[0].n === 0) {
+    console.log('写入种子数据...')
+    await pool.query(`INSERT INTO recipes (name,category_id,color,price,tags,ingredients,steps,cover_emoji) VALUES
+('宫保鸡丁',1,'#ff8baa',38,'["午餐","晚餐","荤菜"]','[{"name":"鸡胸肉","amount":"300g"}]','[{"text":"鸡胸肉切丁腌制"}]','🍗'),
+('麻婆豆腐',2,'#79bcff',22,'["午餐","晚餐","素菜"]','[{"name":"嫩豆腐","amount":"1块"}]','[{"text":"豆腐焯水"}]','🧈'),
+('清蒸鲈鱼',1,'#ff8baa',58,'["午餐","晚餐","海鲜菜"]','[{"name":"鲈鱼","amount":"1条"}]','[{"text":"鲈鱼处理干净"}]','🐟'),
+('番茄鸡蛋汤',4,'#ffb37c',15,'["午餐","晚餐","汤羹"]','[{"name":"番茄","amount":"2个"}]','[{"text":"番茄切块"}]','🍅'),
+('蛋炒饭',5,'#6de192',18,'["早餐","午餐","面食"]','[{"name":"米饭","amount":"2碗"}]','[{"text":"鸡蛋打散"}]','🍚'),
+('红烧排骨',1,'#ff8baa',48,'["午餐","晚餐","荤菜"]','[{"name":"猪小排","amount":"500g"}]','[{"text":"排骨焯水"}]','🍖'),
+('蒜蓉西蓝花',2,'#79bcff',16,'["午餐","晚餐","素菜"]','[{"name":"西蓝花","amount":"1颗"}]','[{"text":"西蓝花焯水"}]','🥦'),
+('芒果慕斯',6,'#6de192',35,'["甜点","风味小吃"]','[{"name":"芒果","amount":"2个"}]','[{"text":"芒果打成泥"}]','🥭')`)
+    console.log('种子数据完成')
+  }
+}
+autoSeed()
+
 app.listen(3000, () => console.log('食光服务器: http://localhost:3000'))
