@@ -55,8 +55,8 @@ app.get('/api/recipes/:id', async (req, res) => {
   try {
     const [r] = await pool.query('SELECT * FROM recipes WHERE id=?', [req.params.id])
     if (r[0]) {
-      try { r[0].ingredients = JSON.parse(r[0].ingredients || '[]') } catch (e) { r[0].ingredients = [] }
-      try { r[0].steps = JSON.parse(r[0].steps || '[]') } catch (e) { r[0].steps = [] }
+      try { r[0].ingredients = typeof r[0].ingredients === 'string' ? JSON.parse(r[0].ingredients) : (r[0].ingredients || []) } catch (e) { r[0].ingredients = [] }
+      try { r[0].steps = typeof r[0].steps === 'string' ? JSON.parse(r[0].steps) : (r[0].steps || []) } catch (e) { r[0].steps = [] }
     }
     res.json({ code: 0, data: r[0] || null })
   } catch (e) { res.json({ code: -1, msg: e.message }) }
