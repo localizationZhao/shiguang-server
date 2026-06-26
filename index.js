@@ -23,8 +23,8 @@ app.get('/api/recipes', async (req, res) => {
     if (keyword) { sql += ' AND name LIKE ?'; p.push('%' + keyword + '%') }
     if (tag) { sql += ' AND JSON_CONTAINS(tags, ?)'; p.push(JSON.stringify(tag)) }
     const [r] = await pool.query(sql + ' ORDER BY id DESC', p)
-    const TAG_MAP: any = {1:['午餐','晚餐','荤菜'],2:['午餐','晚餐','素菜'],3:['素菜','风味小吃'],4:['午餐','晚餐','汤羹'],5:['午餐','主食'],6:['甜点','风味小吃']}
-const SPECIAL_TAGS: any = {'蛋炒饭':['早餐','午餐'],'牛肉拉面':['午餐','主食'],'皮蛋瘦肉粥':['早餐','荤菜'],'春卷':['午餐','风味小吃']}
+    const TAG_MAP = {1:['午餐','晚餐','荤菜'],2:['午餐','晚餐','素菜'],3:['素菜','风味小吃'],4:['午餐','晚餐','汤羹'],5:['午餐','主食'],6:['甜点','风味小吃']}
+const SPECIAL_TAGS = {'蛋炒饭':['早餐','午餐'],'牛肉拉面':['午餐','主食'],'皮蛋瘦肉粥':['早餐','荤菜'],'春卷':['午餐','风味小吃']}
     r.forEach(x => {
       try { x.tags = typeof x.tags === 'string' ? JSON.parse(x.tags) : (x.tags || []) } catch (e) { x.tags = [] }
       if (!x.tags || x.tags.length === 0) x.tags = SPECIAL_TAGS[x.name] || TAG_MAP[x.category_id] || ['午餐','晚餐']
@@ -160,17 +160,14 @@ async function autoSeed() {
   }
   const [c] = await pool.query('SELECT COUNT(*) as n FROM recipes')
   if (c[0].n === 0) {
-    console.log('写入种子数据...')
-    await pool.query(`INSERT INTO recipes (name,category_id,color,price,tags,ingredients,steps,cover_emoji) VALUES
-('宫保鸡丁',1,'#ff8baa',38,'["午餐","晚餐","荤菜"]','[{"name":"鸡胸肉","amount":"300g"}]','[{"text":"鸡胸肉切丁腌制"}]','🍗'),
-('麻婆豆腐',2,'#79bcff',22,'["午餐","晚餐","素菜"]','[{"name":"嫩豆腐","amount":"1块"}]','[{"text":"豆腐焯水"}]','🧈'),
-('清蒸鲈鱼',1,'#ff8baa',58,'["午餐","晚餐","海鲜菜"]','[{"name":"鲈鱼","amount":"1条"}]','[{"text":"鲈鱼处理干净"}]','🐟'),
-('番茄鸡蛋汤',4,'#ffb37c',15,'["午餐","晚餐","汤羹"]','[{"name":"番茄","amount":"2个"}]','[{"text":"番茄切块"}]','🍅'),
-('蛋炒饭',5,'#6de192',18,'["早餐","午餐","面食"]','[{"name":"米饭","amount":"2碗"}]','[{"text":"鸡蛋打散"}]','🍚'),
-('红烧排骨',1,'#ff8baa',48,'["午餐","晚餐","荤菜"]','[{"name":"猪小排","amount":"500g"}]','[{"text":"排骨焯水"}]','🍖'),
-('蒜蓉西蓝花',2,'#79bcff',16,'["午餐","晚餐","素菜"]','[{"name":"西蓝花","amount":"1颗"}]','[{"text":"西蓝花焯水"}]','🥦'),
-('芒果慕斯',6,'#6de192',35,'["甜点","风味小吃"]','[{"name":"芒果","amount":"2个"}]','[{"text":"芒果打成泥"}]','🥭')`)
-    console.log('种子数据完成')
+    console.log('写入69道种子菜谱...')
+    const fs = require('fs'), path = require('path')
+    const sql = fs.readFileSync(path.join(__dirname, 'seed_full.sql'), 'utf8')
+    const stmts = sql.split(';').filter(s => s.trim());
+    for (const stmt of stmts) {
+      if (stmt.trim()) await pool.query(stmt.trim());
+    }
+    console.log('种子数据完成（69道）')
   }
 }
 autoSeed()
@@ -289,6 +286,55 @@ app.get('/api/download/:filename', (req, res) => {
   } else {
     res.status(404).json({ code: -1, msg: 'file not found' })
   }
+})
+
+// ======== 小程序码生成 ========
+const https = require('https')
+const APPID = 'wxd365bdf6af7f1643'
+const APPSECRET = process.env.WX_APP_SECRET || '09a41c8fbd85d7b60a7e0fb8654f9082'
+let tokenCache = { token: '', expires: 0 }
+
+function getAccessToken() {
+  return new Promise((resolve, reject) => {
+    if (Date.now() < tokenCache.expires) return resolve(tokenCache.token)
+    https.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${APPID}&secret=${APPSECRET}`, (resp) => {
+      let data = ''
+      resp.on('data', (chunk) => data += chunk)
+      resp.on('end', () => {
+        try {
+          const json = JSON.parse(data)
+          if (json.access_token) {
+            tokenCache = { token: json.access_token, expires: Date.now() + (json.expires_in - 300) * 1000 }
+            resolve(tokenCache.token)
+          } else reject(new Error('获取token失败: ' + JSON.stringify(json)))
+        } catch (e) { reject(e) }
+      })
+    }).on('error', reject)
+  })
+}
+
+app.get('/api/qrcode', async (req, res) => {
+  try {
+    const scene = req.query.scene || ''
+    if (!scene) return res.json({ code: -1, msg: '缺少scene参数' })
+    if (!APPSECRET) return res.json({ code: -1, msg: '未配置WX_APP_SECRET环境变量' })
+
+    const token = await getAccessToken()
+    const body = JSON.stringify({ scene, page: 'pages/restaurant/restaurant', width: 300, auto_color: false, line_color: { r: 255, g: 163, b: 203 }, is_hyaline: true })
+    const url = `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${token}`
+
+    const fetch = (await import('node-fetch')).default || require('node-fetch')
+    const wxRes = await fetch(url, { method: 'POST', body, headers: { 'Content-Type': 'application/json' } })
+    const buffer = await wxRes.buffer()
+    const ct = wxRes.headers.get('content-type') || ''
+    if (ct.includes('application/json')) {
+      const json = JSON.parse(buffer.toString())
+      return res.json({ code: -1, msg: '微信API错误: ' + JSON.stringify(json) })
+    }
+    res.set('Content-Type', 'image/png')
+    res.set('Cache-Control', 'public, max-age=600')
+    res.send(buffer)
+  } catch (e) { res.status(500).json({ code: -1, msg: e.message }) }
 })
 
 app.listen(3000, () => console.log('食光服务器: http://localhost:3000'))
