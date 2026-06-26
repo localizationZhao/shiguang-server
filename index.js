@@ -187,6 +187,68 @@ app.put('/api/orders/:id', async (req, res) => {
   } catch (e) { res.json({ code: -1, msg: e.message }) }
 })
 
+// ======== 餐厅成员 ========
+app.get('/api/restaurant-members/:restaurantId', async (req, res) => {
+  try {
+    const [r] = await pool.query('SELECT * FROM restaurant_members WHERE restaurant_id=?', [req.params.restaurantId])
+    res.json({ code: 0, data: r })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+app.post('/api/restaurant-members', async (req, res) => {
+  try {
+    const { restaurant_id, user_id, nickname, bird_type, seat_index } = req.body
+    await pool.query('REPLACE INTO restaurant_members (restaurant_id, user_id, nickname, bird_type, seat_index) VALUES (?,?,?,?,?)',
+      [restaurant_id, user_id || 0, nickname, bird_type, seat_index || 0])
+    res.json({ code: 0, msg: 'ok' })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+app.delete('/api/restaurant-members/:restaurantId/:userId', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM restaurant_members WHERE restaurant_id=? AND user_id=?', [req.params.restaurantId, req.params.userId])
+    res.json({ code: 0, msg: 'ok' })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+// ======== 订单聊天 ========
+app.get('/api/order-chat/:orderId', async (req, res) => {
+  try {
+    const [r] = await pool.query('SELECT * FROM order_chat WHERE order_id=? ORDER BY created_at', [req.params.orderId])
+    res.json({ code: 0, data: r })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+app.post('/api/order-chat', async (req, res) => {
+  try {
+    const { order_id, sender, message } = req.body
+    await pool.query('INSERT INTO order_chat (order_id, sender, message) VALUES (?,?,?)', [order_id, sender, message])
+    res.json({ code: 0, msg: 'ok' })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+// ======== 分类标签 ========
+app.get('/api/categories', async (req, res) => {
+  try { const [r] = await pool.query('SELECT * FROM categories ORDER BY sort'); res.json({ code: 0, data: r }) }
+  catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+app.post('/api/categories', async (req, res) => {
+  try {
+    const { name, sort, color } = req.body
+    await pool.query('INSERT INTO categories (name, sort, color) VALUES (?,?,?) ON DUPLICATE KEY UPDATE sort=?, color=?',
+      [name, sort || 0, color || '', sort || 0, color || ''])
+    res.json({ code: 0, msg: 'ok' })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+app.delete('/api/categories/:name', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM categories WHERE name=?', [req.params.name])
+    res.json({ code: 0, msg: 'ok' })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
 app.get('/api/feeds', async (req, res) => {
   try { const [r] = await pool.query('SELECT * FROM feeds ORDER BY created_at DESC'); res.json({ code: 0, data: r }) }
   catch (e) { res.json({ code: -1, msg: e.message }) }
