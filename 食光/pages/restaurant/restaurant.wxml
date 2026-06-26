@@ -1,0 +1,615 @@
+<!-- 餐厅页面 -->
+<navigation-bar title="餐厅" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{false}}"></navigation-bar>
+
+<!-- 无餐厅空白页 -->
+<view class="page" wx:if="{{!hasRestaurant}}">
+  <view class="glass empty-rest">
+    <text class="empty-icon">{{role === 'owner' ? '🏪' : '🍽️'}}</text>
+    <text class="empty-title">{{role === 'owner' ? '快来创建属于自己的餐厅吧～' : '还没有加入任何餐厅'}}</text>
+    <text class="empty-desc">{{role === 'owner' ? '创建餐厅后将DIY菜谱上架' : '加入后可浏览菜单并点餐'}}</text>
+    <button class="btn-primary" wx:if="{{role === 'owner'}}" bindtap="openCreateRest">🏪 创建餐厅</button>
+    <button class="btn-primary" wx:if="{{role === 'customer'}}" bindtap="openJoinRest">🔗 加入餐厅</button>
+  </view>
+</view>
+
+
+<!-- 已有餐厅 -->
+<view class="page" wx:else>
+
+  <!-- 自定义提示框 -->
+  <view class="custom-toast {{showToast ? 'show' : ''}}" style="background:{{toastColor}}" bindtap="closeToast">
+    <text>{{toastMsg}}</text>
+  </view>
+
+  <!-- 餐厅标签 -->
+  <scroll-view class="rest-tabs-scroll" scroll-x enhanced show-scrollbar="{{false}}" enable-flex>
+    <view class="rest-tab {{activeRestIdx === index ? 'active' : ''}}"
+      wx:for="{{restaurants}}" wx:key="id" wx:for-index="idx"
+      data-index="{{idx}}" bindtap="switchRest">
+      <text>{{item.owner ? '👨‍🍳' : '🍽️'}} {{item.name}}</text>
+    </view>
+    <view class="rest-tab-add" bindtap="{{role === 'owner' ? 'openCreateRest' : 'openJoinRest'}}" wx:if="{{restaurants.length < 4}}">＋</view>
+  </scroll-view>
+
+  <!-- 操作栏 -->
+  <view class="glass top-bar">
+    <view class="role-switch" wx:if="{{activeRest}}" bindtap="switchRole">
+      <text>当前：</text>
+      <text class="role-tag {{role}}">{{role === 'owner' ? '店主' : '食客'}}</text>
+      <text class="role-hint">点击切换</text>
+    </view>
+
+    <view class="top-btns">
+      <text class="top-btn" bindtap="openShareSheet">📤 分享</text>
+      <text class="top-btn" wx:if="{{activeRest && activeRest.owner && role === 'owner'}}" bindtap="openShelf">📋 上架</text>
+      <text class="top-btn" wx:if="{{avgRating !== '--'}}">⭐ {{avgRating}}</text>
+      <text class="top-btn" bindtap="openRestDetail">ℹ️ 详情</text>
+      <text class="top-btn" bindtap="openStatus">👥 状态</text>
+      <text class="top-btn enter-btn" bindtap="enterInterior">🚪 进店</text>
+    </view>
+  </view>
+
+
+  <!-- Tab导航 -->
+  <view class="glass tab-nav">
+    <view class="tab-nav-item {{tab === 'menu' ? 'active' : ''}}" data-tab="menu" bindtap="switchTab">📋 菜单</view>
+    <view class="tab-nav-item {{tab === 'orders' ? 'active' : ''}}" data-tab="orders" bindtap="switchTab">📦 订单</view>
+    <view class="tab-nav-item {{tab === 'share' ? 'active' : ''}}" data-tab="share" bindtap="switchTab">💬 分享</view>
+  </view>
+
+
+  <!-- 菜单 Tab -->
+  <scroll-view class="glass content-area" scroll-y enable-flex wx:if="{{tab === 'menu'}}">
+    <text class="section-t">{{role === 'owner' ? '我的菜单' : '点餐菜单'}}</text>
+
+    <!-- 店主操作按钮 -->
+    <view class="owner-actions" wx:if="{{activeRest && activeRest.owner && role === 'owner'}}">
+      <text class="top-btn" bindtap="openEditRest">✏️ 编辑餐厅</text>
+      <text class="top-btn del-btn" bindtap="deleteRestaurant">🗑️ 删除餐厅</text>
+    </view>
+
+    <view wx:if="{{menu.length === 0}}" class="empty-hint">
+      <text style="font-size:40px">🍽️</text>
+      <text>还没有上架菜品</text>
+      <text class="sub" wx:if="{{activeRest && activeRest.owner}}">去DIY菜谱中选择上架</text>
+      <button wx:if="{{activeRest && activeRest.owner}}" class="btn-primary" style="margin-top:8px" bindtap="openShelf">去上架</button>
+    </view>
+
+
+    <!-- 食客模式 -->
+    <block wx:if="{{activeRest && !activeRest.owner}}">
+      <view class="menu-item {{item.onShelf ? '' : 'off-shelf'}}" wx:for="{{menuAll}}" wx:key="recipeId"
+        data-id="{{item.recipeId}}"
+        bindtap="{{item.onShelf ? 'toggleOrderItem' : ''}}">
+        <view class="mi-emoji">{{item.emoji || '🍲'}}</view>
+        <view class="mi-info">
+          <text class="mi-name">{{item.name}}</text>
+          <text class="mi-price">¥{{item.price || 0}}</text>
+        </view>
+        <view wx:if="{{!item.onShelf}}" class="sold-out-stamp">已下架</view>
+        <view wx:if="{{item.onShelf}}" class="mi-check {{item.ordered ? 'checked' : ''}}">
+          {{item.ordered ? '✓' : ''}}
+        </view>
+      </view>
+    </block>
+
+    <!-- 店主模式 -->
+    <block wx:if="{{activeRest && activeRest.owner && role === 'owner'}}">
+      <view class="menu-item" wx:for="{{menuAll}}" wx:key="recipeId" data-id="{{item.recipeId}}">
+        <view class="mi-emoji">{{item.emoji || '🍲'}}</view>
+        <view class="mi-info">
+          <text class="mi-name">{{item.name}}</text>
+          <text class="mi-price">¥{{item.price || 0}}</text>
+        </view>
+        <text class="mi-status">{{item.onShelf ? '已上架' : '已下架'}}</text>
+        <view class="mi-unshelf" data-id="{{item.recipeId}}" catchtap="unshelfFromMenu">{{item.onShelf ? '下架' : '移除'}}</view>
+      </view>
+    </block>
+
+    <view class="float-shelf-btn" wx:if="{{activeRest && activeRest.owner && role === 'owner'}}" bindtap="openShelf">📋 上架菜品</view>
+    <button wx:if="{{activeRest && !activeRest.owner}}" class="submit-btn btn-primary" bindtap="submitOrder">🎯 提交订单</button>
+
+  </scroll-view>
+
+  <!-- 订单 Tab -->
+  <scroll-view class="glass content-area" scroll-y enable-flex wx:if="{{tab === 'orders'}}">
+    <text class="section-t">📦 订单</text>
+
+    <view class="order-filters">
+      <view class="of-chip {{orderFilter === 'all' ? 'active' : ''}}" data-filter="all" bindtap="filterOrders">全部</view>
+      <view class="of-chip {{orderFilter === 'pending' ? 'active' : ''}}" data-filter="pending" bindtap="filterOrders">待接单</view>
+      <view class="of-chip {{orderFilter === 'cooking' ? 'active' : ''}}" data-filter="cooking" bindtap="filterOrders">制作中</view>
+      <view class="of-chip {{orderFilter === 'done' ? 'active' : ''}}" data-filter="done" bindtap="filterOrders">已完成</view>
+    </view>
+
+    <view wx:if="{{orders.length === 0}}" class="empty-hint">
+      <text style="font-size:40px">📭</text>
+      <text>暂无订单</text>
+    </view>
+
+    <view class="order-card glass-card" wx:for="{{orders}}" wx:key="id" data-id="{{item.id}}" bindtap="viewOrderDetail">
+      <view class="oc-hd">
+        <text class="oc-user">{{item.customer}}</text>
+        <text class="oc-status st-{{item.status}}">
+          {{item.status === 'pending' ? '待接单' : item.status === 'cooking' ? '制作中' : item.status === 'done' ? '已完成' : '已拒绝'}}
+        </text>
+      </view>
+      <text class="oc-items">{{item.items}}</text>
+      <text class="oc-time" wx:if="{{item.time}}">{{item.time}}</text>
+      <text class="oc-urge" wx:if="{{item.urgeCount}}">🔔 已催单 {{item.urgeCount}} 次</text>
+
+      <view class="oc-chat" wx:if="{{item.chat && item.chat.length > 0}}">
+        <text class="oc-chat-title">💬 交流记录</text>
+        <block wx:for="{{item.chat}}" wx:key="index" wx:for-index="ci" wx:for-item="msg">
+          <view class="oc-chat-msg">
+            <text class="oc-chat-from">{{msg.from === 'owner' ? '👨‍🍳' : '🍽️'}}</text>
+            <text class="oc-chat-txt">{{msg.txt}}</text>
+            <text class="oc-chat-time">{{msg.time}}</text>
+            <text class="oc-chat-del" data-id="{{item.id}}" data-ci="{{ci}}" catchtap="deleteOrderChat">✕</text>
+          </view>
+        </block>
+      </view>
+
+      <view class="oc-actions" wx:if="{{activeRest && activeRest.owner && role === 'owner'}}">
+        <button class="oa-btn accept" wx:if="{{item.status === 'pending'}}" data-id="{{item.id}}" catchtap="acceptOrder">接单</button>
+        <button class="oa-btn reject" wx:if="{{item.status === 'pending'}}" data-id="{{item.id}}" catchtap="rejectOrder">拒单</button>
+        <button class="oa-btn finish" wx:if="{{item.status === 'cooking'}}" data-id="{{item.id}}" catchtap="finishOrder">出餐</button>
+        <button class="oa-btn msg" wx:if="{{item.status === 'pending' || item.status === 'cooking'}}" data-id="{{item.id}}" catchtap="openMsgModal">💬</button>
+      </view>
+
+      <view class="oc-actions" wx:if="{{activeRest && !activeRest.owner}}">
+        <button class="oa-btn msg" wx:if="{{item.status === 'pending' || item.status === 'cooking'}}" data-id="{{item.id}}" catchtap="openUrgeModal">🔔 催单</button>
+        <button class="oa-btn rate" wx:if="{{item.status === 'done' && !item.rating}}" data-id="{{item.id}}" catchtap="rateOrder">⭐ 评价</button>
+      </view>
+      <view class="oc-review" wx:if="{{item.rating}}">
+        <text class="oc-review-stars">⭐ {{item.rating}} 分</text>
+        <text class="oc-review-txt" wx:if="{{item.review}}">"{{item.review}}"</text>
+        <view wx:if="{{activeRest && activeRest.owner && role === 'owner'}}">
+          <text class="oa-btn sm {{item.reviewFeatured ? 'on' : ''}}" data-id="{{item.id}}" catchtap="toggleFeatured">{{item.reviewFeatured ? '★ 已精选' : '精选'}}</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 分享 Tab -->
+  <scroll-view class="glass content-area" scroll-y enable-flex wx:if="{{tab === 'share'}}">
+    <view class="share-header">
+      <text class="section-t">💬 感受分享</text>
+      <button class="btn-primary" style="padding:6px 14px;font-size:12px" bindtap="openNewFeed">＋ 发布</button>
+    </view>
+
+    <view class="order-filters" style="margin-bottom:12rpx">
+      <view class="of-chip {{feedFilter === 'all' ? 'active' : ''}}" data-f="all" bindtap="setFeedFilter">全部</view>
+      <view class="of-chip {{feedFilter === 'restaurant' ? 'active' : ''}}" data-f="restaurant" bindtap="setFeedFilter">本餐厅</view>
+      <view class="of-chip {{feedFilter === 'self' ? 'active' : ''}}" data-f="self" bindtap="setFeedFilter">我的</view>
+    </view>
+
+    <view wx:if="{{feeds.length === 0}}" class="empty-hint">
+      <text style="font-size:40px">💬</text>
+      <text>暂无分享动态</text>
+    </view>
+
+    <view class="feed-card glass-card" wx:for="{{feeds}}" wx:key="id">
+      <view class="feed-hd">
+        <view class="feed-user">
+          <text class="feed-avatar">{{item.posterRole === 'owner' ? '👨‍🍳' : '🍽️'}}</text>
+          <view>
+            <text class="feed-nick">{{item.nickname || '美食家'}}</text>
+            <text class="feed-role-tag">{{item.posterRole === 'owner' ? '店主' : '食客'}}</text>
+          </view>
+        </view>
+        <view class="feed-time-box">
+          <text class="feed-time-icon">🕒</text>
+          <text class="feed-time-text">{{item.timeDisplay}}</text>
+        </view>
+        <text class="feed-vis-tag">{{item.visibility === 'all' ? '🌐' : item.visibility === 'restaurant' ? '🏪' : '🔒'}}</text>
+      </view>
+      <text class="feed-content">{{item.content}}</text>
+      <view class="feed-imgs" wx:if="{{item.images && item.images.length > 0}}">
+        <image wx:for="{{item.images}}" wx:key="*this" wx:for-item="img" src="{{img}}" mode="aspectFill"></image>
+      </view>
+      <view class="feed-ft" wx:if="{{item.showLocation || item.restaurantName}}">
+        <view class="feed-loc" wx:if="{{item.locDisplay}}">
+          <text class="feed-loc-icon">📍</text>
+          <text class="feed-loc-text">{{item.locDisplay}}</text>
+        </view>
+        <text class="feed-rest" wx:if="{{item.restaurantName}}">@{{item.restaurantName}}</text>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
+
+<!-- ==================== 弹窗区 ==================== -->
+
+<!-- 创建餐厅弹窗 -->
+<view class="modal-overlay {{showCreateRest ? 'show' : ''}}" bindtap="closeCreateRest">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-header"><text class="modal-title">🏪 创建餐厅</text><view class="modal-close" bindtap="closeCreateRest">✕</view></view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">餐厅名称</text>
+        <input class="form-input" placeholder="给你的餐厅起个名字" value="{{restName}}" bindinput="onRestNameInput" maxlength="20"/>
+      </view>
+      <view class="form-group">
+        <text class="form-label">餐厅描述</text>
+        <textarea class="form-input" style="min-height:80rpx" placeholder="介绍一下你的餐厅吧~" value="{{restDescription}}" bindinput="onRestDescInput" maxlength="200"/>
+      </view>
+      <button class="btn-primary" bindtap="confirmCreateRest">确认开店</button>
+    </view>
+  </view>
+</view>
+
+<!-- 编辑餐厅弹窗 -->
+<view class="modal-overlay {{showEditRest ? 'show' : ''}}" bindtap="closeEditRest">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-header"><text class="modal-title">✏️ 编辑餐厅</text><view class="modal-close" bindtap="closeEditRest">✕</view></view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">餐厅名称</text>
+        <input class="form-input" value="{{editRestName}}" bindinput="onEditRestNameInput" maxlength="20"/>
+      </view>
+      <view class="form-group">
+        <text class="form-label">餐厅描述</text>
+        <textarea class="form-input" style="min-height:80rpx" placeholder="介绍一下你的餐厅吧~" value="{{editRestDesc}}" bindinput="onEditRestDescInput" maxlength="200"/>
+      </view>
+      <button class="btn-primary" bindtap="confirmEditRest">💾 保存修改</button>
+    </view>
+  </view>
+</view>
+
+<!-- 加入餐厅弹窗（含选鸟+选座） -->
+<view class="modal-overlay {{showJoinRest ? 'show' : ''}}" bindtap="closeJoinRest">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-header"><text class="modal-title">🔗 加入餐厅</text><view class="modal-close" bindtap="closeJoinRest">✕</view></view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">输入邀请码</text>
+        <input class="form-input" placeholder="店主分享的邀请码" value="{{joinCode}}" bindinput="onJoinCodeInput" bindblur="checkAvailableSeats"/>
+        <text style="font-size:20rpx;color:rgba(63,44,21,0.3);margin-top:8rpx;display:block">邀请码10分钟有效，输入后点空白处查看空位</text>
+      </view>
+
+      <!-- 选座 -->
+      <view wx:if="{{availableSeats.length > 0}}" class="seat-picker-section">
+        <text class="form-label">🪑 选择座位</text>
+        <view class="seat-grid-sm">
+          <view class="seat-chip-sm {{selectedSeat === item ? 'selected' : ''}}"
+            wx:for="{{availableSeats}}" wx:key="*this"
+            data-seat="{{item}}" bindtap="selectSeat">
+            <text>🪑 {{item}}号</text>
+          </view>
+        </view>
+        <text class="seat-hint">共{{availableSeats.length}}个空位可选</text>
+      </view>
+
+      <!-- 选鸟 -->
+      <view wx:if="{{showBirdPicker}}" class="bird-picker-section">
+        <text class="form-label">🐦 选择你的鸟型</text>
+        <scroll-view class="bird-grid" scroll-y style="max-height:260rpx">
+          <view class="bird-option {{selectedBird === item ? 'selected' : ''}}"
+            wx:for="{{birdTypes}}" wx:key="*this"
+            data-bird="{{item}}" bindtap="selectBird">
+            <image class="bird-img" src="/sptites/birds/{{item}}.png" mode="aspectFit" style="image-rendering:pixelated"></image>
+          </view>
+        </scroll-view>
+        <view class="bird-preview">
+          <text>当前鸟型：</text>
+          <image class="bird-img-lg" src="/sptites/birds/{{selectedBird}}.png" mode="aspectFit" style="image-rendering:pixelated"></image>
+        </view>
+      </view>
+
+      <!-- 选配饰 -->
+      <view wx:if="{{showBirdPicker}}" class="bird-picker-section">
+        <text class="form-label">🎩 鸟型配饰</text>
+        <scroll-view class="acc-grid" scroll-x>
+          <view class="acc-option {{selectedAccessory === item ? 'selected' : ''}}"
+            wx:for="{{accessories}}" wx:key="*this"
+            data-acc="{{item}}" bindtap="selectAccessory">
+            <text class="acc-emoji">{{item || '🚫'}}</text>
+          </view>
+        </scroll-view>
+      </view>
+
+      <!-- 选灵魂色 -->
+      <view wx:if="{{showBirdPicker}}" class="bird-picker-section">
+        <text class="form-label">🌈 灵魂色</text>
+        <view class="color-grid">
+          <view class="color-dot {{selectedSoulColor === item ? 'selected' : ''}}"
+            wx:for="{{soulColors}}" wx:key="*this"
+            style="background:{{item}}"
+            data-color="{{item}}" bindtap="selectSoulColor"></view>
+        </view>
+      </view>
+
+      <button class="btn-primary" bindtap="confirmJoinRest">确认落座</button>
+    </view>
+  </view>
+</view>
+
+<!-- 餐厅状态面板 -->
+<view class="modal-overlay {{showStatus ? 'show' : ''}}" bindtap="closeStatus">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-header"><text class="modal-title">👥 餐厅状态</text><view class="modal-close" bindtap="closeStatus">✕</view></view>
+    <view class="modal-body">
+      <view class="status-summary">
+        <view class="status-card online">
+          <text class="status-num">{{statusOnline}}</text>
+          <text class="status-label">在线</text>
+        </view>
+        <view class="status-card offline">
+          <text class="status-num">{{statusOffline}}</text>
+          <text class="status-label">离线</text>
+        </view>
+        <view class="status-card total">
+          <text class="status-num">{{statusMembers.length}}</text>
+          <text class="status-label">总食客</text>
+        </view>
+      </view>
+
+      <text class="section-t" style="margin-top:24rpx">食客列表</text>
+      <view wx:if="{{statusMembers.length === 0}}" class="empty-hint">
+        <text>暂无食客落座</text>
+      </view>
+      <view class="member-row" wx:for="{{statusMembers}}" wx:key="nickname">
+        <image class="member-bird" src="/sptites/birds/{{item.birdType}}.png" mode="aspectFit" style="image-rendering:pixelated;--soul:{{item.soulColor || '#ffa3cb'}}"></image>
+        <text class="member-nick">{{item.nickname}}</text>
+        <view class="member-status {{item.online ? 'on' : 'off'}}">
+          <text>{{item.online ? '🟢 在线' : '⚫ 离线'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- ==================== 餐厅内部空间 ==================== -->
+<view class="interior-overlay {{showInterior ? 'show' : ''}}" catchtap="leaveInterior">
+  <view class="interior-scene" catchtap="preventClose">
+
+    <!-- 背景图 -->
+    <image class="interior-bg" src="/sptites/canteen/image.png" mode="aspectFill"></image>
+
+    <!-- 前景内容层 -->
+    <view class="interior-fg" catchtap="preventClose">
+      <!-- 招牌 -->
+      <view class="interior-signboard">
+        <text class="sign-text">{{activeRest && activeRest.description ? activeRest.description : '欢迎光临本店~'}}</text>
+        <text class="sign-name">【name: {{activeRest ? activeRest.name : ''}}】</text>
+      </view>
+
+      <!-- 在线统计 + 换装/换色 -->
+      <view class="online-badge">
+        <text>🟢 {{statusOnline}} 在线  ⚫ {{statusOffline}} 离线  👥 {{statusMembers.length}} 食客</text>
+        <view class="dress-up-btn" bindtap="toggleAccessoryPick"><text>🎩 换装</text></view>
+        <view class="dress-up-btn color-btn" bindtap="toggleColorPick"><text>🌈 换色</text></view>
+      </view>
+
+      <!-- 配饰选择条 -->
+      <view class="acc-bar" wx:if="{{showAccessoryPick}}">
+        <view class="acc-chip {{selectedAccessory === item ? 'selected' : ''}}"
+          wx:for="{{accessories}}" wx:key="*this"
+          data-acc="{{item}}" bindtap="changeAccessory">
+          <text class="acc-emoji-sm">{{item || '🚫'}}</text>
+        </view>
+      </view>
+
+      <!-- 灵魂色选择条 -->
+      <view class="acc-bar" wx:if="{{showColorPick}}">
+        <view class="color-chip {{selectedSoulColor === item ? 'selected' : ''}}"
+          wx:for="{{soulColors}}" wx:key="*this"
+          style="background:{{item}}"
+          data-color="{{item}}" bindtap="changeSoulColor">
+          <text wx:if="{{selectedSoulColor === item}}" class="color-check">✓</text>
+        </view>
+      </view>
+
+      <!-- 8座板凳区 -->
+      <view class="bench-area">
+        <view class="bench-row" wx:for="{{seatMap}}" wx:key="seatId">
+          <view class="bench-seat {{item.isOwner ? 'owner-seat' : ''}} {{!item.member ? 'empty-seat' : ''}}"
+            data-seat="{{item.seatId}}" bindtap="{{!item.member ? 'switchSeat' : ''}}">
+            <!-- 鸟型食客 + 配饰 -->
+            <view class="bird-wrap {{item.isOwner ? 'bird-owner-wrap' : ''}}">
+              <image wx:if="{{item.member}}"
+                class="bird-on-bench {{item.member.online ? 'bird-alive' : 'bird-away'}} {{item.isOwner ? 'bird-owner' : ''}}"
+                src="/sptites/birds/{{item.member.birdType}}.png"
+                mode="aspectFit"
+                style="image-rendering:pixelated;--soul:{{item.member.soulColor || '#ffa3cb'}}"></image>
+              <text wx:if="{{item.member && item.member.accessory}}" class="bird-accessory {{item.member.online ? 'acc-glow' : ''}}">{{item.member.accessory}}</text>
+            </view>
+            <!-- 空座占位 -->
+            <text wx:if="{{!item.member}}" class="empty-seat-icon">🪑</text>
+            <!-- 板凳 -->
+            <view class="bench-plank {{item.isOwner ? 'plank-owner' : ''}}"></view>
+            <view class="bench-legs">
+              <view class="bench-leg {{item.isOwner ? 'leg-owner' : ''}}"></view>
+              <view class="bench-leg {{item.isOwner ? 'leg-owner' : ''}}"></view>
+            </view>
+            <!-- 标签 -->
+            <text class="bench-nick {{item.isOwner ? 'nick-owner' : ''}}">{{item.member ? item.member.nickname : '虚位以待'}}</text>
+            <text class="bench-label-sm">{{item.label}}</text>
+            <text wx:if="{{item.member}}" class="bench-dot">{{item.member.online ? '🟢' : '⚫'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 底部关闭按钮 -->
+      <view class="interior-exit" bindtap="leaveInterior">
+        <view class="exit-btn"><text class="exit-x">✕</text></view>
+        <text class="exit-label">【返回】</text>
+      </view>
+    </view>
+
+  </view>
+</view>
+
+<!-- ==================== 欢迎弹窗 ==================== -->
+<view class="modal-overlay welcome-overlay {{showWelcome ? 'show' : ''}}" bindtap="closeWelcome">
+  <view class="welcome-card" catchtap="preventClose">
+    <view class="welcome-sparkle">✨</view>
+    <text class="welcome-icon">🐦</text>
+    <text class="welcome-title">新食客光临！</text>
+    <text class="welcome-msg">{{welcomeMsg}}</text>
+    <view class="welcome-birds">
+      <image class="welcome-bird-img" src="/sptites/birds/32x32x1.png" mode="aspectFit" style="image-rendering:pixelated"></image>
+      <image class="welcome-bird-img" src="/sptites/birds/48x48x1.png" mode="aspectFit" style="image-rendering:pixelated"></image>
+      <image class="welcome-bird-img" src="/sptites/birds/60x45x2.png" mode="aspectFit" style="image-rendering:pixelated"></image>
+    </view>
+    <button class="btn-primary" style="width:auto;padding:16rpx 40rpx" bindtap="closeWelcome">🎉 热烈欢迎</button>
+  </view>
+</view>
+
+<!-- 上架菜谱弹窗 -->
+<view class="modal-overlay {{showShelf ? 'show' : ''}}" bindtap="closeShelf">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-header"><text class="modal-title">📋 上架菜谱</text><view class="modal-close" bindtap="closeShelf">✕</view></view>
+    <view class="modal-body">
+      <input class="form-input" style="margin-bottom:16rpx" placeholder="🔍 搜索你的DIY菜谱..." value="{{shelfSearch}}" bindinput="onShelfSearch" bindconfirm="doShelfSearch"/>
+      <view wx:if="{{diyRecipes.length === 0}}" class="empty-hint"><text>没有找到菜谱</text></view>
+      <view class="shelf-item" wx:for="{{diyRecipes}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleShelfRecipe">
+        <text>{{item.coverEmoji || '🍽️'}} {{item.name}}</text>
+        <view class="shelf-check {{item.onShelf ? 'checked' : ''}}">{{item.onShelf ? '✓' : ''}}</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 分享弹窗 -->
+<view class="modal-overlay {{showShareSheet ? 'show' : ''}}" bindtap="closeShareSheet">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-header"><text class="modal-title">📤 分享餐厅</text><view class="modal-close" bindtap="closeShareSheet">✕</view></view>
+    <view class="modal-body" style="text-align:center">
+      <text style="font-size:48px;display:block">🏪</text>
+      <text style="font-size:28rpx;font-weight:700;display:block;margin:8px 0;color:#3f2c15">{{activeRest ? activeRest.name : ''}}</text>
+
+      <!-- 小程序码 -->
+      <view class="qr-wrap" wx:if="{{qrCodePath}}">
+        <image class="qr-img" src="{{qrCodePath}}" mode="aspectFit"></image>
+        <text class="qr-tip">📱 扫码直接进店</text>
+      </view>
+      <view class="qr-wrap qr-loading" wx:elif="{{generatingQR}}">
+        <text style="font-size:48rpx">⏳</text>
+        <text style="font-size:22rpx;color:rgba(63,44,21,0.4)">生成小程序码中...</text>
+      </view>
+
+      <view style="background:rgba(0,0,0,0.03);padding:14rpx;margin:12rpx 0;border:2rpx dashed var(--hl)">
+        <text style="font-size:20rpx;color:rgba(63,44,21,0.4);display:block">邀请码（10分钟有效）</text>
+        <text style="font-size:36rpx;font-weight:800;color:var(--hl);font-family:monospace">{{activeRest ? activeRest.inviteCode || '---' : '---'}}</text>
+      </view>
+      <view style="display:flex;gap:8rpx">
+        <button class="btn-outline" style="flex:1;margin-top:8rpx" bindtap="refreshInviteCode" wx:if="{{activeRest && activeRest.owner}}">🔄 刷新</button>
+        <button class="btn-primary" style="flex:1;margin-top:8rpx" bindtap="copyShareLink">📋 复制邀请码</button>
+      </view>
+      <button class="btn-outline" style="margin-top:8rpx;width:100%" open-type="share">📤 转发给好友</button>
+    </view>
+  </view>
+</view>
+
+<!-- 发布感受弹窗 -->
+<view class="modal-overlay {{showNewFeed ? 'show' : ''}}" bindtap="closeNewFeed">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-header"><text class="modal-title">💬 发布感受</text><view class="modal-close" bindtap="closeNewFeed">✕</view></view>
+    <view class="modal-body">
+      <textarea class="form-input" style="min-height:80px;margin-bottom:16rpx" placeholder="分享你的美食感受..." value="{{feedContent}}" bindinput="onFeedInput" maxlength="500"/>
+      <view class="feed-img-grid" wx:if="{{feedImages.length > 0}}">
+        <view class="feed-img-item" wx:for="{{feedImages}}" wx:key="*this" wx:for-index="fi">
+          <image src="{{item}}" mode="aspectFill"></image>
+          <view class="feed-img-del" data-index="{{fi}}" bindtap="removeFeedImage">✕</view>
+        </view>
+      </view>
+      <view class="feed-actions">
+        <button class="btn-ghost" bindtap="addFeedImage">📷 添加图片</button>
+        <view class="vis-toggle" bindtap="toggleVisibility">
+          <text>{{feedVisibility === 'all' ? '🌐 公开' : feedVisibility === 'restaurant' ? '🏪 餐厅' : '🔒 仅自己'}}</text>
+        </view>
+      </view>
+      <view class="setting-row">
+        <text>🕒 显示发布时间</text>
+        <switch checked="{{feedIsTimePublic}}" bindchange="toggleFeedTimePublic" color="#ff4997"/>
+      </view>
+      <view class="setting-label">📍 位置显示</view>
+      <view class="loc-options">
+        <view class="loc-opt {{feedIsLocationPublic && feedShowLocation ? 'active' : ''}}" data-mode="public" bindtap="toggleFeedLocationMode">公开位置</view>
+        <view class="loc-opt {{!feedIsLocationPublic && feedShowLocation ? 'active' : ''}}" data-mode="custom" bindtap="toggleFeedLocationMode">自定义</view>
+        <view class="loc-opt {{!feedShowLocation ? 'active' : ''}}" data-mode="hide" bindtap="toggleFeedLocationMode">隐藏</view>
+      </view>
+      <view class="setting-row" wx:if="{{feedIsLocationPublic && feedShowLocation}}" style="margin-top:8rpx">
+        <text>📍 定位精度</text>
+        <text class="top-btn" bindtap="toggleLocPrecision">{{feedLocPrecision === 'exact' ? '精确' : '模糊'}}</text>
+      </view>
+      <input wx:if="{{!feedIsLocationPublic && feedShowLocation}}" class="form-input" style="margin-top:12rpx" placeholder="比如：我在火星🚀、猜猜我在哪里" value="{{feedCustomLocation}}" bindinput="onFeedCustomLocation"/>
+      <button class="btn-primary" style="margin-top:20rpx" bindtap="publishFeed">发布</button>
+    </view>
+  </view>
+
+<!-- 飘落 -->
+<view class="float-food" style="left:20%;animation-delay:0s">🍽️</view>
+<view class="float-food" style="left:60%;animation-delay:-8s">🥂</view>
+</view>
+
+<!-- 消息弹窗 -->
+<view class="modal-overlay {{showMsgModal ? 'show' : ''}}" bindtap="closeMsgModal">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-header"><text class="modal-title">💬 发送消息</text><view class="modal-close" bindtap="closeMsgModal">✕</view></view>
+    <view class="modal-body">
+      <text class="form-label">快捷消息</text>
+      <view class="preset-row">
+        <view class="preset-chip" wx:for="{{msgMode === 'customer' ? urgePresets : msgPresets}}" wx:key="*this" data-txt="{{item}}" bindtap="sendPresetMsg">{{item}}</view>
+      </view>
+      <text class="form-label" style="margin-top:20rpx">自定义消息（25字内）</text>
+      <input class="form-input" placeholder="输入想说的话..." value="{{msgText}}" bindinput="onMsgInput" maxlength="25"/>
+      <button class="btn-primary" style="margin-top:14rpx" bindtap="sendCustomMsg">发送</button>
+    </view>
+  </view>
+</view>
+
+<!-- 评价弹窗 -->
+<view class="modal-overlay {{showRateModal ? 'show' : ''}}" bindtap="closeRateModal">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-header"><text class="modal-title">⭐ 评价</text><view class="modal-close" bindtap="closeRateModal">✕</view></view>
+    <view class="modal-body" style="text-align:center">
+      <text class="form-label">给这道菜打分</text>
+      <view class="star-row">
+        <text class="star-btn {{rateStars >= 1 ? 'on' : ''}}" data-star="1" bindtap="setRateStars">★</text>
+        <text class="star-btn {{rateStars >= 2 ? 'on' : ''}}" data-star="2" bindtap="setRateStars">★</text>
+        <text class="star-btn {{rateStars >= 3 ? 'on' : ''}}" data-star="3" bindtap="setRateStars">★</text>
+        <text class="star-btn {{rateStars >= 4 ? 'on' : ''}}" data-star="4" bindtap="setRateStars">★</text>
+        <text class="star-btn {{rateStars >= 5 ? 'on' : ''}}" data-star="5" bindtap="setRateStars">★</text>
+      </view>
+      <view class="half-star-row">
+        <text class="hs-btn {{rateStars === 1.5 ? 'on' : ''}}" data-star="1.5" bindtap="setRateStars">1.5</text>
+        <text class="hs-btn {{rateStars === 2.5 ? 'on' : ''}}" data-star="2.5" bindtap="setRateStars">2.5</text>
+        <text class="hs-btn {{rateStars === 3.5 ? 'on' : ''}}" data-star="3.5" bindtap="setRateStars">3.5</text>
+        <text class="hs-btn {{rateStars === 4.5 ? 'on' : ''}}" data-star="4.5" bindtap="setRateStars">4.5</text>
+      </view>
+      <text style="font-size:36rpx;display:block;margin:12rpx 0">{{rateStars}} 分</text>
+      <textarea class="form-input" style="min-height:80rpx;margin-top:16rpx" placeholder="留下你的好评吧~" value="{{rateText}}" bindinput="onRateTextInput" maxlength="200"/>
+      <button class="btn-primary" style="margin-top:16rpx" bindtap="submitRating">✅ 提交评价</button>
+    </view>
+  </view>
+</view>
+
+<!-- 餐厅详情弹窗 - 橙色便签风 -->
+<view class="modal-overlay {{showRestDetail ? 'show' : ''}}" bindtap="closeRestDetail">
+  <view class="rest-detail-note" catchtap="preventClose">
+    <view class="rest-detail-hd"><text>🏪 {{activeRest ? activeRest.name : ''}}</text><view class="modal-close" bindtap="closeRestDetail">✕</view></view>
+    <view class="rest-detail-bd">
+      <text class="rest-desc">{{activeRest && activeRest.description ? activeRest.description : '这家餐厅还没有写介绍~'}}</text>
+      <view class="rest-info-row"><text class="rir-l">食客人数</text><text class="rir-v">{{activeRest ? activeRest.members.length : 0}} 位</text></view>
+      <view class="rest-info-row"><text class="rir-l">评分</text><text class="rir-v">⭐ {{avgRating}}</text></view>
+      <view class="rest-code-box">
+        <text class="rcb-label">邀请码（10分钟有效）</text>
+        <text class="rcb-code">{{activeRest ? activeRest.inviteCode || '---' : '---'}}</text>
+      </view>
+      <view class="rcb-btns">
+        <button class="rest-btn-outline" bindtap="refreshInviteCode" wx:if="{{activeRest && activeRest.owner}}">🔄 刷新</button>
+        <button class="rest-btn-main" bindtap="copyShareLink">📋 复制邀请码</button>
+      </view>
+      <text class="rest-section-label">精选评价</text>
+      <view wx:if="{{orders.length === 0}}" class="rest-empty">暂无评价</view>
+      <view class="rest-review" wx:for="{{orders}}" wx:key="id" wx:if="{{item.reviewFeatured && item.review}}">
+        <text class="rr-stars">⭐ {{item.rating}} 分</text>
+        <text class="rr-text">"{{item.review}}"</text>
+      </view>
+    </view>
+  </view>
+</view>

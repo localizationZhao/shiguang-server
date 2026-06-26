@@ -1,0 +1,76 @@
+<!-- 个人中心 -->
+<navigation-bar title="我的" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{false}}"></navigation-bar>
+
+<scroll-view class="page" scroll-y enhanced show-scrollbar="{{false}}">
+
+  <!-- 用户信息卡片 -->
+  <view class="glass user-card">
+    <view class="user-avatar" bindtap="editProfile">
+      <image wx:if="{{user.avatar}}" src="{{user.avatar}}" mode="aspectFill" class="avatar-img"></image>
+      <text wx:else style="font-size:32px">👤</text>
+    </view>
+
+    <view class="user-info">
+      <text class="user-nick">{{user.nick}}</text>
+      <text class="user-id">ID: {{user.id}}</text>
+    </view>
+
+    <text class="user-edit" bindtap="editProfile">编辑资料 ›</text>
+  </view>
+
+
+  <!-- 数据统计 -->
+  <view class="glass stats-row">
+    <view class="stat-item">
+      <text class="stat-num">{{recipeCount}}</text>
+      <text class="stat-label">自制菜谱</text>
+    </view>
+
+    <view class="stat-divider"></view>
+
+    <view class="stat-item">
+      <text class="stat-num">{{cookingCount}}</text>
+      <text class="stat-label">做菜次数</text>
+    </view>
+
+    <view class="stat-divider"></view>
+
+    <view class="stat-item">
+      <text class="stat-num">{{orderCount}}</text>
+      <text class="stat-label">历史订单</text>
+    </view>
+
+  </view>
+
+
+  <!-- 功能入口 -->
+  <view class="glass menu-section">
+    <view class="menu-item" wx:for="{{menuItems}}" wx:key="key" data-key="{{item.key}}" bindtap="onMenuItem">
+      <text class="menu-icon">{{item.icon}}</text>
+      <text class="menu-title">{{item.title}}</text>
+      <text class="menu-badge" wx:if="{{item.key === 'favorites' && favCount > 0}}">{{favCount}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+
+  </view>
+
+
+  <!-- 设置 -->
+  <view class="glass menu-section">
+    <text class="section-label">设置</text>
+    <view class="menu-item" wx:for="{{settingsItems}}" wx:key="key" data-key="{{item.key}}" bindtap="onSettingsItem">
+      <text class="menu-icon">{{item.icon}}</text>
+      <text class="menu-title">{{item.title}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+
+  </view>
+
+
+  <!-- 底部留白 -->
+  <view style="height:80px;text-align:center;padding-top:30px">
+    <text style="font-size:11px;color:rgba(26,26,46,0.3)">食光 v1.0.0 · 美食创作平台</text>
+  </view>
+
+
+</scroll-view>

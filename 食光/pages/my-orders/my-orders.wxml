@@ -1,0 +1,3 @@
+<navigation-bar title="订单记录" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
+<scroll-view class="page" scroll-y><view class="glass" wx:for="{{orders}}" wx:key="id" data-id="{{item.id}}" bindtap="viewDetail" style="margin:8px"><text style="font-weight:600;display:block">{{item.restaurantName}}</text><text style="font-size:13px;color:rgba(26,26,46,0.65)">{{item.items}}</text><text style="font-size:11px;color:#ff4997;margin-top:4px;display:block">{{item.status}}</text></view>
+<view wx:if="{{orders.length===0}}" class="empty-state"><text style="font-size:64px">📭</text><text style="color:rgba(26,26,46,0.45)">暂无订单</text></view></scroll-view>

@@ -1,0 +1,53 @@
+<!-- 订单详情页 -->
+<navigation-bar title="订单详情" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
+
+<scroll-view class="page" scroll-y enhanced show-scrollbar="{{false}}" wx:if="{{order}}">
+
+  <!-- 状态头部 -->
+  <view class="card status-card">
+    <view class="card-hd">{{order.status === 'pending' ? '⏳ 等待接单' : order.status === 'cooking' ? '🔥 制作中' : order.status === 'done' ? '✅ 已完成' : '❌ 已拒绝'}}</view>
+    <text class="status-emoji">{{order.status === 'pending' ? '⏳' : order.status === 'cooking' ? '🔥' : order.status === 'done' ? '✅' : '❌'}}</text>
+    <text class="status-title">{{order.status === 'pending' ? '等待接单' : order.status === 'cooking' ? '制作中' : order.status === 'done' ? '已完成' : '已拒绝'}}</text>
+    <text class="status-sub" wx:if="{{order.time}}">{{order.time}}</text>
+  </view>
+
+  <!-- 订单信息 -->
+  <view class="card">
+    <text class="section-hd">📋 订单信息</text>
+    <view class="info-row"><text class="info-l">餐厅</text><text class="info-v">{{order.restaurantName}}</text></view>
+    <view class="info-row"><text class="info-l">顾客</text><text class="info-v">{{order.customer}}</text></view>
+    <view class="info-row"><text class="info-l">时间</text><text class="info-v">{{order.createdAt ? order.createdAt.slice(0,16) : ''}}</text></view>
+  </view>
+
+  <!-- 菜品 -->
+  <view class="card">
+    <text class="section-hd">🛒 菜品</text>
+    <view class="oi-row" wx:for="{{order.itemList}}" wx:key="recipeId" wx:for-item="oi">
+      <text class="oi-emoji">{{oi.emoji || '🍲'}}</text>
+      <text class="oi-name">{{oi.name}}</text>
+      <text class="oi-price">¥{{oi.price}}</text>
+    </view>
+  </view>
+
+  <!-- 评分 -->
+  <view class="card" wx:if="{{order.rating}}">
+    <text class="section-hd">⭐ 评分</text>
+    <text class="stars">{{starsStr}}</text>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="card">
+    <button wx:if="{{order.status === 'pending'}}" class="btn-accept" bindtap="acceptOrder">✅ 接单</button>
+    <button wx:if="{{order.status === 'pending'}}" class="btn-reject" bindtap="rejectOrder">❌ 拒单</button>
+    <button wx:if="{{order.status === 'cooking'}}" class="btn-accept" bindtap="finishOrder">🍽️ 出餐</button>
+    <button wx:if="{{order.status === 'pending' || order.status === 'cooking'}}" class="btn-outline" bindtap="urgeOrder">🔔 催单</button>
+    <button wx:if="{{order.status === 'done' && !order.rating}}" class="btn-rate" bindtap="rateOrder">⭐ 评价</button>
+  </view>
+
+  <view style="height:80px"></view>
+</scroll-view>
+
+<view class="empty-state" wx:if="{{!order}}">
+  <text style="font-size:100rpx">🔍</text>
+  <text style="color:rgba(63,44,21,0.4)">订单不存在</text>
+</view>

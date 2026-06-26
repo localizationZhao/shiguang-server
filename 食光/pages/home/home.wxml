@@ -1,0 +1,182 @@
+<!-- 首页 -->
+<navigation-bar title="查菜谱" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{false}}"></navigation-bar>
+
+<view class="page" style="--th:{{themeMain}};--thd:{{themeDark}};--thl:{{themeLight}}">
+  <view class="home-top">
+    <view class="search-bar">
+      <view class="search-wrap">
+        <text class="search-icon">🔍</text>
+        <input class="search-input" placeholder="搜索菜名、食材..." value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="doSearch" confirm-type="search"/>
+        <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
+      </view>
+      <button class="btn-search" hover-class="btn-search-press" bindtap="doSearch">搜索</button>
+    </view>
+    <view class="blind-box" bindtap="spin">
+      <view class="blind-pet" catchtap="openPetCustom">
+        <image wx:if="{{petFace}}" src="{{petFace}}" mode="aspectFill" class="pet-face"></image>
+        <text wx:else style="font-size:32px">{{spinning ? '🌀' : '🐱'}}</text>
+        <text class="pet-badge">✏️</text>
+      </view>
+      <view class="blind-info">
+        <text class="blind-title">今天吃什么？</text>
+        <text class="blind-result">{{blindResult}}</text>
+      </view>
+      <view class="blind-btn" catchtap="spin"><text>{{spinning ? '⏳' : '🎲'}}</text></view>
+    </view>
+    <view class="scroll-name-box">
+      <view class="scroll-name-fade-top"></view>
+      <view class="scroll-name-list">
+        <text class="scroll-name-item" wx:for="{{scrollNames}}" wx:key="*this">{{item}}</text>
+      </view>
+      <view class="scroll-name-fade-bottom"></view>
+    </view>
+    <view class="pref-tags">
+      <view class="pref-tag {{(item === '全部' && selectedTags.length === 0) || selectedTags[0] === item ? 'active' : ''}}"
+        hover-class="pref-tag-press"
+        wx:for="{{['全部','早餐','午餐','晚餐','肉类','蔬菜','海鲜','主食','甜点','汤类','小吃']}}"
+        wx:key="*this" data-tag="{{item}}" bindtap="toggleTag" hover-stop-propagation>{{item}}</view>
+    </view>
+    <view class="filter-row">
+      <view class="filter-btn" bindtap="openFilter">🔽 筛选</view>
+      <text class="filter-hint" wx:if="{{selectedIngCat !== '全部'}}">{{selectedIngCat}}</text>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <scroll-view class="flex-1" scroll-y wx:if="{{isSearching}}">
+    <view wx:if="{{searchResults.length === 0}}" style="text-align:center;padding:60px;color:rgba(26,26,46,0.45)">
+      <text style="font-size:48px;display:block;margin-bottom:12px">🔍</text>
+      <text>没有找到相关菜谱</text>
+    </view>
+    <view class="result-item" wx:for="{{searchResults}}" wx:key="id" data-id="{{item.id}}" bindtap="viewRecipe">
+      <text class="r-emoji">{{item.coverEmoji}}</text>
+      <view class="r-info"><text class="r-name">{{item.name}}</text><text class="r-meta">{{item.category}} · ¥{{item.price || 0}}</text></view>
+      <text class="r-arrow">›</text>
+    </view>
+  </scroll-view>
+  <view class="search-back-bar" wx:if="{{isSearching}}">
+    <button class="btn-back-all" hover-class="btn-back-all-press" bindtap="clearSearch">← 返回全部</button>
+  </view>
+
+  <!-- 菜谱列表 -->
+  <scroll-view class="flex-1" scroll-y enhanced show-scrollbar="{{false}}" enable-flex wx:if="{{!isSearching}}">
+    <view class="recipe-grid-2col">
+      <view class="recipe-card" style="--hl:{{item.color}}" wx:for="{{displayRecipes}}" wx:key="id" data-id="{{item.id}}" bindtap="viewRecipe">
+        <view class="rc-img"><text class="rc-emoji">{{item.coverEmoji}}</text></view>
+        <view class="rc-info">
+          <text class="rc-name">{{item.name}}</text>
+          <view class="rc-meta"><text class="rc-price">¥{{item.price || 0}}</text><text class="rc-cat">{{item.category}}</text></view>
+          <text class="rc-actions" data-id="{{item.id}}" catchtap="quickCopy">📋 复刻</text>
+        </view>
+      </view>
+    </view>
+    <view style="height:80px"></view>
+  </scroll-view>
+</view>
+
+<!-- 自定义灵宠 - 下拉菜单便签风 -->
+<view class="modal-overlay {{showPetCustom ? 'show' : ''}}" bindtap="closePetCustom">
+  <view class="pet-menu" catchtap="preventClose" style="--th:{{themeMain}};--thd:{{themeDark}};--thl:{{themeLight}}">
+    <view class="pet-menu-hd"><text>🎨 自定义</text><view class="modal-close" bindtap="closePetCustom">X</view></view>
+
+    <!-- 当前灵宠预览 -->
+    <view class="pet-menu-row" style="padding:20rpx;justify-content:center">
+      <view class="pet-avatar">
+        <image wx:if="{{petFace}}" src="{{petFace}}" mode="aspectFill"></image>
+        <text wx:else style="font-size:56rpx">🐱</text>
+      </view>
+    </view>
+
+    <!-- 系统灵宠 -->
+    <view class="pet-menu-label">🐾 系统灵宠</view>
+    <view class="pet-menu-row">
+      <view class="pet-opt {{petFace === item ? 'active' : ''}}" hover-class="pet-opt-hover" wx:for="{{systemPets}}" wx:key="*this" data-src="{{item}}" bindtap="selectSystemPet">
+        <image src="{{item}}" mode="aspectFit" style="width:100%;height:100%"></image>
+      </view>
+    </view>
+
+    <!-- 自定义上传 -->
+    <view class="pet-menu-item" hover-class="pet-menu-item-hover" bindtap="pickPetFace">
+      <text>📸</text>
+      <text class="pet-menu-text">{{petFace ? '更换自拍' : '自定义上传'}}</text>
+      <text class="pet-menu-hint">1:1裁剪</text>
+    </view>
+
+    <view class="pet-menu-sep"></view>
+
+    <!-- 主题色 -->
+    <view class="pet-menu-label">🎨 页面主题色</view>
+    <view class="pet-menu-row">
+      <view class="pet-theme-chip {{themeColor === 'orange' ? 'active' : ''}}" hover-class="pet-theme-chip-hover" data-color="orange" bindtap="selectPetColor">
+        <view class="pet-theme-dot" style="background:#FF9A56"></view>
+      </view>
+      <view class="pet-theme-chip {{themeColor === 'pink' ? 'active' : ''}}" data-color="pink" bindtap="selectPetColor">
+        <view class="pet-theme-dot" style="background:#ff4997"></view>
+      </view>
+      <view class="pet-theme-chip {{themeColor === 'blue' ? 'active' : ''}}" data-color="blue" bindtap="selectPetColor">
+        <view class="pet-theme-dot" style="background:#4285f4"></view>
+      </view>
+      <view class="pet-theme-chip {{themeColor === 'green' ? 'active' : ''}}" data-color="green" bindtap="selectPetColor">
+        <view class="pet-theme-dot" style="background:#6bcb77"></view>
+      </view>
+      <view class="pet-theme-chip {{themeColor === 'purple' ? 'active' : ''}}" data-color="purple" bindtap="selectPetColor">
+        <view class="pet-theme-dot" style="background:#9C27B0"></view>
+      </view>
+    </view>
+
+    <view class="pet-menu-sep"></view>
+
+    <!-- 操作 -->
+    <view class="pet-btns">
+      <button class="btn-pet-reset" bindtap="resetPet">🔄 恢复默认</button>
+      <button class="btn-pet-save" bindtap="savePet">💾 保存灵宠</button>
+    </view>
+  </view>
+</view>
+
+<!-- 盲盒结果 - 主题便签 -->
+<view class="modal-overlay {{showBlindModal ? 'show' : ''}}" bindtap="closeBlindModal">
+  <view class="blind-note" catchtap="preventClose" style="--th:{{themeMain}};--thd:{{themeDark}};--thl:{{themeLight}}">
+    <view class="blind-note-hd"><text>🎲 今天吃这个！</text><view class="modal-close" bindtap="closeBlindModal">✕</view></view>
+    <view class="blind-note-bd">
+      <text class="blind-emoji">{{blindPick ? blindPick.coverEmoji : '🍽️'}}</text>
+      <text class="blind-name">{{blindPick ? blindPick.name : ''}}</text>
+      <view class="blind-modal-btns">
+        <button class="btn-blind-retry" bindtap="retryBlind">🎲 再抽一次</button>
+        <button class="btn-blind-detail" bindtap="viewBlindDetail">📋 查看详情</button>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 首次启动欢迎弹窗 - 粉色便签 -->
+<view class="modal-overlay {{showWelcomeModal ? 'show' : ''}}">
+  <view class="welcome-note" catchtap="preventClose">
+    <view class="welcome-note-hd"><text>欢迎来到食光 🍽️</text><view class="modal-close" bindtap="closeWelcomeModal">✕</view></view>
+    <view class="welcome-note-bd">
+      <text class="welcome-text">【给自己起个名字吧~】</text>
+      <input class="welcome-input" placeholder="美食家" value="{{welcomeNick}}" bindinput="onWelcomeNickInput" maxlength="8"/>
+      <button class="btn-welcome-go" bindtap="closeWelcomeModal">进入食光</button>
+    </view>
+  </view>
+</view>
+
+<!-- 食材筛选 - 主题便签 -->
+<view class="modal-overlay {{showFilter ? 'show' : ''}}" bindtap="closeFilter">
+  <view class="flt-menu" catchtap="preventClose" style="--th:{{themeMain}};--thd:{{themeDark}};--thl:{{themeLight}}">
+    <view class="flt-menu-hd"><text>🥬 食材分类</text><view class="modal-close" bindtap="closeFilter">✕</view></view>
+    <view class="flt-menu-row">
+      <view class="flt-menu-chip {{selectedIngCat === item ? 'active' : ''}}" hover-class="flt-menu-chip-hover" wx:for="{{['全部','肉类','海鲜','蔬菜','豆制品','水果','蛋奶类','谷物杂粮']}}" wx:key="*this" data-cat="{{item}}" bindtap="selectIngCat">{{item}}</view>
+    </view>
+    <view class="flt-menu-sep"></view>
+    <view class="flt-menu-row" style="gap:16rpx">
+      <view class="flt-menu-item" hover-class="flt-menu-item-hover" bindtap="resetFilters"><text>🔄 重置</text></view>
+      <view class="flt-menu-item primary" hover-class="flt-menu-item-primary-hover" bindtap="closeFilter"><text>✓ 完成</text></view>
+    </view>
+  </view>
+</view>
+
+<view class="float-food" style="left:8%;animation-delay:0s">🍕</view>
+<view class="float-food" style="left:30%;animation-delay:-6s">🍰</view>
+<view class="float-food" style="left:55%;animation-delay:-12s">🥘</view>
+<view class="float-food" style="left:78%;animation-delay:-18s">🍲</view>

@@ -1,0 +1,195 @@
+<!-- 新建/编辑菜谱 - 5步表单 -->
+<navigation-bar title="{{editId ? '编辑菜谱' : '新建菜谱'}}" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
+
+<view class="page">
+  <!-- ===== 步骤指示器 ===== -->
+  <view class="glass step-indicator">
+    <block wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:for-item="s">
+      <view class="step-wrapper" data-step="{{s}}" bindtap="goStep">
+        <view class="step-dot {{s < step ? 'done' : ''}} {{s === step ? 'active' : ''}}">
+          <text wx:if="{{s < step}}">✓</text>
+          <text wx:else>{{s}}</text>
+        </view>
+      </view>
+      <view class="step-line {{s < step ? 'done' : ''}}" wx:if="{{s < 5}}"></view>
+    </block>
+  </view>
+
+  <!-- ===== 表单内容滚动区 ===== -->
+  <scroll-view class="form-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+
+    <!-- 第1步：基本信息 -->
+    <view class="glass step-content" wx:if="{{step === 1}}">
+      <text class="step-title">📝 基本信息</text>
+
+      <view class="form-group">
+        <text class="form-label">菜谱名称 *</text>
+        <input class="form-input" placeholder="给你的菜起个名字吧~" value="{{form.name}}" bindinput="onNameInput" maxlength="30"/>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">分类标签 <text class="cat-mgr-btn" bindtap="openCatMgr">⚙️ 管理</text></text>
+        <view class="tag-picker">
+          <view class="tag-chip {{form.category === item.name ? 'selected' : ''}}"
+            wx:for="{{categories}}" wx:key="name" data-cat="{{item.name}}" bindtap="pickCategory">
+            {{item.name}}
+          </view>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">菜品定价 (¥)</text>
+        <input class="form-input" type="digit" placeholder="留空表示免费分享" value="{{form.price}}" bindinput="onPriceInput" style="width:160px"/>
+      </view>
+    </view>
+
+    <!-- 第2步：食材清单 -->
+    <view class="glass step-content" wx:if="{{step === 2}}">
+      <text class="step-title">🥬 食材清单</text>
+
+      <view class="ingredient-block" wx:for="{{form.ingredients}}" wx:key="index" wx:for-index="idx">
+        <view class="ing-header">
+          <text class="ing-num">#{{idx + 1}}</text>
+          <view class="ing-cat-picker">
+            <view
+              class="tag-chip sm {{cat === form.ingredients[idx].category ? 'selected' : ''}}"
+              wx:for="{{ingredientCategories}}"
+              wx:key="*this"
+              wx:for-item="cat"
+              data-index="{{idx}}"
+              data-cat="{{cat}}"
+              bindtap="pickIngCategory">
+              {{cat}}
+            </view>
+          </view>
+          <view class="ing-remove" data-index="{{idx}}" bindtap="removeIngredient">✕</view>
+        </view>
+        <view class="ing-row">
+          <input class="form-input" placeholder="食材名称" value="{{item.name}}" data-index="{{idx}}" bindinput="onIngNameInput" style="flex:2"/>
+          <input class="form-input" placeholder="用量(如:200g)" value="{{item.amount}}" data-index="{{idx}}" bindinput="onIngAmountInput" style="flex:1"/>
+        </view>
+      </view>
+
+      <button class="btn-add-row" bindtap="addIngredient">＋ 添加食材</button>
+    </view>
+
+    <!-- 第3步：烹饪步骤 -->
+    <view class="glass step-content" wx:if="{{step === 3}}">
+      <text class="step-title">👨‍🍳 烹饪步骤</text>
+      <text class="step-hint">分步描述烹饪过程，每步限500字</text>
+
+      <view class="step-block" wx:for="{{form.steps}}" wx:key="index" wx:for-index="idx" data-index="{{idx}}">
+        <view class="step-header">
+          <view class="step-badge">{{idx + 1}}</view>
+          <view class="step-actions">
+            <text class="step-btn" data-index="{{idx}}" bindtap="addStepImg">📷</text>
+            <text class="step-btn danger" data-index="{{idx}}" bindtap="removeStep">🗑️</text>
+          </view>
+        </view>
+
+        <!-- 步骤图片 -->
+        <view class="step-img-area" wx:if="{{item.img}}" data-index="{{idx}}">
+          <image class="step-img" src="{{item.img}}" mode="aspectFill"></image>
+          <view class="step-img-remove" data-index="{{idx}}" bindtap="removeStepImg">✕</view>
+        </view>
+
+        <textarea class="form-input step-textarea" placeholder="描述这一步..." value="{{item.text}}" data-index="{{idx}}" bindinput="onStepInput" maxlength="500"/>
+      </view>
+
+      <button class="btn-add-row" bindtap="addStep">＋ 添加步骤</button>
+    </view>
+
+    <!-- 第4步：参考资料 -->
+    <view class="glass step-content" wx:if="{{step === 4}}">
+      <text class="step-title">🔗 参考资料</text>
+      <text class="step-hint">添加参考链接或备注（选填）</text>
+
+      <view class="form-group">
+        <text class="form-label">参考链接</text>
+        <input class="form-input" placeholder="例如：https://..." value="{{form.reference}}" bindinput="onRefInput"/>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">备注说明</text>
+        <textarea class="form-input step-textarea" placeholder="其他补充说明..." value="{{form.notes}}" bindinput="onNotesInput" style="min-height:100px"/>
+      </view>
+    </view>
+
+    <!-- 第5步：封面与确认 -->
+    <view class="glass step-content" wx:if="{{step === 5}}">
+      <text class="step-title">🎉 封面与确认</text>
+
+      <!-- 封面图 -->
+      <view class="form-group">
+        <text class="form-label">菜品封面图</text>
+        <view class="cover-picker {{coverPreview ? 'has-img' : ''}}" bindtap="pickCover">
+          <image class="cover-picker-img" wx:if="{{coverPreview}}" src="{{coverPreview}}" mode="aspectFill"></image>
+          <block wx:else>
+            <text class="cover-picker-icon">📸</text>
+            <text style="font-size:13px;color:rgba(26,26,46,0.45)">点击上传封面图</text>
+          </block>
+        </view>
+        <view wx:if="{{coverPreview}}" style="text-align:center;margin-top:8px">
+          <text style="font-size:12px;color:#e74c3c" bindtap="removeCover">移除封面</text>
+        </view>
+      </view>
+
+      <!-- 预览摘要 -->
+      <view class="preview-card">
+        <text class="preview-name">{{form.name || '未命名菜谱'}}</text>
+        <view class="preview-meta">
+          <text class="tag-chip selected">{{form.category}}</text>
+          <text class="preview-price" wx:if="{{form.price}}">¥{{form.price}}</text>
+          <text class="preview-price free" wx:else>免费</text>
+        </view>
+        <view class="preview-stats">
+          <text>{{ingredientCount}} 种食材</text>
+          <text style="margin:0 8px">·</text>
+          <text>{{stepCount}} 个步骤</text>
+        </view>
+      </view>
+    </view>
+
+  </scroll-view>
+
+  <!-- ===== 底部操作栏（fixed固定） ===== -->
+  <view class="bottom-bar">
+    <button class="btn-draft" bindtap="saveAsDraft">📝 暂存草稿</button>
+    <view class="bottom-nav">
+      <button class="btn-nav prev" wx:if="{{step > 1}}" bindtap="prevStep">← 上一步</button>
+      <button class="btn-nav next" wx:if="{{step < maxStep}}" bindtap="nextStep">下一步 →</button>
+      <button class="btn-primary save-btn" wx:if="{{step === maxStep}}" bindtap="saveRecipe">
+        {{editId ? '💾 保存修改' : '✅ 创建菜谱'}}
+      </button>
+    </view>
+  </view>
+</view>
+
+<!-- 分类管理弹窗 - 蓝色便签 -->
+<view class="modal-overlay {{showCatMgr ? 'show' : ''}}" bindtap="closeCatMgr">
+  <view class="cat-note cat-note-blue" catchtap="preventClose">
+    <view class="cat-note-hd"><text>管理标签</text><view class="modal-close" bindtap="closeCatMgr">✕</view></view>
+    <view class="cat-note-bd">
+      <view class="cat-note-item" wx:for="{{categories}}" wx:key="name">
+        <text class="cat-note-name">{{item.name}}</text>
+        <view class="cat-note-acts">
+          <text data-index="{{index}}" bindtap="startEditCat">✏️</text>
+          <text data-index="{{index}}" bindtap="deleteCategory" style="color:#f85149" wx:if="{{!item.isSystem}}">✕</text>
+        </view>
+      </view>
+      <input class="cat-input" placeholder="新标签名(≤4字)" value="{{newCatName}}" bindinput="onNewCatInput" maxlength="4"/>
+      <button class="cat-note-add" bindtap="confirmAddCat">＋ 新建</button>
+    </view>
+  </view>
+</view>
+
+<!-- 改名弹窗 -->
+<view class="modal-overlay {{editingCat ? 'show' : ''}}" bindtap="cancelEditCat">
+  <view class="cat-note cat-note-blue" catchtap="preventClose">
+    <view class="cat-note-hd"><text>改名</text><view class="modal-close" bindtap="cancelEditCat">✕</view></view>
+    <view class="cat-note-bd">
+      <input class="cat-input" placeholder="新名字(≤4字)" value="{{editCatName}}" bindinput="onEditCatInput" maxlength="4"/>
+      <button class="cat-note-add" bindtap="confirmEditCat">确认</button>
+    </view>
+  </view>
+</view>

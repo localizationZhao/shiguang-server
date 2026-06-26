@@ -1,0 +1,10 @@
+<!-- 自定义像素风TabBar -->
+<view class="tab-bar">
+  <view class="tab-item {{selected === index ? 'active' : ''}}"
+    wx:for="{{list}}" wx:key="pagePath" wx:for-index="idx"
+    data-index="{{idx}}" bindtap="switchTab">
+    <image class="tab-icon-img" src="{{item.img}}"></image>
+    <view class="tab-text">{{item.text}}</view>
+    <view class="tab-line" wx:if="{{selected === index}}"></view>
+  </view>
+</view>

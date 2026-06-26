@@ -1,0 +1,1 @@
+interface IAppOption{globalData:{recipes:any[];categories:string[];pendingInviteCode?:string;userInfo:any;isLogin:boolean;systemInfo:any;needWelcome?:boolean}}

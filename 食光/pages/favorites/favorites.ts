@@ -1,0 +1,2 @@
+import { getFavorites, removeFavorite } from '../../utils/storage'
+Page({data:{favorites:[]},onShow(){this.setData({favorites:getFavorites()})},viewDetail(e){wx.navigateTo({url:'/pages/recipe-detail/recipe-detail?id='+e.currentTarget.dataset.id})},removeFav(e){const id=e.currentTarget.dataset.id;removeFavorite(id);this.setData({favorites:getFavorites()});wx.showToast({title:'已取消收藏',icon:'none'})}})

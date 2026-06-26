@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pocket Bird 便签设计提取 — 食光小程序参考</title>
+<style>@font-face{font-family:Monocraft;src:url(https://cdn.jsdelivr.net/gh/idreesinc/Monocraft@99b32ab40612ff2533a69d8f14bd8b3d9e604456/dist/Monocraft.otf) format("opentype")}
+body{font-family:'PingFang SC',system-ui;max-width:900px;margin:40px auto;padding:20px;background:#1a1a2e;color:#e0e0e0;line-height:1.8}
+h1{color:#ff8baa;text-align:center}
+h2{color:#79bcff;border-bottom:1px solid #333;padding-bottom:8px;margin-top:40px}
+h3{color:#ffb37c;margin-top:20px}
+.card{background:#252540;border-radius:12px;padding:20px;margin:16px 0;border:1px solid #333}
+pre{background:#0d1117;color:#7ee787;padding:14px;border-radius:8px;overflow-x:auto;font-size:0.85em;max-height:400px;overflow-y:auto}
+.color-box{display:inline-block;width:20px;height:20px;border-radius:4px;margin-right:6px;vertical-align:middle}
+table{width:100%;border-collapse:collapse;margin:12px 0}
+th,td{border:1px solid #30363d;padding:10px 14px;text-align:left}
+th{background:#21262d;color:#79c0ff}
+
+/* ===== 实际便签预览 ===== */
+:root{--border:2px}
+.sticky-preview{padding:24px;background:linear-gradient(180deg,#66b0ff,#bfbbff);border-radius:16px;margin:20px 0}
+.sticky-columns{display:flex;gap:20px;align-items:flex-start}
+.sticky-col{flex:1;display:flex;flex-direction:column;gap:20px}
+.sticky-col.offset{margin-top:30px}
+.sticky-note{background:var(--bg);position:relative;border-radius:2px;box-shadow:var(--border) 0 var(--hl),calc(var(--border)*-1) 0 var(--hl),0 calc(var(--border)*-1) var(--hl),0 var(--border) var(--hl),calc(var(--border)*2) 0 var(--hl),calc(var(--border)*-2) 0 var(--hl),0 calc(var(--border)*-2) var(--hl),0 calc(var(--border)*2) var(--hl),0 0 0 var(--border) var(--hl),0 0 0 calc(var(--border)*2) #fff,calc(var(--border)*2) 0 0 var(--border) #fff,calc(var(--border)*-2) 0 0 var(--border) #fff,0 calc(var(--border)*-2) 0 var(--border) #fff,0 calc(var(--border)*2) 0 var(--border) #fff;transition:.15s}
+.sticky-note:hover{transform:scale(1.03);filter:drop-shadow(0 8px 5px rgba(0,0,0,.15))}
+.sticky-hd{font-family:Monocraft,monospace;background:var(--hl);padding:3px 30px;text-align:center;font-size:14px;font-weight:bold;color:var(--bg);position:relative}
+.sticky-bd{font-family:Monocraft,monospace;padding:12px 16px;color:#3f2c15;font-size:13px;line-height:1.6}
+.sticky-bd img{max-width:100%;border-radius:10px}
+.sticky-bd h3{color:#5a4a36;font-size:14px;margin:8px 0}
+.sticky-bd ul{padding-left:1.2em}
+
+/* 5种配色 */
+.n1{--hl:#ff8baa;--bg:#ffecda}
+.n2{--hl:#79bcff;--bg:#ffecda}
+.n3{--hl:#ffb37c;--bg:#ffecda}
+.n4{--hl:#d18bff;--bg:#ffecda}
+.n5{--hl:#6de192;--bg:#ffecda}
+</style>
+</head>
+<body>
+
+<h1>🎨 Pocket Bird 便签设计提取</h1>
+<p style="text-align:center;color:#8b949e">供「食光」小程序参考 · 像素风毛玻璃便签卡片</p>
+
+<!-- ===== 实际效果预览 ===== -->
+<h2>📦 实际效果预览</h2>
+<div class="sticky-preview">
+  <div class="sticky-columns">
+    <div class="sticky-col">
+      <div class="sticky-note n1">
+        <div class="sticky-hd">Pocket Bird</div>
+        <div class="sticky-bd">
+          <p>🖼️ 图片区域（可放菜品封面）</p>
+          <p>内容区域：菜谱简介、食材清单等</p>
+        </div>
+      </div>
+      <div class="sticky-note n2">
+        <div class="sticky-hd">FAQ</div>
+        <div class="sticky-bd"><p>常见问题、做菜贴士</p></div>
+      </div>
+      <div class="sticky-note n3">
+        <div class="sticky-hd">联系方式</div>
+        <div class="sticky-bd"><p>评论区、打分、分享</p></div>
+      </div>
+    </div>
+    <div class="sticky-col offset">
+      <div class="sticky-note n4">
+        <div class="sticky-hd">Features</div>
+        <div class="sticky-bd">
+          <p>🖼️ 图片区域</p>
+          <ul><li>功能列表项</li><li>标签、分类</li></ul>
+        </div>
+      </div>
+      <div class="sticky-note n5">
+        <div class="sticky-hd">评论区</div>
+        <div class="sticky-bd"><p>用户评论、感受分享</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 5套配色 ===== -->
+<h2>🎨 5套配色方案</h2>
+<div class="card">
+  <table>
+    <tr><th>#</th><th>高亮色(标题栏)</th><th>底色(内容区)</th><th>用途</th></tr>
+    <tr><td>1</td><td><span class="color-box" style="background:#ff8baa"></span> #ff8baa 粉</td><td><span class="color-box" style="background:#ffecda"></span> #ffecda 奶油</td><td>主菜谱展示</td></tr>
+    <tr><td>2</td><td><span class="color-box" style="background:#79bcff"></span> #79bcff 蓝</td><td><span class="color-box" style="background:#ffecda"></span> #ffecda 奶油</td><td>问题/FAQ</td></tr>
+    <tr><td>3</td><td><span class="color-box" style="background:#ffb37c"></span> #ffb37c 橘</td><td><span class="color-box" style="background:#ffecda"></span> #ffecda 奶油</td><td>联系/分享</td></tr>
+    <tr><td>4</td><td><span class="color-box" style="background:#d18bff"></span> #d18bff 紫</td><td><span class="color-box" style="background:#ffecda"></span> #ffecda 奶油</td><td>功能列表</td></tr>
+    <tr><td>5</td><td><span class="color-box" style="background:#6de192"></span> #6de192 绿</td><td><span class="color-box" style="background:#ffecda"></span> #ffecda 奶油</td><td>评论区</td></tr>
+  </table>
+  <p style="color:#8b949e;font-size:0.9em">所有便签共用奶油色底 #ffecda，通过切换标题栏颜色区分便签类型。</p>
+</div>
+
+<!-- ===== HTML结构 ===== -->
+<h2>🏗️ HTML 结构</h2>
+<div class="card">
+<pre>&lt;div class="sticky-columns"&gt;                    ← 总容器
+  &lt;div class="sticky-col"&gt;                      ← 左列
+    &lt;div class="sticky-note"&gt;                   ← 单张便签
+      &lt;div class="sticky-hd"&gt;标题&lt;/div&gt;         ← 彩色标题栏
+      &lt;div class="sticky-bd"&gt;                    ← 奶油色内容区
+        图片、文字、列表…
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="sticky-col offset"&gt;              ← 右列（offset = 错位下沉）
+    …
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+</div>
+
+<!-- ===== CSS核心 ===== -->
+<h2>💡 CSS 核心技巧</h2>
+<div class="card">
+  <h3>1. 右上角像素 x 关闭按钮</h3>
+  <p>就是标题栏里一个小小的 <strong>x</strong>。Monocraft 像素字体让它自带锯齿感，不需要图片：</p>
+  <pre>.sticky-close {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  padding: 0 5px;
+  color: var(--bg);           /* 和标题栏同色 → 变成反白效果 */
+  font-family: Monocraft;     /* 像素字体 → x 带锯齿 */
+  font-size: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+.sticky-close:hover {
+  transform: scale(1.1);      /* 悬浮微微放大 */
+}</pre>
+  <p style="color:#8b949e">原理：x 就是个普通文字，放在彩色标题栏里，颜色设成底色(=反白)。像素字体让它看起来像画上去的。小程序里改成 <code>font-family: Monocraft, monospace</code> 同样效果。</p>
+
+  <h3>2. 像素风双层边框（box-shadow 技法）</h3>
+  <p>用多重 box-shadow 实现像素感粗边框 + 白色间隙，不是普通的 border：</p>
+  <pre>/* --border = 2px, --hl = 标题栏颜色 */
+box-shadow:
+  2px 0 var(--hl), -2px 0 var(--hl),  /* 左右彩色内层 */
+  0 -2px var(--hl), 0 2px var(--hl),  /* 上下彩色内层 */
+  4px 0 var(--hl), -4px 0 var(--hl),  /* 左右彩色外层 */
+  0 -4px var(--hl), 0 4px var(--hl),  /* 上下彩色外层 */
+  0 0 0 2px var(--hl),                 /* 缝隙填充 */
+  0 0 0 4px #fff,                      /* 白色间隙 */
+  4px 0 0 2px #fff, -4px 0 0 2px #fff, /* 左右白色…… */
+  …</pre>
+
+  <h3>3. CSS变量换色</h3>
+  <p>5种配色不用写5份CSS，只改两个变量：</p>
+  <pre>.n1 { --hl: #ff8baa; --bg: #ffecda; }  /* 粉 */
+.n2 { --hl: #79bcff; --bg: #ffecda; }  /* 蓝 */
+.n3 { --hl: #ffb37c; --bg: #ffecda; }  /* 橘 */
+.n4 { --hl: #d18bff; --bg: #ffecda; }  /* 紫 */
+.n5 { --hl: #6de192; --bg: #ffecda; }  /* 绿 */</pre>
+
+  <h3>3. 悬浮效果</h3>
+  <pre>.sticky-note:hover {
+  transform: scale(1.03);                          /* 微微放大 */
+  filter: drop-shadow(0 8px 5px rgba(0,0,0,.15)); /* 投影浮起 */
+}</pre>
+</div>
+
+<!-- ===== 适配小程序 ===== -->
+<h2>🔧 适配食光小程序</h2>
+<div class="card">
+  <table>
+    <tr><th>原版</th><th>改为</th></tr>
+    <tr><td>px 单位</td><td>rpx 单位（小程序适配）</td></tr>
+    <tr><td>box-shadow 像素边框</td><td>保持（小程序支持）</td></tr>
+    <tr><td>CSS变量 --hl / --bg</td><td>保持（小程序支持）</td></tr>
+    <tr><td>filter drop-shadow</td><td>box-shadow 替代（更兼容）</td></tr>
+    <tr><td>Monocraft 像素字体</td><td>系统默认字体 / PingFang SC</td></tr>
+    <tr><td>flex + gap</td><td>保持</td></tr>
+  </table>
+</div>
+
+<!-- ===== 毛玻璃透明原理 ===== -->
+<h2>🪟 附：日志/评论区的毛玻璃透明是怎么做到的</h2>
+<div class="card">
+  <p>Pocket Bird 商店页面的 Devlog 和 Comments 区域是<strong>半透明毛玻璃效果</strong>。核心就一行：</p>
+  <pre>.footer, .game_devlog, .game_comments_widget, .uploads {
+  background: rgba(187, 210, 255, 0.15);     /* 淡蓝 · 仅15%不透明 */
+  backdrop-filter: blur(10px);               /* 背景模糊 10px */
+  -webkit-backdrop-filter: blur(10px);       /* Safari/小程序兼容 */
+  border-radius: 25px;
+}</pre>
+
+  <h3>原理</h3>
+  <table>
+    <tr><th>步骤</th><th>发生了什么</th></tr>
+    <tr><td>1</td><td>页面背景是渐变天空（蓝色→紫色）</td></tr>
+    <tr><td>2</td><td><code>backdrop-filter: blur(10px)</code> 把后面像素模糊</td></tr>
+    <tr><td>3</td><td><code>rgba(187,210,255, 0.15)</code> 盖一层薄薄淡蓝</td></tr>
+    <tr><td>4</td><td>你看到 → 半透明毛玻璃，能看到背后图片但看不清</td></tr>
+  </table>
+
+  <h3>你的食光小程序已经在用了</h3>
+  <p><code>app.wxss</code> 里的 <code>.glass</code> 就是完全一样的原理：</p>
+  <pre>/* 食光 — 你已经有的代码 */
+.glass {
+  background: rgba(255, 255, 255, 0.25);     /* 白色 · 25%不透明 */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 25px;
+}</pre>
+  <p style="color:#8b949e">Pocket Bird 用淡蓝（<code>rgba(187,210,255,0.15)</code>），食光用白色（<code>rgba(255,255,255,0.25)</code>）。换颜色就能变风格。</p>
+</div>
+
+<!-- ===== 云朵背景 ===== -->
+<h2>☁️ 云朵背景是怎么做到的</h2>
+<div class="card">
+  <p>页面背景不是纯色，而是一张<strong>像素风天空插图</strong>，通过 base64 直接写在 CSS 里：</p>
+  <pre>html {
+  /* 渐变色打底 */
+  background: linear-gradient(180deg, #66b0ff, #bfbbff);
+  /* 云朵图片盖在上面 */
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAA...");
+  background-attachment: fixed;  /* 滚动时背景不动 */
+  background-size: cover;
+  background-position: bottom;
+  image-rendering: pixelated;    /* 像素风不模糊 */
+}</pre>
+
+  <h3>三层叠加</h3>
+  <table>
+    <tr><th>层</th><th>是什么</th><th>CSS</th></tr>
+    <tr><td>1. 底色</td><td>天蓝→淡紫渐变</td><td><code>linear-gradient(180deg, #66b0ff, #bfbbff)</code></td></tr>
+    <tr><td>2. 云朵</td><td>base64像素画</td><td><code>background-image: url(data:image/png;base64,...)</code></td></tr>
+    <tr><td>3. 固定</td><td>滚动不跟走</td><td><code>background-attachment: fixed</code></td></tr>
+  </table>
+
+  <p style="color:#8b949e;font-size:0.9em">云朵就是一张PNG图片转成了字符串。小程序同样支持 <code>background-image</code> + base64。</p>
+</div>
+
+<!-- ===== 悬浮感 ===== -->
+<h2>🪄 "所有部件都悬浮"是怎么做到的</h2>
+<div class="card">
+  <p>不是真的悬浮，是<strong>毛玻璃把前景和背景分离开了</strong>。大脑看到模糊的背景 + 清晰的前景 → 自动判断"这个东西浮在上面"。</p>
+
+  <h3>三个因素叠加</h3>
+  <table>
+    <tr><th>因素</th><th>代码</th><th>效果</th></tr>
+    <tr>
+      <td>毛玻璃</td>
+      <td><code>backdrop-filter: blur(10px)</code></td>
+      <td>背景模糊 → 前景"脱离"背景</td>
+    </tr>
+    <tr>
+      <td>半透明底色</td>
+      <td><code>background: rgba(255,255,255,0.25)</code></td>
+      <td>能看到背后 → 不是死板的白块</td>
+    </tr>
+    <tr>
+      <td>投影</td>
+      <td><code>filter: drop-shadow(0 8px 5px rgba(0,0,0,0.15))</code></td>
+      <td>下方有阴影 → 确认"浮起来了"</td>
+    </tr>
+  </table>
+
+  <h3>悬浮感的本质</h3>
+  <pre>┌─────────────────────────┐
+│ ☁️ 云朵背景（模糊的）    │  ← 被 blur 模糊了
+│  ┌─────────────────┐    │
+│  │ 便签卡片（清晰的）│    │  ← 不受 blur 影响
+│  │ 还有投影 ↓      │    │
+│  └─────────────────┘    │
+│         ░░░░░░ 阴影      │  ← drop-shadow
+└─────────────────────────┘</pre>
+  <p>你的食光小程序已经具备全部三个条件了——<code>.glass</code> 类就是毛玻璃。</p>
+</div>
+
+</body>
+</html>

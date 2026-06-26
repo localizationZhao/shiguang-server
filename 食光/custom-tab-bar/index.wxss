@@ -1,0 +1,49 @@
+/* ===== 像素风TabBar ===== */
+.tab-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+  height: 130rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #ffffff;
+  border-top: 6rpx solid #e8ecf2;
+  display: flex; justify-content: space-around; align-items: center;
+  box-shadow: 0 -4rpx 24rpx rgba(0,0,0,0.05);
+}
+
+.tab-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4rpx; position: relative;
+  padding-top: 8rpx;
+  transition: transform .15s;
+}
+.tab-item:active {
+  transform: scale(.92) translateY(4rpx);
+}
+
+/* 像素图标 */
+.tab-icon-img {
+  width: 48rpx; height: 48rpx;
+  image-rendering: pixelated;  /* 像素风不模糊 */
+  transition: all .2s;
+}
+
+/* 文字 */
+.tab-text {
+  font-size: 24rpx; font-weight: 600;
+  color: #99a2b5;
+  letter-spacing: 2rpx;
+  transition: all .2s;
+}
+
+/* ===== 选中态 ===== */
+.tab-item.active {
+  background: rgba(255,73,151,0.1);
+}
+.tab-item.active .tab-icon-img {
+  width: 56rpx; height: 56rpx;
+  transform: translateY(-6rpx);
+}
+.tab-item.active .tab-text {
+  font-size: 26rpx; font-weight: 800;
+  color: #ff4997;
+}

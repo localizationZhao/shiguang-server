@@ -1,0 +1,1 @@
+# 食光·美食创作与社交平台\n\n微信小程序 + Node.js 全栈项目\n\n## 结构\n- miniprogram/ - 前端\n- server/ - 后端API\n\n## 启动后端\ncd server && npm install && npm start\n\n## 风格\nPocket Bird 毛玻璃 + 渐变天空

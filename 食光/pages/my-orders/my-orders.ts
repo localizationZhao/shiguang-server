@@ -1,0 +1,2 @@
+import { getOrders } from '../../utils/storage'
+Page({data:{orders:[] as any[],filter:'all'},onShow(){this.setData({orders:getOrders()})},filterOrders(e){this.setData({filter:e.currentTarget.dataset.filter})},viewDetail(e){wx.navigateTo({url:'/pages/order-detail/order-detail?id='+e.currentTarget.dataset.id})}})

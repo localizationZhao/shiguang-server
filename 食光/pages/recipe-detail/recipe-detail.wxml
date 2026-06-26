@@ -1,0 +1,111 @@
+<!-- 菜谱详情页 -->
+<navigation-bar title="{{recipe ? recipe.name : '菜谱详情'}}" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
+
+<scroll-view class="detail-page" scroll-y enhanced show-scrollbar="{{false}}" wx:if="{{recipe}}">
+
+  <!-- 封面图 -->
+  <view class="cover-wrap">
+    <image wx:if="{{recipe.coverImg}}" src="{{recipe.coverImg}}" mode="aspectFill" class="cover-img" bindtap="previewImg" data-src="{{recipe.coverImg}}"></image>
+    <view wx:else class="cover-placeholder">
+      <text class="cover-emoji">{{recipe.coverEmoji || '🍽️'}}</text>
+    </view>
+  </view>
+
+  <!-- 基本信息卡片 -->
+  <view class="card">
+    <text class="info-name">{{recipe.name}}</text>
+    <view class="info-tags">
+      <text class="tag primary" wx:if="{{isPublic}}">📚 公共菜谱</text>
+      <text class="tag primary" wx:else>👨‍🍳 DIY</text>
+      <text class="tag">{{recipe.category}}</text>
+    </view>
+    <view class="info-price-row">
+      <text class="info-price {{recipe.price ? '' : 'free'}}">{{recipe.price ? '¥' + recipe.price : '免费分享'}}</text>
+      <text class="info-date">{{recipe.createdAt}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="card action-row">
+    <view class="action-item" bindtap="toggleFavorite">
+      <text class="action-icon">{{faved ? '❤️' : '🤍'}}</text>
+      <text class="action-label">{{faved ? '已收藏' : '收藏'}}</text>
+    </view>
+    <view class="action-item" wx:if="{{isPublic}}" bindtap="copyToDIY">
+      <text class="action-icon">📋</text>
+      <text class="action-label">一键复刻</text>
+    </view>
+    <view class="action-item" bindtap="shareRecipe">
+      <text class="action-icon">📤</text>
+      <text class="action-label">分享</text>
+    </view>
+    <view class="action-item" wx:if="{{!isPublic}}" bindtap="editRecipe">
+      <text class="action-icon">✏️</text>
+      <text class="action-label">编辑</text>
+    </view>
+  </view>
+
+  <!-- 食材清单 -->
+  <view class="card">
+    <text class="section-hd">🥬 食材清单</text>
+    <view class="ing-list" wx:if="{{recipe.ingredients.length > 0}}">
+      <view class="ing-row" wx:for="{{recipe.ingredients}}" wx:key="name">
+        <view class="ing-left">
+          <text class="ing-cat" wx:if="{{item.category}}">{{item.category}}</text>
+          <text class="ing-name">{{item.name}}</text>
+        </view>
+        <text class="ing-amount">{{item.amount}}</text>
+      </view>
+    </view>
+    <view wx:else class="no-data">暂无食材信息</view>
+  </view>
+
+  <!-- 烹饪步骤 -->
+  <view class="card">
+    <text class="section-hd">👨‍🍳 烹饪步骤</text>
+    <view class="step-list" wx:if="{{recipe.steps.length > 0}}">
+      <view class="step-row" wx:for="{{recipe.steps}}" wx:key="index">
+        <view class="step-num">{{index + 1}}</view>
+        <view class="step-body">
+          <text class="step-text">{{item.text}}</text>
+          <image wx:if="{{item.img}}" src="{{item.img}}" mode="aspectFill" class="step-img" bindtap="previewImg" data-src="{{item.img}}"></image>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="no-data">暂无烹饪步骤</view>
+  </view>
+
+  <!-- 参考资料 -->
+  <view class="card" wx:if="{{recipe.reference || recipe.notes}}">
+    <text class="section-hd">🔗 参考资料</text>
+    <text class="ref-text" wx:if="{{recipe.reference}}">{{recipe.reference}}</text>
+    <text class="ref-text" wx:if="{{recipe.notes}}">💬 {{recipe.notes}}</text>
+  </view>
+
+</scroll-view>
+
+<!-- 空状态 -->
+<view class="empty-state" wx:if="{{!recipe}}">
+  <text style="font-size:100rpx">🔍</text>
+  <text class="empty-text">菜谱不存在或已被删除</text>
+</view>
+
+<!-- 导出/分享弹窗 - 像素风绿色主题 -->
+<view class="export-overlay {{showExport ? 'show' : ''}}" bindtap="closeExport">
+  <view class="export-window" catchtap="preventClose">
+    <view class="export-hd">
+      <text class="export-title">📤 Share & Export</text>
+      <view class="export-close" bindtap="closeExport">✕</view>
+    </view>
+    <view class="export-bd">
+      <view class="ex-menu-item" hover-class="ex-menu-active" bindtap="shareToChat"><text class="ex-mi-icon">💬</text><text>选择聊天</text></view>
+      <view class="ex-menu-item" hover-class="ex-menu-active" bindtap="copyLink"><text class="ex-mi-icon">🔗</text><text>复制链接</text></view>
+      <view class="ex-menu-item" hover-class="ex-menu-active" bindtap="exportAsText"><text class="ex-mi-icon">📋</text><text>纯文字列表</text></view>
+      <view class="ex-menu-item" hover-class="ex-menu-active" bindtap="exportAsImage"><text class="ex-mi-icon">🖼️</text><text>以长图导出</text></view>
+      <view class="ex-menu-item" hover-class="ex-menu-active" bindtap="exportAsSQL"><text class="ex-mi-icon">🗄️</text><text>以SQL导出</text></view>
+    </view>
+  </view>
+</view>
+
+<!-- 隐藏canvas用于导出图片 -->
+<canvas canvas-id="exportCanvas" style="position:fixed;left:-9999px;width:600px;height:2000px"></canvas>

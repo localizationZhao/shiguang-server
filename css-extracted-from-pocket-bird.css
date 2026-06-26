@@ -1,0 +1,112 @@
+﻿/* ================================
+   从 Pocket Bird 提取的 CSS 样式
+   适合菜谱小程序使用的风格
+   by Codex
+   ================================ */
+
+/* --- 1. 🎨 CSS 变量（主色调） --- */
+:root {
+  --c-primary: #ff4997;
+  --c-primary-shadow: #ea3482;
+  --c-primary-text: #ffffff;
+  --c-bg-card: rgba(187, 210, 255, 0.15);
+  --c-bg-soft: #e5e5e5;
+  --c-text: #000000;
+  --c-text-link: #000000;
+  --c-border: #d8d8d8;
+  --c-sky-top: #66b0ff;
+  --c-sky-bottom: #bfbbff;
+}
+
+/* --- 2. 🌤️ 渐变天空背景 --- */
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(180deg, var(--c-sky-top), var(--c-sky-bottom));
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: bottom;
+}
+
+/* --- 3. 🪟 毛玻璃卡片（核心亮点） --- */
+.glass-card {
+  background: rgba(187, 210, 255, 0.15);
+  border-radius: 25px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  color: var(--c-text);
+}
+
+/* 偏白的毛玻璃变体 */
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 25px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  padding: 20px;
+}
+
+/* --- 4. 🧩 按钮（粉红活泼风） --- */
+.btn {
+  display: inline-block;
+  background-color: var(--c-primary);
+  color: var(--c-primary-text);
+  text-shadow: 0 1px 0px var(--c-primary-shadow);
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.btn:hover { transform: scale(1.03); }
+.btn:active { transform: scale(0.97); }
+
+/* --- 5. 标题 & 链接 --- */
+h1, h2, h3 { font-weight: bold; margin-top: 0; }
+a { color: var(--c-text-link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* --- 6. 选中颜色（粉色） --- */
+::selection {
+  color: #ffffff;
+  background: var(--c-primary);
+}
+
+/* --- 7. 🍳 菜谱卡片专属 --- */
+.recipe-card {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 25px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+}
+
+.recipe-card img {
+  border-radius: 16px;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.recipe-tag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-size: 14px;
+  backdrop-filter: blur(4px);
+}
+
+/* --- 8. 响应式 --- */
+@media (max-width: 600px) {
+  body { padding: 12px; }
+  .glass-card, .glass-card-light, .recipe-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+}

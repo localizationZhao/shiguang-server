@@ -1,0 +1,8 @@
+{
+  "name": "shiguang",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "server": "cd server && node app.js"
+  }
+}

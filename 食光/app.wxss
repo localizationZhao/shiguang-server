@@ -1,0 +1,149 @@
+/* 食光 - 像素便签风全局样式 */
+
+page {
+  --hl: #ffa3cb;
+  --bg: #ffecda;
+  --border: 4rpx;
+  --neg-border: -4rpx;
+  --gap: 20rpx;
+
+  font-family: -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  background: linear-gradient(180deg, #66b0ff, #bfbbff);
+  background-attachment: fixed;
+  color: #3f2c15;
+  font-size: 28rpx;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+/* ===== 像素双层边框卡片 ===== */
+.card {
+  background: var(--bg);
+  position: relative;
+  box-shadow:
+    var(--border) 0 var(--hl), var(--neg-border) 0 var(--hl),
+    0 calc(var(--neg-border)) var(--hl), 0 var(--border) var(--hl),
+    calc(var(--border)*2) 0 var(--hl), calc(var(--neg-border)*2) 0 var(--hl),
+    0 calc(var(--neg-border)*2) var(--hl), 0 calc(var(--border)*2) var(--hl),
+    0 0 0 var(--border) var(--hl),
+    0 0 0 calc(var(--border)*2) #fff,
+    calc(var(--border)*2) 0 0 var(--border) #fff,
+    calc(var(--neg-border)*2) 0 0 var(--border) #fff,
+    0 calc(var(--neg-border)*2) 0 var(--border) #fff,
+    0 calc(var(--border)*2) 0 var(--border) #fff;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+/* 卡片彩色标题栏 */
+.card-hd {
+  background: var(--hl);
+  color: var(--bg);
+  text-align: center;
+  padding: 6rpx 30rpx;
+  font-weight: bold;
+  margin: -24rpx -24rpx 16rpx -24rpx;
+  border-radius: 0;
+}
+
+/* ===== 按钮 ===== */
+.btn {
+  padding: 12rpx 28rpx;
+  font-family: -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  font-size: 26rpx; font-weight: 700;
+  border: none;
+  color: var(--bg);
+  background: var(--hl);
+  box-shadow:
+    var(--border) 0 var(--hl), var(--neg-border) 0 var(--hl),
+    0 var(--neg-border) var(--hl), 0 var(--border) var(--hl);
+  cursor: pointer;
+}
+.btn:active { opacity: 0.8; transform: scale(0.97); }
+
+.btn-outline {
+  background: var(--bg);
+  color: var(--hl);
+  box-shadow:
+    var(--border) 0 var(--hl), var(--neg-border) 0 var(--hl),
+    0 var(--neg-border) var(--hl), 0 var(--border) var(--hl);
+}
+
+/* ===== 输入框 ===== */
+.input {
+  width: 100%; height: 76rpx; line-height: 1.5;
+  padding: 0 20rpx;
+  border: 3rpx solid var(--hl);
+  font-family: -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  font-size: 26rpx;
+  background: var(--bg);
+  color: #3f2c15;
+  box-sizing: border-box;
+}
+.input:focus { outline: none; }
+
+/* ===== 标签/芯片 ===== */
+.chip {
+  display: inline-flex;
+  padding: 8rpx 20rpx;
+  font-family: -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  font-size: 24rpx;
+  background: var(--bg);
+  border: 2rpx solid var(--hl);
+  color: rgba(63,44,21,0.6);
+}
+.chip.active {
+  background: var(--hl);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+/* ===== 弹窗遮罩 ===== */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); z-index: 1000;
+  justify-content: center; align-items: center;
+  padding: 0 40rpx;
+}
+.modal-overlay.show { display: flex; }
+.modal-sheet {
+  background: var(--bg);
+  width: 100%; max-width: 600rpx; max-height: 70vh; overflow-y: auto;
+  box-shadow:
+    var(--border) 0 var(--hl), var(--neg-border) 0 var(--hl),
+    0 calc(var(--neg-border)) var(--hl), 0 var(--border) var(--hl),
+    calc(var(--border)*2) 0 var(--hl), calc(var(--neg-border)*2) 0 var(--hl),
+    0 calc(var(--neg-border)*2) var(--hl), 0 calc(var(--border)*2) var(--hl),
+    0 0 0 var(--border) var(--hl),
+    0 0 0 calc(var(--border)*2) #fff,
+    calc(var(--border)*2) 0 0 var(--border) #fff,
+    calc(var(--neg-border)*2) 0 0 var(--border) #fff,
+    0 calc(var(--neg-border)*2) 0 var(--border) #fff,
+    0 calc(var(--border)*2) 0 var(--border) #fff;
+  animation: fadeUp .25s ease;
+}
+.modal-hd {
+  background: var(--hl); color: var(--bg);
+  padding: 14rpx 30rpx; text-align: center;
+  font-weight: bold; font-size: 28rpx;
+}
+.modal-body { padding: 28rpx 32rpx; }
+
+/* ===== 飘落食物（精简） ===== */
+.float-food{position:fixed;font-size:44rpx;z-index:0;opacity:0.35;pointer-events:none;animation:foodX 18s ease-in-out infinite,foodY 20s ease-in-out infinite,foodFall 24s linear infinite}
+@keyframes foodX{0%,100%{transform:translateX(0)}50%{transform:translateX(60rpx)}}
+@keyframes foodY{0%,50%,100%{margin-top:0}25%,75%{margin-top:40rpx}}
+@keyframes foodFall{0%{top:-120rpx}100%{top:105vh}}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(60rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16rpx; padding: 80rpx 40rpx;
+  color: rgba(63,44,21,0.4);
+}
