@@ -114,6 +114,36 @@ app.get('/api/restaurants/by-code/:code', async (req, res) => {
   } catch (e) { res.json({ code: -1, msg: e.message }) }
 })
 
+// 餐厅菜单（通过邀请码）
+app.get('/api/restaurants/menu-by-code/:code', async (req, res) => {
+  try {
+    const [rest] = await pool.query('SELECT id FROM restaurants WHERE invite_code=?', [req.params.code])
+    if (!rest[0]) return res.json({ code: 0, data: [] })
+    const [r] = await pool.query('SELECT * FROM restaurant_menu WHERE restaurant_id=? AND on_shelf=1', [rest[0].id])
+    res.json({ code: 0, data: r })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+app.post('/api/restaurants/menu-by-code/:code', async (req, res) => {
+  try {
+    const [rest] = await pool.query('SELECT id FROM restaurants WHERE invite_code=?', [req.params.code])
+    if (!rest[0]) return res.json({ code: -1, msg: 'not found' })
+    const { recipeId, name, price, emoji } = req.body
+    await pool.query('REPLACE INTO restaurant_menu (restaurant_id, recipe_id, name, price, emoji, on_shelf) VALUES (?,?,?,?,?,1)',
+      [rest[0].id, recipeId, name, price, emoji])
+    res.json({ code: 0, msg: 'ok' })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+app.delete('/api/restaurants/menu-by-code/:code/:recipeId', async (req, res) => {
+  try {
+    const [rest] = await pool.query('SELECT id FROM restaurants WHERE invite_code=?', [req.params.code])
+    if (!rest[0]) return res.json({ code: -1, msg: 'not found' })
+    await pool.query('DELETE FROM restaurant_menu WHERE restaurant_id=? AND recipe_id=?', [rest[0].id, req.params.recipeId])
+    res.json({ code: 0, msg: 'ok' })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
 app.get('/api/orders', async (req, res) => {
   try { const [r] = await pool.query('SELECT * FROM orders ORDER BY created_at DESC'); res.json({ code: 0, data: r }) }
   catch (e) { res.json({ code: -1, msg: e.message }) }
