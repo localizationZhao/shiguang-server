@@ -153,7 +153,7 @@ app.get('/api/orders', async (req, res) => {
       restId = rest[0]?.id || 0
     }
     let sql = 'SELECT * FROM orders'
-    let params: any[] = []
+    let params = []
     if (restId) { sql += ' WHERE restaurant_id=?'; params.push(restId) }
     sql += ' ORDER BY created_at DESC'
     const [r] = await pool.query(sql, params)
