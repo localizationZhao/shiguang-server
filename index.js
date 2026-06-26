@@ -145,15 +145,35 @@ app.delete('/api/restaurants/menu-by-code/:code/:recipeId', async (req, res) => 
 })
 
 app.get('/api/orders', async (req, res) => {
-  try { const [r] = await pool.query('SELECT * FROM orders ORDER BY created_at DESC'); res.json({ code: 0, data: r }) }
-  catch (e) { res.json({ code: -1, msg: e.message }) }
+  try {
+    const { restaurant_id, invite_code } = req.query
+    let restId = restaurant_id
+    if (invite_code) {
+      const [rest] = await pool.query('SELECT id FROM restaurants WHERE invite_code=?', [invite_code])
+      restId = rest[0]?.id || 0
+    }
+    let sql = 'SELECT * FROM orders'
+    let params: any[] = []
+    if (restId) { sql += ' WHERE restaurant_id=?'; params.push(restId) }
+    sql += ' ORDER BY created_at DESC'
+    const [r] = await pool.query(sql, params)
+    res.json({ code: 0, data: r })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
 })
 
 app.post('/api/orders', async (req, res) => {
   try {
     const o = req.body
-    const [result] = await pool.query('INSERT INTO orders (restaurant_id,customer_id,items) VALUES (?,?,?)',
-      [o.restaurant_id, o.customer_id, JSON.stringify(o.items || [])])
+    // 如果传的是邀请码，先查出真实 restaurant_id
+    let restId = o.restaurant_id
+    if (restId && isNaN(Number(restId))) {
+      const [rest] = await pool.query('SELECT id FROM restaurants WHERE invite_code=?', [restId])
+      restId = rest[0]?.id || 0
+    }
+    const [result] = await pool.query(
+      'INSERT INTO orders (restaurant_id, restaurant_name, customer_id, customer_name, items, item_list, status) VALUES (?,?,?,?,?,?,?)',
+      [restId, o.restaurant_name, o.customer_id || 0, o.customer_name, o.items, JSON.stringify(o.item_list || []), o.status || 'pending']
+    )
     res.json({ code: 0, data: { id: result.insertId } })
   } catch (e) { res.json({ code: -1, msg: e.message }) }
 })
@@ -162,7 +182,7 @@ app.put('/api/orders/:id', async (req, res) => {
   try {
     const o = req.body
     await pool.query('UPDATE orders SET status=?,urge_count=?,rating=?,review=?,review_featured=? WHERE id=?',
-      [o.status, o.urge_count || 0, o.rating, o.review, o.review_featured || 0, req.params.id])
+      [o.status, o.urge_count || 0, o.rating || 0, o.review || '', o.review_featured || 0, req.params.id])
     res.json({ code: 0, msg: 'ok' })
   } catch (e) { res.json({ code: -1, msg: e.message }) }
 })
