@@ -15,6 +15,22 @@ app.get('/api/test', async (req, res) => {
   catch (e) { res.json({ code: -1, msg: e.message }) }
 })
 
+// 一键导入种子菜谱
+app.get('/api/seed', async (req, res) => {
+  try {
+    console.log('手动触发种子导入...')
+    await pool.query("DELETE FROM recipes WHERE is_public=1")
+    const fs = require('fs'), path = require('path')
+    const sql = fs.readFileSync(path.join(__dirname, 'seed_full.sql'), 'utf8')
+    const stmts = sql.split(';').filter(s => s.trim()).slice(1) // 跳过DELETE
+    let count = 0
+    for (const stmt of stmts) {
+      if (stmt.trim()) { await pool.query(stmt.trim()); count++ }
+    }
+    res.json({ code: 0, msg: '种子导入完成', count })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
 app.get('/api/recipes', async (req, res) => {
   try {
     const { keyword, tag } = req.query
