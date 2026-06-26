@@ -155,8 +155,22 @@ app.post('/api/feeds', async (req, res) => {
 
 app.get('/api/favorites', async (req, res) => {
   try {
-    const [r] = await pool.query('SELECT r.* FROM favorites f JOIN recipes r ON f.recipe_id=r.id WHERE f.user_id=?', [req.query.user_id])
+    const [r] = await pool.query('SELECT r.* FROM favorites f JOIN recipes r ON f.recipe_id=r.id WHERE f.user_id=?', [req.query.user_id || 0])
     res.json({ code: 0, data: r })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+app.post('/api/favorites', async (req, res) => {
+  try {
+    await pool.query('INSERT IGNORE INTO favorites (recipe_id, user_id) VALUES (?, ?)', [req.body.recipe_id, req.body.user_id || 0])
+    res.json({ code: 0, msg: 'ok' })
+  } catch (e) { res.json({ code: -1, msg: e.message }) }
+})
+
+app.delete('/api/favorites/:recipeId', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM favorites WHERE recipe_id=?', [req.params.recipeId])
+    res.json({ code: 0, msg: 'ok' })
   } catch (e) { res.json({ code: -1, msg: e.message }) }
 })
 
