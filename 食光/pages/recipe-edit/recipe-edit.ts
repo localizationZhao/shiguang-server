@@ -411,14 +411,19 @@ Page({
       return
     }
 
-    // 同步云端
+    // 同步云端（编辑更新、新建添加）
     const catId = getCategories().findIndex((c: any) => c.name === recipe.category) + 1 || 1
-    api.addRecipe({
+    const cloudData = {
       name: recipe.name, category_id: catId, color: recipe.color || '#ff8baa',
       price: recipe.price, ingredients: recipe.ingredients, steps: recipe.steps,
       reference: recipe.reference, cover_img: recipe.coverImg, cover_emoji: recipe.coverEmoji,
       is_public: 0, is_draft: 0, tags: JSON.stringify([])
-    }).catch(() => {}) // 云端失败不影响本地
+    }
+    if (this.data.editId) {
+      api.updateRecipe(this.data.editId, cloudData).catch(() => {})
+    } else {
+      api.addRecipe(cloudData).catch(() => {})
+    }
 
     const saveId = recipe.id
     wx.showToast({ title: this.data.editId ? '修改成功 ✅' : '创建成功 🎉', icon: 'success' })
