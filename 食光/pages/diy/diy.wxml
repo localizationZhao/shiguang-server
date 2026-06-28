@@ -55,27 +55,27 @@
       </view>
 
 
-      <!-- 正方形菜谱卡片网格 -->
+      <!-- 便签卡片网格 -->
       <scroll-view class="recipe-grid" scroll-y enhanced show-scrollbar="{{false}}" wx:if="{{!isEmpty}}">
         <view
           class="sticky-note {{isManageMode && selectedIds.indexOf(item.id) >= 0 ? 'selected' : ''}}"
+          style="--hl:{{item.color || '#FF9A56'}}"
           wx:for="{{filteredRecipes}}"
           wx:key="id"
           data-id="{{item.id}}"
           bindtap="viewDetail"
           bindlongpress="longPressRecipe">
-          <!-- 勾选 -->
           <view class="sticky-check" wx:if="{{isManageMode}}">
             <view class="check-circle {{selectedIds.indexOf(item.id) >= 0 ? 'checked' : ''}}">
               <text wx:if="{{selectedIds.indexOf(item.id) >= 0}}">✓</text>
             </view>
           </view>
-          <!-- 封面 -->
+          <!-- 封面区 -->
           <view class="sticky-bd">
             <image class="sticky-cover" wx:if="{{item.coverImg}}" src="{{item.coverImg}}" mode="aspectFill"></image>
             <text wx:else class="sticky-emoji">{{item.coverEmoji || '🍽️'}}</text>
           </view>
-          <!-- 名字 -->
+          <!-- 彩色标题栏在下 -->
           <view class="sticky-hd"><text>{{item.name}}</text></view>
         </view>
       </scroll-view>
@@ -98,29 +98,23 @@
 </view>
 
 
-<!-- ===== 长按上下文菜单 ===== -->
+<!-- ===== 长按管理菜单——birb-window像素风 ===== -->
 <view class="modal-overlay {{showContextMenu ? 'show' : ''}}" bindtap="closeContextMenu">
-  <view class="modal-sheet" catchtap="preventClose">
-    <view class="modal-header">
-      <text class="modal-title">{{contextRecipe ? contextRecipe.name : ''}}</text>
-      <view class="modal-close" bindtap="closeContextMenu">✕</view>
-
+  <view class="birb-window" catchtap="preventClose">
+    <view class="birb-window-header">
+      <text>{{contextRecipe ? contextRecipe.name : ''}}</text>
+      <view class="birb-window-x" bindtap="closeContextMenu">✕</view>
     </view>
-
-    <view class="modal-body context-menu">
-      <view class="context-item" bindtap="editRecipe">
-        <text class="context-icon">✏️</text>
-        <text>编辑菜谱</text>
+    <view class="birb-window-content">
+      <view class="birb-menu-item" bindtap="editRecipe">
+        <text>✏️ 编辑菜谱</text>
       </view>
-
-      <view class="context-item" bindtap="shelfToRestaurant">
-        <text class="context-icon">🏪</text>
-        <text>上架至餐厅</text>
+      <view class="birb-menu-item" bindtap="shelfToRestaurant">
+        <text>🏪 上架至餐厅</text>
       </view>
-
-      <view class="context-item danger" bindtap="confirmDeleteRecipe">
-        <text class="context-icon">🗑️</text>
-        <text>删除菜谱</text>
+      <view class="birb-window-sep"></view>
+      <view class="birb-menu-item danger" bindtap="confirmDeleteRecipe">
+        <text>🗑️ 删除菜谱</text>
       </view>
 
     </view>
