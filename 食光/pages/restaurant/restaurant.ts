@@ -367,8 +367,12 @@ Page({
 
   switchRole() {
     const newRole = this.data.role === 'owner' ? 'customer' : 'owner'
-    this.setData({ role: newRole, tab: 'menu', activeRestIdx: 0 })
-    this.refreshAll()
+    // 切到店主自动显示订单Tab，切到食客显示菜单Tab
+    const newTab = newRole === 'owner' ? 'orders' : 'menu'
+    const that = this
+    this.setData({ role: newRole, tab: newTab, activeRestIdx: 0 }, function () {
+      that.refreshAll()
+    })
   },
 
   pickRestTheme(e: any) {
