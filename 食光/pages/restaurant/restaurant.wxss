@@ -81,13 +81,13 @@
 .section-t{font-size:28rpx;font-weight:700;color:#3f2c15;display:block;margin-bottom:14rpx;font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif}
 
 /* ===== 菜单 ===== */
-.menu-item{display:flex;align-items:center;gap:14rpx;padding:14rpx;background:rgba(255,255,255,0.5);border:2rpx solid var(--hl);margin-bottom:10rpx}
+.menu-item{display:flex;align-items:center;gap:20rpx;padding:24rpx 18rpx;background:rgba(255,255,255,0.7);border:2rpx solid var(--rhd);margin-bottom:14rpx}
 .menu-item:active{transform:scale(.98)}
-.mi-emoji{width:52rpx;height:52rpx;display:flex;align-items:center;justify-content:center;font-size:28rpx;background:linear-gradient(135deg,var(--hl),var(--rhl));border:2rpx solid var(--hl)}
-.mi-info{flex:1}.mi-name{font-size:26rpx;font-weight:600;color:#3f2c15;display:block}.mi-price{font-size:28rpx;font-weight:700;color:var(--hl)}
-.mi-check{width:30rpx;height:30rpx;border-radius:50%;border:3rpx solid var(--hl);display:flex;align-items:center;justify-content:center;font-size:18rpx;font-weight:700;color:transparent}
+.mi-emoji{width:72rpx;height:72rpx;display:flex;align-items:center;justify-content:center;font-size:36rpx;background:var(--hl);border:2rpx solid var(--rhd)}
+.mi-info{flex:1}.mi-name{font-size:30rpx;font-weight:600;color:#3f2c15;display:block}.mi-price{font-size:32rpx;font-weight:700;color:var(--hl)}
+.mi-check{width:36rpx;height:36rpx;border-radius:50%;border:3rpx solid var(--hl);display:flex;align-items:center;justify-content:center;font-size:20rpx;font-weight:700;color:transparent}
 .mi-check.checked{background:var(--hl);color:var(--bg)}
-.submit-btn{width:100%;margin-top:14rpx}
+.submit-btn{width:100%;margin-top:16rpx}
 
 /* 店主下架按钮 */
 .mi-unshelf{padding:4rpx 12rpx;font-size:18rpx;color:#f85149;border:2rpx solid #f85149;font-weight:600;flex-shrink:0}
