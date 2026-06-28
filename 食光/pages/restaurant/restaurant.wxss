@@ -81,7 +81,7 @@
 .section-t{font-size:28rpx;font-weight:700;color:#3f2c15;display:block;margin-bottom:14rpx;font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif}
 
 /* ===== 菜单 ===== */
-.menu-item{display:flex;align-items:center;gap:20rpx;padding:24rpx 18rpx;background:rgba(255,255,255,0.7);border:2rpx solid var(--rhd);margin-bottom:14rpx}
+.menu-item{display:flex;align-items:center;gap:24rpx;padding:36rpx 20rpx;background:rgba(255,255,255,0.7);border:2rpx solid var(--rhd);margin-bottom:16rpx}
 .menu-item:active{transform:scale(.98)}
 .mi-emoji{width:72rpx;height:72rpx;display:flex;align-items:center;justify-content:center;font-size:36rpx;background:var(--hl);border:2rpx solid var(--rhd)}
 .mi-info{flex:1}.mi-name{font-size:30rpx;font-weight:600;color:#3f2c15;display:block}.mi-price{font-size:32rpx;font-weight:700;color:var(--hl)}
