@@ -43,18 +43,26 @@
 .pref-tags{display:flex;flex-wrap:wrap;gap:10rpx;flex-shrink:0;padding:4rpx 0}
 .pref-tag{
   display:flex;padding:14rpx 20rpx;font-size:32rpx;font-weight:700;
-  background:#ffecda;color:var(--thd);border:3rpx solid var(--th);
-  box-shadow:3rpx 3rpx 0 var(--thd);
+  background:#ffecda;color:var(--thd);
+  box-shadow:2rpx 0 var(--th),-2rpx 0 var(--th),0 -2rpx var(--th),0 2rpx var(--th),
+    4rpx 0 var(--th),-4rpx 0 var(--th),0 -4rpx var(--th),0 4rpx var(--th),
+    0 0 0 2rpx var(--th),0 0 0 4rpx #fff,
+    4rpx 0 0 2rpx #fff,-4rpx 0 0 2rpx #fff,
+    0 -4rpx 0 2rpx #fff,0 4rpx 0 2rpx #fff;
   transition:all .15s;font-family:monospace;align-items:center;justify-content:center;
 }
 .pref-tag.active{
-  background:var(--thl);color:var(--thd);font-weight:800;
-  box-shadow:3rpx 3rpx 0 var(--thd);
+  background:var(--th);color:#fff;font-weight:800;
+  box-shadow:2rpx 0 var(--th),-2rpx 0 var(--th),0 -2rpx var(--th),0 2rpx var(--th),
+    4rpx 0 var(--th),-4rpx 0 var(--th),0 -4rpx var(--th),0 4rpx var(--th),
+    0 0 0 2rpx var(--th),0 0 0 4rpx #fff,
+    4rpx 0 0 2rpx #fff,-4rpx 0 0 2rpx #fff,
+    0 -4rpx 0 2rpx #fff,0 4rpx 0 2rpx #fff;
   z-index:2;
 }
-.pref-tag-press{transform:translate(2rpx,2rpx);box-shadow:2rpx 2rpx 0 var(--thd) !important}
-.pref-tag:active{transform:translate(2rpx,2rpx);box-shadow:2rpx 2rpx 0 var(--thd)}
-.pref-tag.active:active{transform:translate(2rpx,2rpx);box-shadow:2rpx 2rpx 0 var(--thd)}
+.pref-tag-press{transform:translate(2rpx,2rpx)}
+.pref-tag:active{transform:translate(2rpx,2rpx)}
+.pref-tag.active:active{transform:translate(2rpx,2rpx)}
 
 /* ===== 筛选行 ===== */
 .filter-row{display:flex;align-items:center;gap:6rpx;flex-shrink:0;padding:0 2rpx}
