@@ -281,38 +281,42 @@ Page({
   // 上架至餐厅
   shelfToRestaurant() {
     const recipe = this.data.contextRecipe!
-    const rests = wx.getStorageSync('restaurants') || []
-    if (rests.length === 0) {
+    const allRests: any[] = wx.getStorageSync('restaurants') || []
+    // 只显示自己开的餐厅
+    const myRests = allRests.filter((r: any) => r.owner && !r.closed)
+    if (myRests.length === 0) {
       wx.showModal({
         title: '提示',
-        content: '你还没有餐厅，先去创建一家餐厅吧',
+        content: '你还没有自己的餐厅，先去创建一家吧',
         confirmText: '去创建',
-        success: (res) => {
+        success: (res: any) => {
           if (res.confirm) wx.switchTab({ url: '/pages/restaurant/restaurant' })
         }
       })
       this.closeContextMenu()
       return
     }
-    // 选择上架到哪家餐厅
-    const names = rests.map((r: any) => r.name)
+    // 用birb-window风格弹窗选择
+    const that = this
+    const names = myRests.map((r: any) => r.name + (r.menu?.find((m: any) => m.recipeId === recipe.id) ? ' ✅已上架' : ''))
     wx.showActionSheet({
       itemList: names,
-      success: (res) => {
-        const rest = rests[res.tapIndex]
+      success: (res: any) => {
+        const rest = myRests[res.tapIndex]
         if (!rest.menu) rest.menu = []
-        if (!rest.menu.find((m: any) => m.recipeId === recipe.id)) {
-          rest.menu.push({
-            recipeId: recipe.id,
-            name: recipe.name,
-            price: recipe.price,
-            emoji: recipe.coverEmoji,
-            onShelf: true,
-          })
-          wx.setStorageSync('restaurants', rests)
-          wx.showToast({ title: `已上架至${rest.name}`, icon: 'success' })
+        const exist = rest.menu.find((m: any) => m.recipeId === recipe.id)
+        if (exist) {
+          // 已上架则下架
+          rest.menu = rest.menu.filter((m: any) => m.recipeId !== recipe.id)
+          wx.setStorageSync('restaurants', allRests)
+          wx.showToast({ title: `已从${rest.name}下架`, icon: 'none' })
         } else {
-          wx.showToast({ title: '该菜品已在菜单中', icon: 'none' })
+          rest.menu.push({
+            recipeId: recipe.id, name: recipe.name,
+            price: recipe.price, emoji: recipe.coverEmoji, onShelf: true,
+          })
+          wx.setStorageSync('restaurants', allRests)
+          wx.showToast({ title: `已上架至${rest.name}`, icon: 'success' })
         }
       }
     })
