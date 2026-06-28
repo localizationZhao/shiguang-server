@@ -106,23 +106,23 @@ App<IAppOption>({
       pixelRatio: sysInfo.pixelRatio,
     }
 
-    // 处理扫码进入（小程序码 scene 参数）
+    // 处理扫码进入（小程序码 scene 参数在 query.scene 里）
     const launchOptions = wx.getLaunchOptionsSync()
-    const launchScene = launchOptions.scene ? decodeURIComponent(launchOptions.scene) : ''
-    if (launchScene) {
-      this.globalData._lastScene = launchScene
-      this.globalData.pendingInviteCode = launchScene
-      console.log('[扫码进店] invite:', launchScene)
+    const launchCode = (launchOptions.query as any)?.scene || ''
+    if (launchCode) {
+      this.globalData._lastScene = launchCode
+      this.globalData.pendingInviteCode = decodeURIComponent(launchCode)
+      console.log('[扫码进店] invite:', this.globalData.pendingInviteCode)
     }
   },
 
   onShow() {
     // 只在有新扫码参数时才设置（避免每次切Tab都触发）
     const enterOptions = wx.getEnterOptionsSync()
-    const scene = enterOptions.scene ? decodeURIComponent(enterOptions.scene) : ''
-    if (scene && scene !== this.globalData._lastScene) {
-      this.globalData._lastScene = scene
-      this.globalData.pendingInviteCode = scene
+    const enterCode = (enterOptions.query as any)?.scene || ''
+    if (enterCode && enterCode !== this.globalData._lastScene) {
+      this.globalData._lastScene = enterCode
+      this.globalData.pendingInviteCode = decodeURIComponent(enterCode)
     }
   },
 
