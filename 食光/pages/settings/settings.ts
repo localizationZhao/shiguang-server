@@ -3,6 +3,7 @@ Page({
     birdDisplayMode: 'all',
     birdModes: [
       { key: 'all', label: '所有页面', icon: '🌐' },
+      { key: 'custom', label: '自定义页面', icon: '🎯' },
       { key: 'restaurant', label: '仅餐厅页', icon: '🍽️' },
       { key: 'interior', label: '仅进店后', icon: '🚪' },
       { key: 'none', label: '关闭小鸟', icon: '🚫' },

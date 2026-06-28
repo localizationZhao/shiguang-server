@@ -36,7 +36,7 @@ Page({
   onTouchStart(e: any) { this._touchStartX = e.touches[0].clientX },
   onTouchEnd(e: any) {
     const deltaX = e.changedTouches[0].clientX - this._touchStartX
-    if (Math.abs(deltaX) < 60) return
+    if (Math.abs(deltaX) < 40) return
     const TABS = ['/pages/diy/diy', '/pages/home/home', '/pages/restaurant/restaurant', '/pages/profile/profile']
     const next = deltaX < 0 ? Math.min(this._tabIndex + 1, 3) : Math.max(this._tabIndex - 1, 0)
     if (next !== this._tabIndex) {
@@ -52,7 +52,11 @@ Page({
     }
     const birdMode = wx.getStorageSync('birdDisplayMode') || 'all'
     const birdPages = wx.getStorageSync('birdPages') || ['home', 'diy', 'restaurant', 'profile']
-    this.setData({ showPocketBird: birdMode === 'all' || (birdMode === 'custom' && birdPages.indexOf('profile') >= 0), birdMode, birdPages })
+    let showBird = false
+    if (birdMode === 'all') showBird = true
+    else if (birdMode === 'custom') showBird = birdPages.indexOf('profile') >= 0
+    else if (birdMode === 'restaurant' || birdMode === 'interior') showBird = false
+    this.setData({ showPocketBird: showBird, birdMode, birdPages })
     this._scanBirdTargets()
     this._refresh()
   },

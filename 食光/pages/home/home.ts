@@ -60,7 +60,7 @@ Page({
   onTouchStart(e: any) { this._touchStartX = e.touches[0].clientX },
   onTouchEnd(e: any) {
     const deltaX = e.changedTouches[0].clientX - this._touchStartX
-    if (Math.abs(deltaX) < 60) return
+    if (Math.abs(deltaX) < 40) return
     const TABS = ['/pages/diy/diy', '/pages/home/home', '/pages/restaurant/restaurant', '/pages/profile/profile']
     const next = deltaX < 0 ? Math.min(this._tabIndex + 1, 3) : Math.max(this._tabIndex - 1, 0)
     if (next !== this._tabIndex) {
@@ -101,7 +101,11 @@ Page({
     // 口袋小鸟显示模式
     const mode = wx.getStorageSync('birdDisplayMode') || 'all'
     const pages = wx.getStorageSync('birdPages') || ['home','diy','restaurant','profile']
-    this.setData({ showPocketBird: mode === 'all' || (mode === 'custom' && pages.indexOf('home') >= 0) })
+    let showBird = false
+    if (mode === 'all') showBird = true
+    else if (mode === 'custom') showBird = pages.indexOf('home') >= 0
+    else if (mode === 'restaurant' || mode === 'interior') showBird = false
+    this.setData({ showPocketBird: showBird })
     // 扫描页面元素给小鸟停靠
     this._scanBirdTargets()
     // 首次启动欢迎弹窗

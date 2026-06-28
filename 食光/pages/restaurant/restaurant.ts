@@ -131,7 +131,7 @@ Page({
   onTouchStart(e: any) { this._touchStartX = e.touches[0].clientX },
   onTouchEnd(e: any) {
     const deltaX = e.changedTouches[0].clientX - this._touchStartX
-    if (Math.abs(deltaX) < 60) return
+    if (Math.abs(deltaX) < 40) return
     const TABS = ['/pages/diy/diy', '/pages/home/home', '/pages/restaurant/restaurant', '/pages/profile/profile']
     const next = deltaX < 0 ? Math.min(this._tabIndex + 1, 3) : Math.max(this._tabIndex - 1, 0)
     if (next !== this._tabIndex) {
@@ -148,10 +148,12 @@ Page({
     // 口袋小鸟显示模式
     const mode = wx.getStorageSync('birdDisplayMode') || 'all'
     const pages = wx.getStorageSync('birdPages') || ['home','diy','restaurant','profile']
-    this.setData({
-      showPocketBird: mode === 'all' || (mode === 'custom' && pages.indexOf('restaurant') >= 0),
-      birdInteriorOnly: false,
-    })
+    let showBird = false, interiorOnly = false
+    if (mode === 'all') showBird = true
+    else if (mode === 'custom') showBird = pages.indexOf('restaurant') >= 0
+    else if (mode === 'restaurant') showBird = true
+    else if (mode === 'interior') { showBird = true; interiorOnly = true }
+    this.setData({ showPocketBird: showBird, birdInteriorOnly: interiorOnly })
     this._scanBirdTargets()
     // 加载保存的餐厅配色
     const saved = wx.getStorageSync('restTheme') || 'blue'
@@ -496,13 +498,14 @@ Page({
     saveRestaurants(rests)
 
     // 构建座位表
+    const ownerNick = isOwner ? nick : '' // 当前用户是店主时，记录其昵称
     const seatMap = SEAT_POSITIONS.map(seat => {
       const m = (rest.members || []).find((mb: Member) => mb.seatIndex === seat.id) || null
       return {
         seatId: seat.id,
         label: seat.label,
-        member: m,
-        isOwner: seat.id === 4  // 4号永远是主座
+        member: m ? { ...m, isOwner: !!ownerNick && m.nickname === ownerNick } : null,
+        isOwner: seat.id === 4  // 4号座位标记（主座视觉）
       }
     })
 
