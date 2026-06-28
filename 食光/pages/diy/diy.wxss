@@ -38,11 +38,11 @@
 /* ===== 正方形卡片网格 ===== */
 .recipe-grid{flex:1;padding:8rpx 14rpx 16rpx;display:flex;flex-wrap:wrap;justify-content:space-between;align-content:flex-start}
 .sticky-note{width:calc(50% - 14rpx);margin-bottom:22rpx;background:#ffecda;position:relative;overflow:hidden;
-  box-shadow:3rpx 0 var(--hl,#FF9A56),-3rpx 0 var(--hl,#FF9A56),0 -3rpx var(--hl,#FF9A56),0 3rpx var(--hl,#FF9A56),
-    6rpx 0 var(--hl,#FF9A56),-6rpx 0 var(--hl,#FF9A56),0 -6rpx var(--hl,#FF9A56),0 6rpx var(--hl,#FF9A56),
-    0 0 0 3rpx var(--hl,#FF9A56),0 0 0 6rpx #fff,
-    6rpx 0 0 3rpx #fff,-6rpx 0 0 3rpx #fff,
-    0 -6rpx 0 3rpx #fff,0 6rpx 0 3rpx #fff;
+  box-shadow:6rpx 0 var(--hl,#FF9A56),-6rpx 0 var(--hl,#FF9A56),0 -6rpx var(--hl,#FF9A56),0 6rpx var(--hl,#FF9A56),
+    12rpx 0 var(--hl,#FF9A56),-12rpx 0 var(--hl,#FF9A56),0 -12rpx var(--hl,#FF9A56),0 12rpx var(--hl,#FF9A56),
+    0 0 0 6rpx var(--hl,#FF9A56),0 0 0 12rpx #fff,
+    12rpx 0 0 6rpx #fff,-12rpx 0 0 6rpx #fff,
+    0 -12rpx 0 6rpx #fff,0 12rpx 0 6rpx #fff;
   aspect-ratio:4/3;display:flex;flex-direction:column;transition:transform .15s}
 .sticky-note:active{transform:scale(.97)}
 .sticky-note.selected{box-shadow:0 0 0 4rpx #FF9A56}
@@ -70,11 +70,11 @@
 
 /* ===== 长按管理菜单——birb-window像素风 ===== */
 .birb-window{background:#ffecda;width:380rpx;animation:popIn .2s ease;overflow:hidden;
-  box-shadow:3rpx 0 #FF9A56,-3rpx 0 #FF9A56,0 -3rpx #FF9A56,0 3rpx #FF9A56,
-    6rpx 0 #FF9A56,-6rpx 0 #FF9A56,0 -6rpx #FF9A56,0 6rpx #FF9A56,
-    0 0 0 3rpx #FF9A56,0 0 0 6rpx #fff,
-    6rpx 0 0 3rpx #fff,-6rpx 0 0 3rpx #fff,
-    0 -6rpx 0 3rpx #fff,0 6rpx 0 3rpx #fff}
+  box-shadow:6rpx 0 #FF9A56,-6rpx 0 #FF9A56,0 -6rpx #FF9A56,0 6rpx #FF9A56,
+    12rpx 0 #FF9A56,-12rpx 0 #FF9A56,0 -12rpx #FF9A56,0 12rpx #FF9A56,
+    0 0 0 6rpx #FF9A56,0 0 0 12rpx #fff,
+    12rpx 0 0 6rpx #fff,-12rpx 0 0 6rpx #fff,
+    0 -12rpx 0 6rpx #fff,0 12rpx 0 6rpx #fff}
 .birb-window-header{background:#FF9A56;padding:10rpx 24rpx;display:flex;justify-content:space-between;align-items:center;
   color:#fff;font-size:24rpx;font-weight:700}
 .birb-window-x{color:#fff;font-size:28rpx;font-weight:900;padding:4rpx 8rpx}
