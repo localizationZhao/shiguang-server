@@ -1242,6 +1242,9 @@ Page({
     const id = e.currentTarget.dataset.id
     wx.navigateTo({ url: '/pages/order-detail/order-detail?id=' + id + '&role=' + this.data.role })
   },
+  toggleRestFilter() {
+    this.setData({ showRestFilter: !this.data.showRestFilter })
+  },
   filterOrdersByRest(e: any) {
     const restId = parseInt(e.currentTarget.dataset.id)
     const allRests = getRestaurants()
