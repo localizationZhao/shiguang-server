@@ -481,8 +481,11 @@ Page({
           const rest = rests[that.data.activeRestIdx]
           if (rest) {
             rest.closed = true
-            // 标记所有加入此店的副本为闭店
-            rests.forEach((r: any) => { if (r.originalId === rest.id) r.closed = true })
+            // 标记所有加入此店的副本为闭店（按originalId或inviteCode匹配）
+            const code = rest.inviteCode || ''
+            rests.forEach((r: any) => {
+              if (r.originalId === rest.id || (code && r.inviteCode === code)) r.closed = true
+            })
           }
           saveRestaurants(rests)
           // 云端同步闭店
