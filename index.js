@@ -126,8 +126,8 @@ app.get('/api/restaurants', async (req, res) => {
 app.post('/api/restaurants', async (req, res) => {
   try {
     const r = req.body
-    const code = 'SG' + Date.now().toString(36).toUpperCase().slice(-6)
-    const [result] = await pool.query('INSERT INTO restaurants (name,invite_code,owner_id) VALUES (?,?,?)', [r.name, code, r.owner_id])
+    const code = r.inviteCode || ('SG' + Date.now().toString(36).toUpperCase().slice(-6))
+    const [result] = await pool.query('INSERT INTO restaurants (name,invite_code,owner_id) VALUES (?,?,?)', [r.name, code, r.owner_id || 0])
     res.json({ code: 0, data: { id: result.insertId, invite_code: code } })
   } catch (e) { res.json({ code: -1, msg: e.message }) }
 })
