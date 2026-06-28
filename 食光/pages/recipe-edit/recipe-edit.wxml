@@ -38,6 +38,15 @@
       </view>
 
       <view class="form-group">
+        <text class="form-label">🎨 便签配色</text>
+        <view class="color-picker">
+          <view class="color-chip {{form.color === item ? 'selected' : ''}}" wx:for="{{noteColors}}" wx:key="*this" data-color="{{item}}" bindtap="pickColor" style="background:{{item}}">
+            <text wx:if="{{form.color === item}}" class="color-check">✓</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="form-group">
         <text class="form-label">菜品定价 (¥)</text>
         <input class="form-input" type="digit" placeholder="留空表示免费分享" value="{{form.price}}" bindinput="onPriceInput" style="width:160px"/>
       </view>

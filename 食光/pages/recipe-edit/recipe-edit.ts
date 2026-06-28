@@ -19,10 +19,15 @@ Page({
     step: 1,
     maxStep: 5,
 
+    // 便签配色
+    noteColors: ['#ff8baa','#79bcff','#ffb37c','#d18bff','#6de192'],
+    selectedColor: '#ff8baa',
+
     // 表单数据
     form: {
       name: '',
       category: '荤菜',
+      color: '#ff8baa',
       price: '',
       ingredients: [] as Ingredient[],
       steps: [] as CookingStep[],
@@ -69,7 +74,7 @@ Page({
               this.setData({
                 editId: d.id,
                 form: {
-                  name: d.name, category: d.category, price: d.price ? String(d.price) : '',
+                  name: d.name, category: d.category, color: d.color || '#ff8baa', price: d.price ? String(d.price) : '',
                   ingredients: d.ingredients.length > 0 ? d.ingredients : [{name:'',amount:'',category:'肉类'}],
                   steps: d.steps.length > 0 ? d.steps : [{text:''}],
                   reference: d.reference || '', notes: d.notes || '',
@@ -91,6 +96,7 @@ Page({
           form: {
             name: recipe.name,
             category: recipe.category,
+            color: recipe.color || '#ff8baa',
             price: recipe.price ? String(recipe.price) : '',
             ingredients: recipe.ingredients.length > 0 ? recipe.ingredients : [{ name: '', amount: '', category: '肉类' }],
             steps: recipe.steps.length > 0 ? recipe.steps : [{ text: '' }],
@@ -149,6 +155,10 @@ Page({
 
   pickCategory(e: any) {
     this.setData({ 'form.category': e.currentTarget.dataset.cat, showCatMgr: false })
+  },
+
+  pickColor(e: any) {
+    this.setData({ 'form.color': e.currentTarget.dataset.color })
   },
 
   // 分类管理
@@ -359,6 +369,7 @@ Page({
       id: this.data.editId || generateId(),
       name: f.name.trim(),
       category: f.category,
+      color: f.color || '#ff8baa',
       price: parseFloat(f.price) || 0,
       ingredients: f.ingredients.filter(i => i.name.trim()),
       steps: f.steps.filter(s => s.text.trim()),
