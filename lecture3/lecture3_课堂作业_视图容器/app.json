@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/container/container"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#9c27b0",
+    "navigationBarTitleText": "课堂练习三：视图容器",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f5f5"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

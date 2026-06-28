@@ -1,0 +1,12 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#F5F0EB",
+    "navigationBarTitleText": "《简·爱》图书详情",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F5F0EB"
+  },
+  "sitemapLocation": "sitemap.json"
+}

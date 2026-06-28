@@ -72,6 +72,12 @@ Page({
 
   fetchRecipes() {
     const CAT_COLORS: Record<string,string>={'荤菜':'#ff8baa','素菜':'#79bcff','凉菜':'#d18bff','汤羹':'#ffb37c','主食':'#6de192','甜点':'#6de192','酒水':'#d18bff'}
+    // 云端 category_id(INT) → 本地 category(STRING) 映射
+    const CAT_ID_TO_NAME: Record<number,string>={1:'荤菜',2:'素菜',3:'凉菜',4:'汤羹',5:'主食',6:'甜点',7:'酒水'}
+    const normCloud = (r: any) => {
+      const cat = CAT_ID_TO_NAME[r.category_id] || r.category || ''
+      return { ...r, category: cat, color: r.color || CAT_COLORS[cat] || '#ff8baa' }
+    }
     const useLocal = () => {
       const recipes = PUBLIC_RECIPES.map((r:any)=>({...r,color:r.color||CAT_COLORS[r.category]||'#ff8baa'}))
       this.setData({ allRecipes: recipes, displayRecipes: recipes, scrollNames: recipes.map((r:any,i:number)=>({id:i, text:r.coverEmoji+' '+r.name})) })
@@ -86,7 +92,7 @@ Page({
           const recipes = res.data.data
             .filter((r: any) => r.is_public == 1 || r.is_public === '1') // 只要公开菜谱
             .filter((r: any) => !r.source || r.source !== 'copy') // 排除复刻来源
-            .map((r: any) => ({...r,color:r.color||CAT_COLORS[r.category_id]||'#ff8baa'}))
+            .map(normCloud)
           if (recipes.length > 0) {
             this.setData({ allRecipes: recipes, displayRecipes: recipes, scrollNames: recipes.map((r: any, i: number) => ({id: i, text: (r.cover_emoji || ':)') + ' ' + r.name})) })
           }
@@ -301,8 +307,11 @@ Page({
       saveCategories(cats)
     }
 
+    const CAT_ID_TO_NAME: Record<number,string>={1:'荤菜',2:'素菜',3:'凉菜',4:'汤羹',5:'主食',6:'甜点',7:'酒水'}
     const copied = {
-      ...recipe, id: generateId(), name: recipe.name + '(复刻)',
+      ...recipe,
+      category: recipe.category || CAT_ID_TO_NAME[recipe.category_id] || '',
+      id: generateId(), name: recipe.name + '(复刻)',
       createdAt: new Date().toISOString().slice(0, 10), source: 'copy', copiedFrom: recipe.id, draft: false,
     }
     addRecipe(copied)

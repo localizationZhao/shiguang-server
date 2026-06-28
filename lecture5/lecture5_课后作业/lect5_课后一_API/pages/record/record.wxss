@@ -1,0 +1,272 @@
+/**
+ * record.wxss - 录音与播放页面样式文件
+ * 功能：定义页面各模块的样式，完全复用课件案例核心样式类名
+ * 知识点：rpx单位响应式设计、flex布局、按压反馈效果
+ */
+
+/* ==================== 页面容器样式 ==================== */
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 20rpx;
+  background-color: #f5f5f5;
+}
+
+/* ==================== 模块区域样式 ==================== */
+.section {
+  width: 100%;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15rpx;
+  padding-left: 10rpx;
+  border-left: 6rpx solid #07C160;
+}
+
+.section-desc {
+  font-size: 26rpx;
+  color: #888;
+  margin-bottom: 20rpx;
+}
+
+/* ==================== 模块一：录音操作区样式 ==================== */
+
+/* 录音按钮容器 - recordClass */
+.recordClass {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30rpx 0;
+}
+
+/* 录音按钮样式 - recordButtonClass */
+.recordButtonClass {
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: 140rpx;
+  background-color: #07C160;
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: bold;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8rpx 20rpx rgba(7, 193, 96, 0.3);
+}
+
+/* 录音按钮按压反馈效果 */
+.recordButtonHover {
+  background-color: #06AD56;
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 10rpx rgba(7, 193, 96, 0.2);
+}
+
+/* 音量动画区域 - speakPicViewClass */
+.speakPicViewClass {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30rpx;
+  padding: 20rpx;
+}
+
+/* 音量图标样式 - imageClass */
+.imageClass {
+  width: 150rpx;
+  height: 150rpx;
+  margin-bottom: 15rpx;
+}
+
+.speakText {
+  font-size: 28rpx;
+  color: #07C160;
+  font-weight: bold;
+}
+
+/* 录音状态提示 */
+.recordStatus {
+  text-align: center;
+  font-size: 26rpx;
+  color: #666;
+  margin-top: 20rpx;
+}
+
+/* ==================== 分割线样式 ==================== */
+.divider {
+  width: 100%;
+  height: 2rpx;
+  background-color: #e0e0e0;
+  margin: 25rpx 0;
+}
+
+/* ==================== 模块二：录音文件列表区样式 ==================== */
+
+/* 滚动视图样式 */
+.scrollClass {
+  width: 100%;
+  max-height: 400rpx;
+  border-radius: 8rpx;
+}
+
+/* 列表项单元格 - cellClass */
+.cellClass {
+  padding: 20rpx;
+  margin-bottom: 15rpx;
+  background-color: #f8f8f8;
+  border-radius: 8rpx;
+  border: 1rpx solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 当前播放项高亮样式 */
+.cellActive {
+  background-color: #e6f7e6;
+  border: 1rpx solid #07C160;
+}
+
+/* 列表行样式 - cellRowClass */
+.cellRowClass {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.cellRowClass:last-child {
+  margin-bottom: 0;
+}
+
+/* 录音时间样式 - dateClass */
+.dateClass {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+/* 文件大小样式 */
+.sizeClass {
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* 文件路径样式 */
+.pathClass {
+  font-size: 22rpx;
+  color: #999;
+}
+
+/* 空列表提示 */
+.emptyTip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 列表统计信息 */
+.listInfo {
+  text-align: center;
+  font-size: 26rpx;
+  color: #888;
+  margin-top: 15rpx;
+}
+
+/* ==================== 模块三：音频播放控制区样式 ==================== */
+
+/* 按钮组样式 */
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 15rpx 0;
+}
+
+/* 按钮基础样式 */
+.btn {
+  width: 180rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  text-align: center;
+  font-size: 26rpx;
+  border-radius: 8rpx;
+  margin: 10rpx;
+  border: none;
+}
+
+/* 主按钮样式 */
+.btn-primary {
+  background-color: #07C160;
+  color: #fff;
+}
+
+.btn-primary[disabled] {
+  background-color: #ccc;
+  color: #999;
+}
+
+/* 暂停按钮样式 */
+.btn-warning {
+  background-color: #FF9500;
+  color: #fff;
+}
+
+.btn-warning[disabled] {
+  background-color: #ccc;
+  color: #999;
+}
+
+/* 继续按钮样式 */
+.btn-success {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+.btn-success[disabled] {
+  background-color: #ccc;
+  color: #999;
+}
+
+/* 停止按钮样式 */
+.btn-danger {
+  background-color: #FF5722;
+  color: #fff;
+}
+
+.btn-danger[disabled] {
+  background-color: #ccc;
+  color: #999;
+}
+
+/* 播放状态显示 */
+.playStatus {
+  text-align: center;
+  font-size: 28rpx;
+  color: #666;
+  margin-top: 20rpx;
+  padding: 15rpx;
+  background-color: #f8f8f8;
+  border-radius: 8rpx;
+}
+
+/* 当前播放文件信息 */
+.currentPlayInfo {
+  text-align: center;
+  font-size: 24rpx;
+  color: #07C160;
+  margin-top: 15rpx;
+  word-break: break-all;
+}

@@ -1,0 +1,5 @@
+<!--pages/attention/attention.wxml-->
+<view class="container">
+  <text class="title">关注页面</text>
+  <text class="desc">这里显示你关注的作者或话题</text>
+</view>

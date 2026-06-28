@@ -1,0 +1,88 @@
+<!--pages/index/index.wxml - 页面结构文件-->
+<view class="container">
+  
+  <!-- 模块一：顶部图书封面模块 -->
+  <view class="cover-section">
+    <!-- 封面图片 -->
+    <image class="cover-image" src="{{coverImage}}" mode="aspectFit" lazy-load></image>
+    
+    <!-- 图书标题信息 -->
+    <view class="title-section">
+      <text class="main-title">《简·爱》</text>
+      <text class="sub-title">{{bookInfo.subtitle}}</text>
+      
+      <!-- 评分标签 -->
+      <view class="rating-badge">
+        <text class="rating-score">{{bookInfo.rating}}</text>
+        <text class="rating-text">高分经典</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模块二：图书基础信息模块 -->
+  <view class="info-section">
+    <view class="info-item">
+      <text class="info-label">作者：</text>
+      <text class="info-value">{{bookInfo.author}}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">出版社：</text>
+      <text class="info-value">{{bookInfo.publisher}}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">出版年份：</text>
+      <text class="info-value">{{bookInfo.publishYear}}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">书籍类型：</text>
+      <text class="info-value">{{bookInfo.category}}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">书籍页数：</text>
+      <text class="info-value">{{bookInfo.pages}}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">适配人群：</text>
+      <text class="info-value">{{bookInfo.audience}}</text>
+    </view>
+    
+    <!-- 书籍标签 -->
+    <view class="tags-section">
+      <view class="tag" wx:for="{{bookInfo.tags}}" wx:key="index">
+        <text class="tag-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模块三：图书内容简介模块 -->
+  <view class="content-section">
+    <text class="section-title">书籍简介</text>
+    <view class="divider"></view>
+    <text class="content-text">{{introduction}}</text>
+  </view>
+
+  <!-- 模块四：作者介绍模块 -->
+  <view class="content-section">
+    <text class="section-title">作者简介</text>
+    <view class="divider"></view>
+    <text class="content-text">{{authorIntro}}</text>
+  </view>
+
+  <!-- 模块五：章节目录模块 -->
+  <view class="content-section">
+    <text class="section-title">章节目录</text>
+    <view class="divider"></view>
+    
+    <!-- 章节列表 -->
+    <view class="chapter-list">
+      <view class="chapter-item" wx:for="{{chapters}}" wx:key="index">
+        <text class="chapter-title">{{item.title}}</text>
+        <text class="chapter-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部留白 -->
+  <view class="bottom-space"></view>
+
+</view>

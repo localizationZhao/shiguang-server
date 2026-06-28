@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/pay/pay"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#FF6B35",
+    "navigationBarTitleText": "微信支付演示",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F8F8F8",
+    "backgroundTextStyle": "dark"
+  },
+  "sitemapLocation": "sitemap.json"
+}

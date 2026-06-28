@@ -1,0 +1,86 @@
+.mainViewClass {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.loading-view {
+  text-align: center;
+  padding: 20rpx;
+  color: #999;
+}
+
+.topTabBarClass {
+  background-color: #ffa589;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 80rpx;
+}
+
+.topTypeListClass {
+  display: inline-block;
+  margin-top: 12rpx;
+  margin-left: 10rpx;
+  font-size: 30rpx;
+  width: 100rpx;
+  height: 100%;
+  text-align: center;
+  z-index: 99;
+  color: #333;
+}
+
+.curPage {
+  animation-fill-mode: forwards;
+  color: #fff;
+  font-size: 35rpx;
+}
+
+.rightview {
+  background-color: transparent;
+  height: 100%;
+  width: 10%;
+  position: relative;
+}
+
+.addImage {
+  position: absolute;
+  width: 40rpx;
+  height: 40rpx;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.cellClass {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20rpx;
+  background: white;
+  border-bottom: 1rpx solid darkgray;
+}
+
+.cellbottomClass {
+  width: 100%;
+  height: 44rpx;
+  background-color: transparent;
+  color: #dddddd;
+  font-size: 30rpx;
+  margin-top: 10rpx;
+  margin-left: 10rpx;
+}
+
+.imageClass {
+  width: 100%;
+  flex-direction: row;
+  display: flex;
+  height: 150rpx;
+  background-color: transparent;
+  justify-content: space-around;
+}
+
+.imageshow {
+  width: 230rpx;
+  height: 150rpx;
+}

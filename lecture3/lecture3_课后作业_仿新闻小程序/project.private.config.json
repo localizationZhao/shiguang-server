@@ -1,0 +1,23 @@
+{
+  "libVersion": "3.16.1",
+  "condition": {},
+  "projectname": "lecture3_%E8%AF%BE%E5%90%8E%E4%BD%9C%E4%B8%9A_%E4%BB%BF%E6%96%B0%E9%97%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F",
+  "setting": {
+    "urlCheck": true,
+    "coverView": true,
+    "lazyloadPlaceholderEnable": false,
+    "skylineRenderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "useApiHook": true,
+    "showShadowRootInWxmlPanel": true,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "compileHotReLoad": true,
+    "checkInvalidKey": true,
+    "ignoreDevUnusedFiles": true,
+    "bigPackageSizeSupport": false,
+    "useIsolateContext": true
+  }
+}

@@ -84,8 +84,10 @@ Page({
       saveCategories(cats)
     }
 
+    const CAT_ID_TO_NAME: Record<number,string>={1:'荤菜',2:'素菜',3:'凉菜',4:'汤羹',5:'主食',6:'甜点',7:'酒水'}
     const newRecipe: Recipe = {
       ...recipe,
+      category: (recipe as any).category || CAT_ID_TO_NAME[(recipe as any).category_id] || '',
       id: generateId(),
       name: recipe.name + '(复刻)',
       createdAt: new Date().toISOString().slice(0, 10),

@@ -1,0 +1,549 @@
+/* pages/index/index.wxss - 页面样式文件 */
+
+/* 页面容器 */
+.container {
+  padding: 0 30rpx 40rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* ==================== 模块一：封面与标题区 ==================== */
+.cover-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0 30rpx;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  border-radius: 20rpx;
+  margin-bottom: 24rpx;
+}
+
+.cover-wrapper {
+  position: relative;
+  margin-bottom: 24rpx;
+}
+
+/* 封面图片 */
+.cover-image {
+  width: 240rpx;
+  height: 340rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.2);
+  display: block;
+}
+
+/* 高分标签（绝对定位在封面右上角） */
+.score-badge {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  border-radius: 24rpx;
+  padding: 8rpx 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4rpx 12rpx rgba(243, 156, 18, 0.4);
+}
+
+.score-text {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.score-label {
+  font-size: 18rpx;
+  color: #fff;
+  line-height: 1.2;
+}
+
+/* 书名 */
+.book-title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 4rpx;
+}
+
+/* ==================== 模块二：基础信息列表 ==================== */
+.info-section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+/* 板块标题 */
+.section-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-right: 16rpx;
+}
+
+.title-line {
+  flex: 1;
+  height: 2rpx;
+  background: linear-gradient(to right, #2c3e50, transparent);
+}
+
+/* 信息行 */
+.info-row {
+  display: flex;
+  flex-direction: row;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+/* 信息标签 */
+.info-label {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #555;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+/* 信息值 */
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+}
+
+/* ==================== 模块三：标签区域 ==================== */
+.tags-section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 20rpx 0;
+  margin-bottom: 24rpx;
+}
+
+/* 单个标签 */
+.tag-item {
+  background-color: #ecf0f1;
+  border-radius: 24rpx;
+  padding: 10rpx 24rpx;
+}
+
+.tag-text {
+  font-size: 24rpx;
+  color: #2c3e50;
+}
+
+/* ==================== 模块四/五：内容模块 ==================== */
+.content-section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+/* 内容文本 */
+.content-text {
+  font-size: 28rpx;
+  color: #555;
+  line-height: 1.8;
+  text-align: justify;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+/* 展开/收起按钮 */
+.toggle-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16rpx 48rpx;
+  margin: 0 auto;
+  width: fit-content;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 32rpx;
+  box-shadow: 0 4rpx 12rpx rgba(44, 62, 80, 0.15), 0 2rpx 4rpx rgba(44, 62, 80, 0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* 按钮点击时的阴影收缩效果（hover-class） */
+.toggle-btn-hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  box-shadow: 0 1rpx 4rpx rgba(44, 62, 80, 0.1), inset 0 1rpx 3rpx rgba(0, 0, 0, 0.08);
+  transform: scale(0.96);
+}
+
+.toggle-text {
+  font-size: 28rpx;
+  color: #2c3e50;
+  font-weight: 500;
+  user-select: none;
+}
+
+/* ==================== 模块六：章节目录 ==================== */
+.chapter-list {
+  margin-top: 8rpx;
+}
+
+/* 章节条目 */
+.chapter-item {
+  display: flex;
+  flex-direction: row;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.chapter-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.chapter-item:first-child {
+  padding-top: 0;
+}
+
+/* 章节序号圆点 */
+.chapter-number {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.number-text {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* 章节内容 */
+.chapter-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.chapter-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 8rpx;
+}
+
+.chapter-summary {
+  font-size: 24rpx;
+  color: #888;
+  line-height: 1.6;
+}
+
+/* ==================== 模块七：电子版提示 ==================== */
+.ebook-section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.ebook-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.ebook-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.ebook-text {
+  font-size: 28rpx;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+/* ==================== 模块八：数据绑定示例 ==================== */
+.binding-item {
+  display: flex;
+  flex-direction: column;
+  padding: 16rpx 0;
+  border-bottom: 1rpx dashed #e8e8e8;
+}
+
+.binding-item:last-child {
+  border-bottom: none;
+}
+
+.binding-label {
+  font-size: 24rpx;
+  color: #888;
+  margin-bottom: 10rpx;
+}
+
+.binding-value {
+  font-size: 28rpx;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.binding-box {
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  border-left: 4rpx solid #2c3e50;
+}
+
+.binding-box.highlight {
+  background-color: #e8f5e9;
+  border-left-color: #4caf50;
+}
+
+/* ==================== 模块九：列表渲染示例 ==================== */
+.list-item {
+  padding: 8rpx 0;
+}
+
+.list-text {
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* 人物关系矩阵 */
+.matrix-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.matrix-label {
+  font-size: 24rpx;
+  color: #2c3e50;
+  font-weight: 500;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+.matrix-cell {
+  margin-right: 8rpx;
+  margin-bottom: 4rpx;
+}
+
+.matrix-text {
+  font-size: 22rpx;
+  color: #555;
+  background-color: #ecf0f1;
+  padding: 4rpx 10rpx;
+  border-radius: 6rpx;
+  display: inline-block;
+}
+
+/* block wx:for 样式 */
+.block-item {
+  display: flex;
+  flex-direction: row;
+  padding: 6rpx 0;
+}
+
+.block-index {
+  font-size: 26rpx;
+  color: #888;
+  margin-right: 12rpx;
+}
+
+.block-value {
+  font-size: 26rpx;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+/* wx:key 样式 */
+.key-item {
+  padding: 8rpx 0;
+  border-bottom: 1rpx solid #eee;
+}
+
+.key-item:last-child {
+  border-bottom: none;
+}
+
+.key-text {
+  font-size: 26rpx;
+  color: #2c3e50;
+}
+
+/* ==================== 模块十：条件渲染示例 ==================== */
+.cond-box {
+  padding: 12rpx 16rpx;
+  border-radius: 8rpx;
+  margin-bottom: 8rpx;
+}
+
+.cond-box:last-child {
+  margin-bottom: 0;
+}
+
+.cond-childhood {
+  background-color: #e3f2fd;
+  border-left: 4rpx solid #2196f3;
+}
+
+.cond-school {
+  background-color: #fff3e0;
+  border-left: 4rpx solid #ff9800;
+}
+
+.cond-adult {
+  background-color: #e8f5e9;
+  border-left: 4rpx solid #4caf50;
+}
+
+/* block wx:if 样式 */
+.block-cond-item {
+  padding: 10rpx 0;
+  border-bottom: 1rpx dashed #e8e8e8;
+}
+
+.block-cond-item:last-child {
+  border-bottom: none;
+}
+
+/* wx:if vs hidden 对比 */
+.compare-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10rpx 0;
+}
+
+.compare-label {
+  font-size: 24rpx;
+  color: #888;
+  width: 220rpx;
+  flex-shrink: 0;
+}
+
+.compare-box {
+  background-color: #f0f0f0;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  margin-right: 12rpx;
+}
+
+.compare-note {
+  font-size: 22rpx;
+  color: #e74c3c;
+}
+
+/* ==================== 模块十一：模板示例 ==================== */
+.template-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #eee;
+}
+
+.template-item:last-child {
+  border-bottom: none;
+}
+
+.template-index {
+  font-size: 26rpx;
+  color: #888;
+  margin-right: 12rpx;
+}
+
+.template-msg {
+  font-size: 26rpx;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.template-time {
+  font-size: 22rpx;
+  color: #aaa;
+}
+
+.template-odd {
+  background-color: #e8f5e9;
+  color: #4caf50;
+  padding: 10rpx 20rpx;
+  border-radius: 8rpx;
+  margin-bottom: 8rpx;
+  font-size: 26rpx;
+}
+
+.template-even {
+  background-color: #e3f2fd;
+  color: #2196f3;
+  padding: 10rpx 20rpx;
+  border-radius: 8rpx;
+  margin-bottom: 8rpx;
+  font-size: 26rpx;
+}
+
+.template-character {
+  background-color: #f5f5f5;
+  padding: 16rpx;
+  border-radius: 8rpx;
+  margin-bottom: 8rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.template-name {
+  font-size: 28rpx;
+  color: #2c3e50;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.template-role {
+  font-size: 24rpx;
+  color: #888;
+}
+
+.template-male {
+  background-color: #e3f2fd;
+  padding: 12rpx 16rpx;
+  border-radius: 8rpx;
+  margin-bottom: 8rpx;
+  border-left: 4rpx solid #2196f3;
+}
+
+.template-female {
+  background-color: #fce4ec;
+  padding: 12rpx 16rpx;
+  border-radius: 8rpx;
+  margin-bottom: 8rpx;
+  border-left: 4rpx solid #e91e63;
+}
+
+/* 底部留白 */
+.bottom-space {
+  height: 40rpx;
+}

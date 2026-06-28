@@ -1,0 +1,489 @@
+<!--pages/container/container.wxml-->
+<!-- 课堂练习三：视图容器练习 -->
+<!-- 知识点：view、scroll-view、swiper/swiper-item、movable-area/movable-view、match-media、page-container -->
+
+<view class="container">
+
+  <!-- ==================== 1. view 容器 ==================== -->
+  <view class="section-title">1. view 容器（块级容器）</view>
+
+  <!-- 1.1 基础列表展示 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">本周课程表（wx:for 列表渲染）</text>
+    </view>
+    <view class="course-list">
+      <view wx:for="{{courseList}}" wx:key="day" class="course-item">
+        <view class="course-day">{{item.day}}</view>
+        <view class="course-info">
+          <text class="course-name">{{item.course}}</text>
+          <text class="course-time">{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 1.2 view 点击交互效果 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">view 点击态效果（hover-class）</text>
+    </view>
+    <view class="hover-demo-grid">
+      <view class="hover-item hover-normal" hover-class="hover-active">
+        <text>普通点击态</text>
+      </view>
+      <view class="hover-item hover-delay" hover-class="hover-active" hover-start-time="200" hover-stay-time="800">
+        <text>延迟 200ms 出现，停留 800ms</text>
+      </view>
+      <view class="hover-item hover-none" hover-class="none">
+        <text>无点击态（hover-class="none"）</text>
+      </view>
+    </view>
+    <view class="tip-text">点击不同方块体验 hover-class 效果差异</view>
+  </view>
+
+  <!-- 1.3 view flex 布局演示 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">view + Flex 布局（横向 / 纵向）</text>
+    </view>
+    <view class="flex-section">
+      <text class="flex-label">flex-direction: row（横向排列）</text>
+      <view class="flex-container flex-row">
+        <view class="flex-block flex-bg-blue"><text>高数</text></view>
+        <view class="flex-block flex-bg-green"><text>数据结构</text></view>
+        <view class="flex-block flex-bg-orange"><text>操作系统</text></view>
+      </view>
+    </view>
+    <view class="flex-section">
+      <text class="flex-label">flex-direction: column（纵向排列）</text>
+      <view class="flex-container flex-column">
+        <view class="flex-block flex-block-v flex-bg-blue"><text>计算机网络</text></view>
+        <view class="flex-block flex-block-v flex-bg-green"><text>移动开发</text></view>
+        <view class="flex-block flex-block-v flex-bg-orange"><text>数据库原理</text></view>
+      </view>
+    </view>
+  </view>
+
+
+  <!-- ==================== 2. scroll-view 容器 ==================== -->
+  <view class="section-title">2. scroll-view 容器（滚动容器）</view>
+
+  <!-- 2.1 横向滚动 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">横向滚动（城市天气）</text>
+    </view>
+    <scroll-view scroll-x="true" class="scroll-view-h">
+      <view class="weather-list">
+        <view wx:for="{{weatherList}}" wx:key="city" class="weather-item">
+          <text class="weather-icon">{{item.icon}}</text>
+          <text class="weather-city">{{item.city}}</text>
+          <text class="weather-temp">{{item.temp}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 2.2 纵向滚动（带滚动事件） -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">纵向滚动（消息列表，监听滚动事件）</text>
+    </view>
+    <scroll-view 
+      scroll-y="true" 
+      style="height: {{scrollHeight}}px;" 
+      class="scroll-view-v"
+      bindscrolltoupper="onScrollToUpper"
+      bindscrolltolower="onScrollToLower"
+      bindscroll="onScroll"
+    >
+      <view wx:for="{{messageList}}" wx:key="id" class="message-item">
+        <view class="message-header">
+          <text class="message-title">{{item.title}}</text>
+          <text class="message-time">{{item.time}}</text>
+        </view>
+        <text class="message-content">{{item.content}}</text>
+      </view>
+    </scroll-view>
+    <view class="tip-text">滚动到顶部/底部时会触发 console.log</view>
+  </view>
+
+  <!-- 2.3 scroll-into-view 滚动到指定元素 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">scroll-into-view（滚动到指定 ID 的元素）</text>
+    </view>
+    <scroll-view 
+      scroll-y="true" 
+      style="height: 300rpx;" 
+      class="scroll-view-v"
+      scroll-into-view="{{toView}}"
+      scroll-top="{{scrollTop}}"
+    >
+      <view id="msg1" class="scroll-item demo-bg-1">
+        <text class="scroll-item-text">第一章：高等数学</text>
+      </view>
+      <view id="msg2" class="scroll-item demo-bg-2">
+        <text class="scroll-item-text">第二章：数据结构</text>
+      </view>
+      <view id="msg3" class="scroll-item demo-bg-3">
+        <text class="scroll-item-text">第三章：操作系统</text>
+      </view>
+      <view id="msg4" class="scroll-item demo-bg-1">
+        <text class="scroll-item-text">第四章：计算机网络</text>
+      </view>
+      <view id="msg5" class="scroll-item demo-bg-2">
+        <text class="scroll-item-text">第五章：移动开发</text>
+      </view>
+      <view id="msg6" class="scroll-item demo-bg-3">
+        <text class="scroll-item-text">第六章：数据库原理</text>
+      </view>
+    </scroll-view>
+    <view class="btn-group">
+      <button class="btn btn-small" bindtap="scrollToTarget">滚动到下一章节</button>
+      <button class="btn btn-small btn-secondary" bindtap="scrollToTop">回到顶部</button>
+      <button class="btn btn-small btn-info" bindtap="scrollMove">向下滚动 50px</button>
+    </view>
+    <view class="tip-text">当前滚动到：{{toView}}</view>
+  </view>
+
+
+  <!-- ==================== 3. swiper 容器 ==================== -->
+  <view class="section-title">3. swiper 容器（轮播容器）</view>
+
+  <!-- 3.1 基础轮播 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">校园风景轮播（可配置参数）</text>
+    </view>
+    <swiper 
+      class="swiper-box" 
+      indicator-dots="{{indicatorDots}}" 
+      autoplay="{{autoplay}}" 
+      vertical="{{vertical}}"
+      circular="{{circular}}"
+      interval="{{interval}}" 
+      duration="{{duration}}"
+      bindchange="onBannerChange"
+    >
+      <block wx:for="{{bannerList}}" wx:key="id">
+        <swiper-item item-id="slide-{{item.id}}">
+          <view class="swiper-item" style="background-color: {{item.color}};">
+            <text class="swiper-text">{{item.title}}</text>
+          </view>
+        </swiper-item>
+      </block>
+    </swiper>
+    <view class="swiper-info">
+      <text>当前第 {{currentBanner + 1}} / {{bannerList.length}} 张</text>
+    </view>
+  </view>
+
+  <!-- 3.2 轮播控制面板 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">轮播参数控制面板</text>
+    </view>
+    
+    <!-- 开关控制 -->
+    <view class="control-row">
+      <text class="control-label">指示点</text>
+      <switch checked="{{indicatorDots}}" bindchange="toggleIndicatorDots" color="#9c27b0" />
+    </view>
+    <view class="control-row">
+      <text class="control-label">自动播放</text>
+      <switch checked="{{autoplay}}" bindchange="toggleAutoplay" color="#9c27b0" />
+    </view>
+    <view class="control-row">
+      <text class="control-label">纵向切换</text>
+      <switch checked="{{vertical}}" bindchange="toggleVertical" color="#9c27b0" />
+    </view>
+    <view class="control-row">
+      <text class="control-label">衔接滑动</text>
+      <switch checked="{{circular}}" bindchange="toggleCircular" color="#9c27b0" />
+    </view>
+
+    <!-- 滑块控制 -->
+    <view class="slider-group">
+      <view class="slider-row">
+        <text class="slider-label">切换时长 (ms)</text>
+        <text class="slider-value">{{duration}}</text>
+      </view>
+      <slider bindchange="durationChange" value="{{duration}}" min="200" max="2000" activeColor="#9c27b0" />
+    </view>
+
+    <view class="slider-group">
+      <view class="slider-row">
+        <text class="slider-label">自动播放间隔 (ms)</text>
+        <text class="slider-value">{{interval}}</text>
+      </view>
+      <slider bindchange="intervalChange" value="{{interval}}" min="1000" max="10000" activeColor="#9c27b0" />
+    </view>
+  </view>
+
+
+  <!-- ==================== 4. movable-area / movable-view 容器 ==================== -->
+  <view class="section-title">4. movable-area / movable-view（可拖动容器）</view>
+
+  <!-- 4.1 区域小于 movable-area -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">movable-view 区域小于 movable-area</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view 
+        class="movable-view-small" 
+        direction="all" 
+        x="{{x}}" 
+        y="{{y}}"
+        bindchange="onChange"
+      >
+        <text>text</text>
+      </movable-view>
+    </movable-area>
+    <button class="btn" bindtap="tap">点击移动到 (30px, 30px)</button>
+  </view>
+
+  <!-- 4.2 区域大于 movable-area -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">movable-view 区域大于 movable-area</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view class="movable-view-large" direction="all">
+        <text>这个区域比容器大，可以拖动查看隐藏部分</text>
+      </movable-view>
+    </movable-area>
+  </view>
+
+  <!-- 4.3 只可以横向移动 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">只可以横向移动</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view class="movable-view-small" direction="horizontal">
+        <text>horizontal</text>
+      </movable-view>
+    </movable-area>
+  </view>
+
+  <!-- 4.4 只可以纵向移动 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">只可以纵向移动</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view class="movable-view-small" direction="vertical">
+        <text>vertical</text>
+      </movable-view>
+    </movable-area>
+  </view>
+
+  <!-- 4.5 可超出边界 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">可超出边界（out-of-bounds）</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view class="movable-view-small" direction="all" out-of-bounds>
+        <text>out-of-bounds</text>
+      </movable-view>
+    </movable-area>
+  </view>
+
+  <!-- 4.6 带有惯性 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">带有惯性（inertia）</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view class="movable-view-small" direction="all" inertia>
+        <text>inertia</text>
+      </movable-view>
+    </movable-area>
+  </view>
+
+  <!-- 4.7 可放缩 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">可放缩（scale）</text>
+    </view>
+    <movable-area class="movable-area" scale-area>
+      <movable-view 
+        class="movable-view-small" 
+        direction="all" 
+        bindchange="onChange" 
+        bindscale="onScale" 
+        scale 
+        scale-min="0.5" 
+        scale-max="4" 
+        scale-value="{{scale}}"
+      >
+        <text>scale</text>
+      </movable-view>
+    </movable-area>
+    <button class="btn" bindtap="tap2">点击放大3倍</button>
+  </view>
+
+  <!-- 4.8 阻尼系数 damping -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">阻尼系数（damping=50，值越大移动越快）</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view class="movable-view-small" direction="all" damping="{{50}}">
+        <text>damping</text>
+      </movable-view>
+    </movable-area>
+  </view>
+
+  <!-- 4.9 摩擦系数 friction -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">摩擦系数（friction=5，值越大滑动越快停止）</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view class="movable-view-small" direction="all" inertia friction="{{5}}">
+        <text>friction</text>
+      </movable-view>
+    </movable-area>
+  </view>
+
+  <!-- 4.10 禁用拖动 disabled -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">禁用拖动（disabled）</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view class="movable-view-small" direction="all" disabled>
+        <text>disabled</text>
+      </movable-view>
+    </movable-area>
+    <view class="tip-text">此小球已被禁用，无法拖动</view>
+  </view>
+
+  <!-- 4.11 是否使用动画 animation -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">动画控制（animation="{{false}}" 无动画）</text>
+    </view>
+    <movable-area class="movable-area">
+      <movable-view 
+        class="movable-view-small" 
+        direction="all" 
+        x="{{animX}}" 
+        y="{{animY}}" 
+        animation="{{false}}"
+      >
+        <text>no anim</text>
+      </movable-view>
+    </movable-area>
+    <button class="btn" bindtap="tapAnim">点击移动（无动画）</button>
+  </view>
+
+
+  <!-- ==================== 5. match-media 容器 ==================== -->
+  <view class="section-title">5. match-media（媒体查询容器）</view>
+
+  <!-- 5.1 页面宽度在 300~600px 之间时展示 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">min-width="300" max-width="600"</text>
+    </view>
+    <match-media min-width="300" max-width="600">
+      <view class="match-result success">
+        <text>✅ 当前页面宽度在 300 ~ 600px 之间，此区域可见</text>
+      </view>
+    </match-media>
+    <match-media min-width="601">
+      <view class="match-result warning">
+        <text>📱 当前页面宽度大于 600px，此区域可见</text>
+      </view>
+    </match-media>
+  </view>
+
+  <!-- 5.2 页面高度不小于 400px 且屏幕方向为纵向 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">min-height="400" orientation="portrait"</text>
+    </view>
+    <match-media min-height="400" orientation="portrait">
+      <view class="match-result success">
+        <text>✅ 页面高度 ≥ 400px 且屏幕方向为纵向（竖屏），此区域可见</text>
+      </view>
+    </match-media>
+  </view>
+
+  <!-- 5.3 屏幕方向为横向 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">orientation="landscape"</text>
+    </view>
+    <match-media orientation="landscape">
+      <view class="match-result info">
+        <text>🔄 屏幕方向为横向（横屏），此区域可见</text>
+      </view>
+    </match-media>
+    <match-media orientation="portrait">
+      <view class="match-result warning">
+        <text>📱 当前为竖屏，横屏内容不可见</text>
+      </view>
+    </match-media>
+  </view>
+
+
+  <!-- ==================== 6. page-container 容器 ==================== -->
+  <view class="section-title">6. page-container（页面容器/假页弹窗）</view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">弹出层容器（点击按钮打开）</text>
+    </view>
+    <button class="btn" bindtap="showPageContainer">打开底部弹窗</button>
+    <button class="btn btn-secondary" bindtap="showCenterContainer">打开居中弹窗</button>
+    <view class="tip-text">打开弹窗后，按返回键/右滑手势会关闭弹窗而非退出页面</view>
+  </view>
+
+  <!-- 底部弹窗 -->
+  <page-container 
+    show="{{showBottom}}" 
+    position="bottom" 
+    round="{{true}}" 
+    close-on-slide-down="{{true}}"
+    bind:beforeenter="onBeforeEnter"
+    bind:afterenter="onAfterEnter"
+    bind:beforeleave="onBeforeLeave"
+    bind:afterleave="onAfterLeave"
+    bind:clickoverlay="onClickOverlay"
+  >
+    <view class="popup-content">
+      <view class="popup-title">底部弹窗</view>
+      <view class="popup-desc">
+        <text>这是一个从底部弹出的 page-container 容器。</text>
+        <text>支持圆角、下滑关闭、点击遮罩层关闭等功能。</text>
+        <text>按返回键会关闭此弹窗而非退出页面。</text>
+      </view>
+      <button class="btn" bindtap="hidePageContainer">关闭弹窗</button>
+    </view>
+  </page-container>
+
+  <!-- 居中弹窗 -->
+  <page-container 
+    show="{{showCenter}}" 
+    position="center" 
+    round="{{true}}"
+    bind:clickoverlay="hideCenterContainer"
+  >
+    <view class="popup-content center-popup">
+      <view class="popup-title">居中弹窗</view>
+      <view class="popup-desc">
+        <text>这是一个居中显示的 page-container 容器。</text>
+        <text>点击遮罩层可关闭。</text>
+      </view>
+      <button class="btn" bindtap="hideCenterContainer">关闭</button>
+    </view>
+  </page-container>
+
+</view>

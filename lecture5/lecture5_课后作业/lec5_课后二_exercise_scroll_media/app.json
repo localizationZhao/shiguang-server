@@ -1,0 +1,24 @@
+{
+  "pages": [
+    "pages/scrollMedia/scrollMedia"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#07C160",
+    "navigationBarTitleText": "横向滚动多媒体",
+    "navigationBarTextStyle": "white"
+  },
+  "permission": {
+    "scope.camera": {
+      "desc": "您的相机权限将用于拍摄视频功能"
+    },
+    "scope.album": {
+      "desc": "您的相册权限将用于选择图片和视频功能"
+    },
+    "scope.record": {
+      "desc": "您的录音权限将用于拍摄视频时录音"
+    }
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

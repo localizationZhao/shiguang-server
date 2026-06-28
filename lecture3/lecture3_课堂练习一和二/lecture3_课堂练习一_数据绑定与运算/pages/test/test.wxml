@@ -1,0 +1,407 @@
+<!--pages/test/test.wxml-->
+<!-- 课堂练习一：基本数据绑定 + 页面数据运算 -->
+<!-- 知识点：Mustache语法、数据绑定、条件渲染、列表渲染、页面数据运算 -->
+
+<view class="container">
+
+  <!-- ==================== 练习1：基本数据绑定 ==================== -->
+  <view class="section-title">练习1 基本数据绑定</view>
+
+  <!-- 1. 字符串 String -->
+  <view class="data-item">
+    <text class="type-label">String</text>
+    <text>字符串：</text>
+    <text class="data-value">{{message}}</text>
+  </view>
+
+  <!-- 2. 整数 Number -->
+  <view class="data-item">
+    <text class="type-label blue">Number</text>
+    <text>整数：</text>
+    <text class="data-value">{{age}}</text>
+  </view>
+
+  <!-- 3. 浮点数 Number -->
+  <view class="data-item">
+    <text class="type-label blue">Number</text>
+    <text>浮点数：</text>
+    <text class="data-value">{{price}}</text>
+  </view>
+
+  <!-- 4. 布尔 true -->
+  <view class="data-item">
+    <text class="type-label orange">Boolean</text>
+    <text>布尔值（true）：</text>
+    <text class="data-value">{{isLogin}}</text>
+  </view>
+
+  <!-- 5. 布尔 false -->
+  <view class="data-item">
+    <text class="type-label orange">Boolean</text>
+    <text>布尔值（false）：</text>
+    <text class="data-value">{{isVip}}</text>
+  </view>
+
+  <!-- 6. null 空值 -->
+  <view class="data-item">
+    <text class="type-label red">null</text>
+    <text>空值：</text>
+    <text class="data-value">{{emptyValue}}</text>
+  </view>
+
+  <!-- 7. undefined 未定义 -->
+  <view class="data-item">
+    <text class="type-label red">undefined</text>
+    <text>未定义：</text>
+    <text class="data-value">{{notDefined}}</text>
+  </view>
+
+  <!-- 8. 一维数组 Array -->
+  <view class="data-item">
+    <text class="type-label purple">Array</text>
+    <text>一维数组：</text>
+    <view class="data-value">
+      <view wx:for="{{fruits}}" wx:key="*this" class="list-item">
+        第{{index + 1}}项：{{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 9. 嵌套对象 Object -->
+  <view class="data-item">
+    <text class="type-label purple">Object</text>
+    <text>嵌套对象：</text>
+    <view class="data-value">
+      <view class="complex-item">姓名：{{userInfo.name}}</view>
+      <view class="complex-item">性别：{{userInfo.gender}}</view>
+      <view class="complex-item">城市：{{userInfo.city}}</view>
+      <view class="complex-item">分数：{{userInfo.score}}</view>
+    </view>
+  </view>
+
+  <!-- 10. 动态属性绑定：动态绑定标签id -->
+  <view class="data-item">
+    <text class="type-label">动态属性</text>
+    <text>动态绑定 id 属性：</text>
+    <view id="item-{{age}}" class="data-value">
+      当前元素的 id 为 "item-{{age}}"（右键检查元素可查看）
+    </view>
+  </view>
+
+
+  <!-- ==================== 分割线 ==================== -->
+  <view class="divider"></view>
+
+
+  <!-- ==================== 练习2：页面数据运算 ==================== -->
+  <view class="section-title">练习2 页面数据运算</view>
+
+  <!-- 1. 基础算术运算：加减乘除、取余 -->
+  <view class="section-title" style="font-size: 30rpx;">2.1 基础算术运算</view>
+
+  <!-- 加法 -->
+  <view class="data-item">
+    <text class="type-label">加法</text>
+    <view class="expression">{{numA}} + {{numB}} = {{numA + numB}}</view>
+  </view>
+
+  <!-- 减法 -->
+  <view class="data-item">
+    <text class="type-label blue">减法</text>
+    <view class="expression">{{numA}} - {{numB}} = {{numA - numB}}</view>
+  </view>
+
+  <!-- 乘法 -->
+  <view class="data-item">
+    <text class="type-label orange">乘法</text>
+    <view class="expression">{{numA}} * {{numB}} = {{numA * numB}}</view>
+  </view>
+
+  <!-- 除法 -->
+  <view class="data-item">
+    <text class="type-label red">除法</text>
+    <view class="expression">{{numA}} / {{numB}} = {{numA / numB}}</view>
+  </view>
+
+  <!-- 取余 -->
+  <view class="data-item">
+    <text class="type-label purple">取余</text>
+    <view class="expression">{{numA}} % {{numB}} = {{numA % numB}}</view>
+  </view>
+
+
+  <!-- 2. 三元表达式运算 -->
+  <view class="section-title" style="font-size: 30rpx;">2.2 三元表达式运算</view>
+
+  <!-- 三元表达式用于 hidden 属性 -->
+  <view class="data-item">
+    <text class="type-label">hidden属性</text>
+    <text>score = {{score}}，score >= 60 时隐藏：</text>
+    <view hidden="{{score >= 60 ? true : false}}" class="cond-result warning">
+      这条内容在 score >= 60 时会被隐藏！
+    </view>
+    <view class="expression">hidden="{{score >= 60 ? true : false}}" → {{score >= 60 ? '隐藏' : '显示'}}</view>
+  </view>
+
+  <!-- 三元表达式用于文本内容动态渲染 -->
+  <view class="data-item">
+    <text class="type-label blue">文本渲染</text>
+    <text>成绩判定：</text>
+    <view class="cond-result {{score >= 60 ? 'success' : 'warning'}}">
+      {{score >= 60 ? '恭喜，及格了！' : '很遗憾，没及格'}}
+    </view>
+    <view class="expression">score >= 60 ? '及格' : '不及格' → {{score >= 60 ? '及格' : '不及格'}}</view>
+  </view>
+
+
+  <!-- 3. 条件比较运算：大于、小于、等于、不等于 -->
+  <view class="section-title" style="font-size: 30rpx;">2.3 条件比较运算</view>
+
+  <!-- 大于 -->
+  <view class="data-item">
+    <text class="type-label">大于（>）</text>
+    <view wx:if="{{m > n}}" class="cond-result success">{{m}} > {{n}} 成立</view>
+    <view wx:else class="cond-result warning">{{m}} > {{n}} 不成立</view>
+  </view>
+
+  <!-- 小于 -->
+  <view class="data-item">
+    <text class="type-label blue">小于（&lt;）</text>
+    <view wx:if="{{m < n}}" class="cond-result success">{{m}} &lt; {{n}} 成立</view>
+    <view wx:else class="cond-result warning">{{m}} &lt; {{n}} 不成立</view>
+  </view>
+
+  <!-- 等于 -->
+  <view class="data-item">
+    <text class="type-label orange">等于（===）</text>
+    <view wx:if="{{x === y}}" class="cond-result success">{{x}} === {{y}} 成立</view>
+    <view wx:else class="cond-result warning">{{x}} === {{y}} 不成立</view>
+  </view>
+
+  <!-- 不等于 -->
+  <view class="data-item">
+    <text class="type-label red">不等于（!==）</text>
+    <view wx:if="{{x !== y}}" class="cond-result success">{{x}} !== {{y}} 成立</view>
+    <view wx:else class="cond-result warning">{{x}} !== {{y}} 不成立</view>
+  </view>
+
+  <!-- wx:if / wx:elif / wx:else 多条件渲染 -->
+  <view class="data-item">
+    <text class="type-label purple">多条件渲染</text>
+    <text>温度 {{temperature}}℃ 的判定：</text>
+    <view wx:if="{{temperature > 35}}" class="cond-result warning">高温预警！注意防暑降温</view>
+    <view wx:elif="{{temperature > 25}}" class="cond-result success">温度适宜，适合出行</view>
+    <view wx:elif="{{temperature > 10}}" class="cond-result info">天气较凉，注意添衣</view>
+    <view wx:else class="cond-result warning">天气寒冷，注意保暖</view>
+  </view>
+
+
+  <!-- 4. 逻辑运算：与&&、或||、非! -->
+  <view class="section-title" style="font-size: 30rpx;">2.4 逻辑运算</view>
+
+  <!-- 逻辑与 && -->
+  <view class="data-item">
+    <text class="type-label">逻辑与（&&）</text>
+    <view class="expression">hasTicket = {{hasTicket}}, isWeekend = {{isWeekend}}</view>
+    <view wx:if="{{hasTicket && isWeekend}}" class="cond-result success">有票且是周末，可以出行！</view>
+    <view wx:else class="cond-result warning">条件不满足，无法出行</view>
+  </view>
+
+  <!-- 逻辑或 || -->
+  <view class="data-item">
+    <text class="type-label blue">逻辑或（||）</text>
+    <view class="expression">isWeekend = {{isWeekend}}, isHoliday = {{isHoliday}}</view>
+    <view wx:if="{{isWeekend || isHoliday}}" class="cond-result success">是周末或节假日，可以休息！</view>
+    <view wx:else class="cond-result warning">需要上班</view>
+  </view>
+
+  <!-- 逻辑非 ! -->
+  <view class="data-item">
+    <text class="type-label orange">逻辑非（!）</text>
+    <view class="expression">isWeekend = {{isWeekend}}, !isWeekend = {{!isWeekend}}</view>
+    <view wx:if="{{!isWeekend}}" class="cond-result info">今天不是周末</view>
+    <view wx:else class="cond-result success">今天是周末</view>
+  </view>
+
+
+  <!-- 5. 字符串运算 -->
+  <view class="section-title" style="font-size: 30rpx;">2.5 字符串运算</view>
+
+  <!-- 固定字符串 + 变量拼接 -->
+  <view class="data-item">
+    <text class="type-label">固定字符串+变量</text>
+    <view class="data-value">{{greeting}}，{{firstName}}{{lastName}}！</view>
+    <view class="expression">"{{greeting}}，" + "{{firstName}}{{lastName}}！"</view>
+  </view>
+
+  <!-- 变量 + 变量拼接 -->
+  <view class="data-item">
+    <text class="type-label blue">变量+变量拼接</text>
+    <view class="data-value">{{firstName + lastName}}</view>
+    <view class="expression">{{firstName}} + {{lastName}} = {{firstName + lastName}}</view>
+  </view>
+
+
+  <!-- 6. 复杂数据渲染 -->
+  <view class="section-title" style="font-size: 30rpx;">2.6 复杂数据渲染</view>
+
+  <!-- 对象嵌套属性取值 -->
+  <view class="data-item">
+    <text class="type-label">对象嵌套属性</text>
+    <view class="complex-item">书名：{{book.title}}</view>
+    <view class="complex-item">作者：{{book.author.name}}</view>
+    <view class="complex-item">国籍：{{book.author.country}}</view>
+  </view>
+
+  <!-- 数组下标取值 -->
+  <view class="data-item">
+    <text class="type-label blue">数组下标取值</text>
+    <view class="complex-item">第一章：{{book.chapters[0]}}</view>
+    <view class="complex-item">第二章：{{book.chapters[1]}}</view>
+    <view class="complex-item">第三章：{{book.chapters[2]}}</view>
+  </view>
+
+  <!-- 对象与数组组合取值 -->
+  <view class="data-item">
+    <text class="type-label orange">对象与数组组合</text>
+    <view class="complex-item">
+      《{{book.title}}》共 {{book.chapters.length}} 章
+    </view>
+    <view wx:for="{{book.chapters}}" wx:key="*this" class="complex-item">
+      {{book.title}} - {{item}}
+    </view>
+  </view>
+
+
+  <!-- 7. 保留课程原生示例：wx:if 条件渲染 + hidden 属性隐藏 -->
+  <view class="section-title" style="font-size: 30rpx;">2.7 课程原生示例保留</view>
+
+  <!-- wx:if 条件渲染 -->
+  <view class="data-item">
+    <text class="type-label">wx:if 条件渲染</text>
+    <text>showContent = {{showContent}}：</text>
+    <view wx:if="{{showContent}}" class="cond-result success">
+      这段内容因为 showContent = true 所以会显示
+    </view>
+  </view>
+
+  <!-- hidden 属性隐藏效果 -->
+  <view class="data-item">
+    <text class="type-label blue">hidden 属性隐藏</text>
+    <text>isStudent = {{isStudent}}，hidden="{{!isStudent}}"：</text>
+    <view hidden="{{!isStudent}}" class="cond-result info">
+      这段内容因为 isStudent = true，hidden="{{false}}" 所以会显示
+    </view>
+    <view class="expression">hidden 与 wx:if 的区别：hidden 只是 CSS 隐藏，DOM 仍存在；wx:if 会真正销毁/重建 DOM</view>
+  </view>
+
+
+  <!-- ==================== 练习二补充功能 ==================== -->
+  <view class="divider"></view>
+  <view class="section-title">练习二补充功能</view>
+
+
+  <!-- 1. 乘法表倒序（9开头） -->
+  <view class="section-title" style="font-size: 30rpx;">3.1 乘法表（9开头倒序）</view>
+
+  <view wx:for="{{multiplicationTable}}" wx:key="multiplier" class="multiply-row">
+    <view class="multiply-header">
+      <text class="multiply-num">{{item.multiplier}}</text>
+      <text class="multiply-label">的乘法表</text>
+    </view>
+    <view class="multiply-items">
+      <view wx:for="{{item.items}}" wx:for-item="expr" wx:key="*this" class="multiply-item">
+        <text>{{expr}}</text>
+      </view>
+    </view>
+  </view>
+
+
+  <!-- 2. 随身物品列表（自定义下标和列表项） -->
+  <view class="section-title" style="font-size: 30rpx;">3.2 随身物品列表</view>
+
+  <view class="items-list">
+    <view wx:for="{{dailyItems}}" wx:for-index="idx" wx:for-item="item" wx:key="name" class="item-card">
+      <view class="item-index">第{{idx + 1}}件</view>
+      <view class="item-content">
+        <text class="item-icon">{{item.icon}}</text>
+        <text class="item-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+
+  <!-- 3. 设备对象渲染 -->
+  <view class="section-title" style="font-size: 30rpx;">3.3 我的设备信息</view>
+
+  <view class="device-card">
+    <view class="device-header">
+      <text class="device-brand">{{myDevice.brand}}</text>
+      <text class="device-model">{{myDevice.model}}</text>
+    </view>
+    <view class="device-specs">
+      <view class="spec-row">
+        <text class="spec-label">颜色</text>
+        <text class="spec-value">{{myDevice.color}}</text>
+      </view>
+      <view class="spec-row">
+        <text class="spec-label">屏幕尺寸</text>
+        <text class="spec-value">{{myDevice.screenSize}}</text>
+      </view>
+      <view class="spec-row">
+        <text class="spec-label">分辨率</text>
+        <text class="spec-value">{{myDevice.resolution}}</text>
+      </view>
+      <view class="spec-row">
+        <text class="spec-label">CPU</text>
+        <text class="spec-value">{{myDevice.cpu}}</text>
+      </view>
+      <view class="spec-row">
+        <text class="spec-label">内存</text>
+        <text class="spec-value">{{myDevice.memory}}</text>
+      </view>
+      <view class="spec-row">
+        <text class="spec-label">存储</text>
+        <text class="spec-value">{{myDevice.storage}}</text>
+      </view>
+      <view class="spec-row">
+        <text class="spec-label">系统</text>
+        <text class="spec-value">{{myDevice.os}}</text>
+      </view>
+    </view>
+  </view>
+
+
+  <!-- 4. 条件渲染图片（根据设备类型显示不同图片） -->
+  <view class="section-title" style="font-size: 30rpx;">3.4 设备类型判定（条件渲染图片）</view>
+
+  <view class="device-type-info">
+    <text>当前设备类型：</text>
+    <text class="device-type-tag {{deviceType}}">{{deviceType}}</text>
+  </view>
+
+  <!-- 苹果设备 -->
+  <view wx:if="{{deviceType === 'apple'}}" class="device-image-card">
+    <text class="device-image-label">苹果设备 → 显示苹果图片</text>
+    <image class="device-image" src="/images/apple.png" mode="aspectFit"></image>
+  </view>
+
+  <!-- 安卓设备 -->
+  <view wx:elif="{{deviceType === 'android'}}" class="device-image-card">
+    <text class="device-image-label">安卓设备 → 显示机器人图片</text>
+    <image class="device-image" src="/images/android.png" mode="aspectFit"></image>
+  </view>
+
+  <!-- Windows 设备 -->
+  <view wx:elif="{{deviceType === 'windows'}}" class="device-image-card">
+    <text class="device-image-label">Windows 设备 → 显示窗户图片</text>
+    <image class="device-image" src="/images/windows.png" mode="aspectFit"></image>
+  </view>
+
+  <!-- 其他情况 -->
+  <view wx:else class="device-image-card">
+    <text class="device-image-label">未知设备</text>
+    <view class="unknown-device">无法识别设备类型</view>
+  </view>
+
+</view>
