@@ -128,6 +128,7 @@
 .bird-mode:active{background:rgba(255,154,86,0.08);border-color:#FF9A56}
 .bird-mode.active{background:rgba(255,154,86,0.12);color:#3f2c15;font-weight:700;border-color:#FF9A56}
 .bird-pages{display:flex;flex-wrap:wrap;gap:10rpx;position:relative;z-index:1}
+.bird-hint{width:100%;font-size:20rpx;color:rgba(63,44,21,0.3);margin-bottom:4rpx}
 .bird-page{display:flex;align-items:center;gap:8rpx;padding:12rpx 18rpx;border-radius:6rpx;
   font-size:24rpx;border:2rpx solid rgba(0,0,0,0.06);color:rgba(63,44,21,0.4)}
 .bird-page-hover{background:rgba(255,154,86,0.1);border-color:#FF9A56 !important}
