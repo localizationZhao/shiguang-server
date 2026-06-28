@@ -42,12 +42,12 @@
   transition:transform .15s}
 .sticky-note:active{transform:scale(.97)}
 .sticky-note.selected{box-shadow:0 0 0 4rpx #FF9A56}
-/* 封面区——占大部分 */
-.sticky-bd{flex:1;display:flex;align-items:center;justify-content:center;background:#f8f8f8;overflow:hidden}
+/* 封面区——3/4 */
+.sticky-bd{flex:3;display:flex;align-items:center;justify-content:center;background:#f8f8f8;overflow:hidden}
 .sticky-cover{width:100%;height:100%}
-.sticky-emoji{font-size:68rpx}
-/* 底部名字栏 */
-.sticky-hd{height:52rpx;display:flex;align-items:center;justify-content:center;padding:0 10rpx;background:#fff}
+.sticky-emoji{font-size:72rpx}
+/* 名字栏——1/4 */
+.sticky-hd{flex:1;display:flex;align-items:center;justify-content:center;padding:0 10rpx;background:#fff}
 .sticky-hd text{font-size:22rpx;font-weight:600;color:#3f2c15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 /* 隐藏不需要的元素 */
 .sticky-meta,.sticky-price,.sticky-cat{display:none}
