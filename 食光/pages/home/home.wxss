@@ -50,6 +50,7 @@
     4rpx 0 0 2rpx #fff,-4rpx 0 0 2rpx #fff,
     0 -4rpx 0 2rpx #fff,0 4rpx 0 2rpx #fff;
   transition:all .15s;font-family:monospace;align-items:center;justify-content:center;
+  filter:drop-shadow(3rpx 5rpx 3rpx rgba(0,0,0,0.15));
 }
 .pref-tag.active{
   background:var(--th);color:#fff;font-weight:800;
@@ -94,8 +95,9 @@
 
 /* ===== 两列网格 - 绿色便签风 ===== */
 .recipe-grid-2col{display:flex;flex-wrap:wrap;justify-content:space-between;padding:0 16rpx}
-.recipe-card{width:calc(50% - 10rpx);margin-bottom:18rpx;background:var(--bg);position:relative;
-  box-shadow:var(--border) 0 var(--th),var(--neg-border) 0 var(--th),0 calc(var(--neg-border)) var(--th),0 var(--border) var(--th),calc(var(--border)*2) 0 var(--th),calc(var(--neg-border)*2) 0 var(--th),0 calc(var(--neg-border)*2) var(--th),0 calc(var(--border)*2) var(--th),0 0 0 var(--border) var(--th),0 0 0 calc(var(--border)*2) #fff,calc(var(--border)*2) 0 0 var(--border) #fff,calc(var(--neg-border)*2) 0 0 var(--border) #fff,0 calc(var(--neg-border)*2) 0 var(--border) #fff,0 calc(var(--border)*2) 0 var(--border) #fff);overflow:hidden}
+.recipe-card{width:calc(50% - 10rpx);margin-bottom:22rpx;background:var(--bg);position:relative;
+  box-shadow:var(--border) 0 var(--th),var(--neg-border) 0 var(--th),0 calc(var(--neg-border)) var(--th),0 var(--border) var(--th),calc(var(--border)*2) 0 var(--th),calc(var(--neg-border)*2) 0 var(--th),0 calc(var(--neg-border)*2) var(--th),0 calc(var(--border)*2) var(--th),0 0 0 var(--border) var(--th),0 0 0 calc(var(--border)*2) #fff,calc(var(--border)*2) 0 0 var(--border) #fff,calc(var(--neg-border)*2) 0 0 var(--border) #fff,0 calc(var(--neg-border)*2) 0 var(--border) #fff,0 calc(var(--border)*2) 0 var(--border) #fff);
+  filter:drop-shadow(4rpx 6rpx 6rpx rgba(0,0,0,0.1));overflow:hidden}
 .recipe-card:active{transform:scale(.97)}
 .rc-img{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,var(--th),#ffecda 50%,var(--th));display:flex;align-items:center;justify-content:center;position:relative}
 .rc-img::after{content:'';position:absolute;bottom:0;left:0;right:0;height:6rpx;background:var(--thd)}
