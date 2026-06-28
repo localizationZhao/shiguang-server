@@ -1,0 +1,290 @@
+<!--pages/event/event.wxml-->
+<!-- 课堂练习二：事件绑定与setData数据更新 -->
+<!-- 知识点：bindtap事件绑定、setData数据更新、事件传参、冒泡事件 -->
+
+<view class="container">
+
+  <!-- ==================== 模块1：基础事件绑定 ==================== -->
+  <view class="section-title">模块1 基础事件绑定</view>
+
+  <!-- view 组件绑定 bindtap -->
+  <view class="data-item">
+    <view class="sub-title">view 组件点击事件</view>
+    <view class="btn" bindtap="onViewTap">点击 view 组件</view>
+    <view wx:if="{{showTip}}" class="tip">
+      提示：view 组件已触发点击事件！
+    </view>
+  </view>
+
+  <!-- button 组件绑定 bindtap -->
+  <view class="data-item">
+    <view class="sub-title">button 组件点击事件</view>
+    <button class="btn" bindtap="onBtnTap">{{btnText}}</button>
+    <view class="param-result">累计点击次数：{{clickCount}}</view>
+  </view>
+
+
+  <!-- ==================== 分割线 ==================== -->
+  <view class="divider"></view>
+
+
+  <!-- ==================== 模块2：setData数据更新 ==================== -->
+  <view class="section-title">模块2 setData数据更新</view>
+
+  <!-- 2.1 数字自增/自减 -->
+  <view class="data-item">
+    <view class="sub-title">数字自增/自减</view>
+    <view class="counter-display">{{counter}}</view>
+    <view style="display: flex; justify-content: center;">
+      <button class="btn btn-danger" bindtap="onDecrement">- 减1</button>
+      <button class="btn btn-success" bindtap="onIncrement">+ 加1</button>
+    </view>
+  </view>
+
+  <!-- 2.2 动态修改文本 -->
+  <view class="data-item">
+    <view class="sub-title">动态修改文本</view>
+    <view class="status-text">{{statusText}}</view>
+    <button class="btn" bindtap="onToggleStatus">切换状态</button>
+  </view>
+
+  <!-- 2.3 数组更新（新增/删除） -->
+  <view class="data-item">
+    <view class="sub-title">数组更新（新增/删除元素）</view>
+    <view style="display: flex; gap: 12rpx; margin-bottom: 16rpx;">
+      <button class="btn btn-success" bindtap="onAddItem">新增任务</button>
+      <button class="btn btn-danger" bindtap="onRemoveItem">删除最后</button>
+    </view>
+    <view wx:for="{{todoList}}" wx:key="*this" class="list-item">
+      <text>{{index + 1}}. {{item}}</text>
+    </view>
+  </view>
+
+  <!-- 2.4 对象属性更新 -->
+  <view class="data-item">
+    <view class="sub-title">对象属性更新</view>
+    <view class="user-card">
+      <text>姓名：{{user.name}}</text>
+      <text>年龄：{{user.age}}</text>
+      <text>角色：{{user.role}}</text>
+    </view>
+    <button class="btn btn-warning" bindtap="onUpdateUser">修改用户信息</button>
+  </view>
+
+
+  <!-- ==================== 分割线 ==================== -->
+  <view class="divider"></view>
+
+
+  <!-- ==================== 模块3：事件传参练习 ==================== -->
+  <view class="section-title">模块3 事件传参练习</view>
+
+  <view class="data-item">
+    <view class="sub-title">data-* 自定义属性传参</view>
+    <view class="param-btns">
+      <!-- 通过 data-id 和 data-name 传递参数 -->
+      <button class="btn" bindtap="onParamTap" data-id="1" data-name="苹果">苹果</button>
+      <button class="btn btn-success" bindtap="onParamTap" data-id="2" data-name="香蕉">香蕉</button>
+      <button class="btn btn-warning" bindtap="onParamTap" data-id="3" data-name="橙子">橙子</button>
+    </view>
+    <!-- 显示传参结果 -->
+    <view class="param-result" wx:if="{{paramResult}}">{{paramResult}}</view>
+  </view>
+
+
+  <!-- ==================== 分割线 ==================== -->
+  <view class="divider"></view>
+
+
+  <!-- ==================== 模块4：条件&列表联动 ==================== -->
+  <view class="section-title">模块4 条件&列表联动</view>
+
+  <view class="data-item">
+    <view class="sub-title">条件渲染 + 列表渲染联动</view>
+    <button class="btn" bindtap="onToggleList">
+      {{showList ? '隐藏列表' : '显示列表'}}
+    </button>
+
+    <!-- wx:if 控制列表显示/隐藏 -->
+    <view wx:if="{{showList}}" style="margin-top: 16rpx;">
+      <view wx:for="{{items}}" wx:key="id" class="list-item {{item.selected ? 'selected' : ''}}" bindtap="onToggleItem" data-index="{{index}}">
+        <text>{{item.name}}</text>
+        <text>{{item.selected ? '✅ 已选中' : '○ 未选中'}}</text>
+      </view>
+    </view>
+    <view wx:else class="tip">
+      列表已隐藏，点击按钮重新显示
+    </view>
+  </view>
+
+
+  <!-- ==================== 分割线 ==================== -->
+  <view class="divider"></view>
+
+
+  <!-- ==================== 模块5：冒泡事件演示 ==================== -->
+  <view class="section-title">模块5 冒泡事件演示</view>
+
+  <view class="data-item">
+    <view class="sub-title">bindtap（冒泡） vs catchtap（阻止冒泡）</view>
+    <view class="tip" style="margin-bottom: 16rpx;">
+      bindtap：事件会向父节点冒泡传递<br/>
+      catchtap：事件不会向父节点传递
+    </view>
+
+    <!-- 冒泡事件演示容器 -->
+    <view class="bubble-demo">
+      <!-- 外层：bindtap 冒泡 -->
+      <view class="outer-box" bindtap="onOuterTap">
+        <text>外层（bindtap）</text>
+        <view class="log-text">{{outerLog}}</view>
+
+        <!-- 中层：bindtap 冒泡 -->
+        <view class="middle-box" bindtap="onMiddleTap">
+          <text>中层（bindtap）</text>
+          <view class="log-text">{{middleLog}}</view>
+
+          <!-- 内层：catchtap 阻止冒泡 -->
+          <view class="inner-box" catchtap="onInnerCatchTap">
+            <text>内层（catchtap 阻止冒泡）</text>
+            <view class="log-text">{{innerLog}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="tip" style="margin-top: 16rpx;">
+      💡 点击内层蓝色区域，观察中层和外层是否被触发，理解 bind 与 catch 的区别
+    </view>
+  </view>
+
+
+  <!-- ==================== 分割线 ==================== -->
+  <view class="divider"></view>
+
+
+  <!-- ==================== 模块6：乘法表倒序 ==================== -->
+  <view class="section-title">模块6 乘法表倒序（9开头）</view>
+
+  <view wx:for="{{multiplicationTable}}" wx:key="multiplier" class="multiply-row">
+    <view class="multiply-header">
+      <text class="multiply-num">{{item.multiplier}}</text>
+      <text class="multiply-label">的乘法表</text>
+    </view>
+    <view class="multiply-items">
+      <view wx:for="{{item.items}}" wx:for-item="expr" wx:key="*this" class="multiply-item">
+        <text>{{expr}}</text>
+      </view>
+    </view>
+  </view>
+
+
+  <!-- ==================== 分割线 ==================== -->
+  <view class="divider"></view>
+
+
+  <!-- ==================== 模块7：随身物品列表 ==================== -->
+  <view class="section-title">模块7 随身物品列表</view>
+
+  <view class="data-item">
+    <view class="sub-title">自定义下标和列表项名称</view>
+    <view class="items-list">
+      <view wx:for="{{dailyItems}}" wx:for-index="idx" wx:for-item="item" wx:key="name" class="item-card">
+        <view class="item-index">第{{idx + 1}}件</view>
+        <view class="item-content">
+          <text class="item-icon">{{item.icon}}</text>
+          <text class="item-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+
+  <!-- ==================== 分割线 ==================== -->
+  <view class="divider"></view>
+
+
+  <!-- ==================== 模块8：设备对象渲染 ==================== -->
+  <view class="section-title">模块8 设备对象渲染</view>
+
+  <view class="data-item">
+    <view class="sub-title">我的设备信息</view>
+    <view class="device-card">
+      <view class="device-header">
+        <text class="device-brand">{{myDevice.brand}}</text>
+        <text class="device-model">{{myDevice.model}}</text>
+      </view>
+      <view class="device-specs">
+        <view class="spec-row">
+          <text class="spec-label">颜色</text>
+          <text class="spec-value">{{myDevice.color}}</text>
+        </view>
+        <view class="spec-row">
+          <text class="spec-label">屏幕尺寸</text>
+          <text class="spec-value">{{myDevice.screenSize}}</text>
+        </view>
+        <view class="spec-row">
+          <text class="spec-label">分辨率</text>
+          <text class="spec-value">{{myDevice.resolution}}</text>
+        </view>
+        <view class="spec-row">
+          <text class="spec-label">CPU</text>
+          <text class="spec-value">{{myDevice.cpu}}</text>
+        </view>
+        <view class="spec-row">
+          <text class="spec-label">内存</text>
+          <text class="spec-value">{{myDevice.memory}}</text>
+        </view>
+        <view class="spec-row">
+          <text class="spec-label">存储</text>
+          <text class="spec-value">{{myDevice.storage}}</text>
+        </view>
+        <view class="spec-row">
+          <text class="spec-label">系统</text>
+          <text class="spec-value">{{myDevice.os}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+
+  <!-- ==================== 分割线 ==================== -->
+  <view class="divider"></view>
+
+
+  <!-- ==================== 模块9：条件渲染图片 ==================== -->
+  <view class="section-title">模块9 条件渲染图片</view>
+
+  <view class="data-item">
+    <view class="sub-title">根据设备类型显示不同图片</view>
+    <view class="device-type-info">
+      <text>当前设备类型：</text>
+      <text class="device-type-tag {{deviceType}}">{{deviceType}}</text>
+    </view>
+
+    <!-- 苹果设备 -->
+    <view wx:if="{{deviceType === 'apple'}}" class="device-image-card">
+      <text class="device-image-label">苹果设备 → 显示苹果图片</text>
+      <image class="device-image" src="/images/apple.png" mode="aspectFit"></image>
+    </view>
+
+    <!-- 安卓设备 -->
+    <view wx:elif="{{deviceType === 'android'}}" class="device-image-card">
+      <text class="device-image-label">安卓设备 → 显示机器人图片</text>
+      <image class="device-image" src="/images/android.png" mode="aspectFit"></image>
+    </view>
+
+    <!-- Windows 设备 -->
+    <view wx:elif="{{deviceType === 'windows'}}" class="device-image-card">
+      <text class="device-image-label">Windows 设备 → 显示窗户图片</text>
+      <image class="device-image" src="/images/windows.png" mode="aspectFit"></image>
+    </view>
+
+    <!-- 其他情况 -->
+    <view wx:else class="device-image-card">
+      <text class="device-image-label">未知设备</text>
+      <view class="unknown-device">无法识别设备类型</view>
+    </view>
+  </view>
+
+</view>
