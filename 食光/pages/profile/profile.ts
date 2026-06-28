@@ -185,7 +185,7 @@ Page({
   _scanBirdTargets() {
     var self = this
     var q = wx.createSelectorQuery()
-    q.selectAll('.card,.glass,.user-card,.btn,.chip,.sticky-card').boundingClientRect()
+    q.selectAll('.profile-card,.quick-card,.diary-entry,.cooking-section,.bird-section,.settings-section,.set-item').boundingClientRect()
     q.exec(function (res: any[]) {
       var rects = res[0]
       if (rects && rects.length > 0) {

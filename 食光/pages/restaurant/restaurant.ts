@@ -427,7 +427,7 @@ Page({
     }
     // 主人自动加入
     const profile = wx.getStorageSync('userProfile') || { nick: '店主' }
-    newRest.members.push({ nick: profile.nick || '店主', seatIndex: 4, birdType: '32x32x1', soulColor: randomSoulColor(), online: true })
+    newRest.members.push({ nickname: profile.nick || '店主', seatIndex: 4, birdType: '32x32x1', soulColor: randomSoulColor(), online: true, accessory: '', joinedAt: new Date().toISOString() })
     rests.push(newRest)
     saveRestaurants(rests)
     // 同步云端
@@ -458,7 +458,7 @@ Page({
     const name = (this.data.editRestName || '').trim()
     if (!name) { wx.showToast({ title: '请输入餐厅名称', icon: 'none' }); return }
     const rests = getRestaurants()
-    const rest = rests[this.data.activeRestIdx]
+    const rest = rests.find((r: any) => r.id === this.data.activeRest?.id)
     if (!rest || !rest.owner) return
     rest.name = name
     rest.description = this.data.editRestDesc || ''
@@ -478,7 +478,7 @@ Page({
       success(res: any) {
         if (res.confirm) {
           const rests = getRestaurants()
-          const rest = rests[that.data.activeRestIdx]
+          const rest = rests.find((r: any) => r.id === that.data.activeRest?.id)
           if (rest) {
             rest.closed = true
             // 标记所有加入此店的副本为闭店（按originalId或inviteCode匹配）
@@ -710,7 +710,7 @@ Page({
     const input = (this.data.joinCode || '').trim().toUpperCase()
     if (!input) { wx.showToast({ title: '请输入邀请码', icon: 'none' }); return }
     const rests = getRestaurants()
-    let target = rests.find((r: any) => r.inviteCode === input)
+    let target = rests.find((r: any) => r.owner && r.inviteCode === input)
     if (!target) {
       // 本地没有，查云端
       const app = getApp<IAppOption>()
@@ -1000,7 +1000,7 @@ Page({
   unshelfFromMenu(e: any) {
     const recipeId = Number(e.currentTarget.dataset.id)
     const rests = getRestaurants()
-    const rest = rests[this.data.activeRestIdx]
+    const rest = rests.find((r: any) => r.id === this.data.activeRest?.id)
     if (!rest || !rest.menu) return
     rest.menu = rest.menu.filter((m: any) => m.recipeId !== recipeId)
     saveRestaurants(rests)
@@ -1012,7 +1012,7 @@ Page({
   toggleShelfRecipe(e: any) {
     const recipeId = Number(e.currentTarget.dataset.id)
     const rests = getRestaurants()
-    const rest = rests[this.data.activeRestIdx]
+    const rest = rests.find((r: any) => r.id === this.data.activeRest?.id)
     if (!rest) return
     if (!rest.menu) rest.menu = []
     const idx = rest.menu.findIndex((m: any) => m.recipeId === recipeId)
@@ -1461,7 +1461,7 @@ Page({
   closeShareSheet() { this.setData({ showShareSheet: false }) },
   refreshInviteCode() {
     const rests = getRestaurants()
-    const rest = rests[this.data.activeRestIdx]
+    const rest = rests.find((r: any) => r.id === this.data.activeRest?.id)
     if (!rest || !rest.owner) return
     rest.inviteCode = 'SG' + Date.now().toString(36).toUpperCase().slice(-8)
     rest.codeExpire = Date.now() + 86400000 // 24小时有效
@@ -1506,7 +1506,7 @@ Page({
     // 直接构建并加入
     const r: any = {
       id: cloudRest.id, name: cloudRest.name,
-      description: cloudRest.description || '', owner: false,
+      description: cloudRest.description || '', owner: true,
       members: (cloudRest.members || []).map((m: any) => ({
         nickname: m.nickname, seatIndex: m.seat_index || 0, birdType: m.bird_type || '32x32x1',
         soulColor: m.soul_color || randomSoulColor(), online: false

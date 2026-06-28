@@ -232,16 +232,19 @@ Component({
       var h = !this.data.birdHidden;
       this.setData({ birdHidden: h, showMenu: false });
       if (this._birb) this._birb.visible = !h;
+      this._saveState();
     },
     tapFreeze: function () {
       var f = !this.data.birdFrozen;
       this.setData({ birdFrozen: f, showMenu: false });
       if (this._bh) this._bh.setFrozen(f);
+      this._saveState();
     },
     tapFlyMode: function () {
       var m = !this.data.birdFlyMode;
       this.setData({ birdFlyMode: m, showMenu: false });
       if (this._bh) this._bh.setFlyMode(m);
+      this._saveState();
       wx.showToast({ title: '【状态】: ' + (m ? '自由' : '底部'), icon: 'none', duration: 1000 });
     },
     tapBirdSettings: function () {
@@ -434,9 +437,8 @@ Component({
     _onShow: function () {
       if (!this._paused) return;
       this._paused = false;
-      // 切换tab时自动显示小鸟
-      this.setData({ birdHidden: false });
-      if (this._birb) { this._birb.visible = true; this._birb.animStart = Date.now(); }
+      // 保持用户的小鸟隐藏/显示状态
+      if (this._birb) { this._birb.visible = !this.data.birdHidden; this._birb.animStart = Date.now(); }
       this._startLoop();
     },
     _onHide: function () {
