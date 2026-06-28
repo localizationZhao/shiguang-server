@@ -1,9 +1,35 @@
 const express = require('express')
 const mysql = require('mysql2/promise')
 const cors = require('cors')
+const http = require('http')
+const { WebSocketServer } = require('ws')
+
 const app = express()
 app.use(cors())
 app.use(express.json({ limit: '10mb' }))
+
+// WebSocket 实时通信
+const server = http.createServer(app)
+const wss = new WebSocketServer({ server, path: '/ws' })
+const clients = new Set()
+
+wss.on('connection', (ws) => {
+  clients.add(ws)
+  ws.on('message', (raw) => {
+    try {
+      const msg = JSON.parse(raw)
+      // 广播给所有其他客户端
+      clients.forEach(c => { if (c !== ws && c.readyState === 1) c.send(JSON.stringify(msg)) })
+    } catch (e) {}
+  })
+  ws.on('close', () => clients.delete(ws))
+})
+
+// REST广播辅助
+function broadcastWS(type, payload) {
+  const msg = JSON.stringify({ type, payload })
+  clients.forEach(c => { if (c.readyState === 1) c.send(msg) })
+}
 
 const pool = mysql.createPool({
   host: '10.32.100.251', port: 3306, user: 'root', password: 'XjYwcMb9',
@@ -34,7 +60,7 @@ app.get('/api/seed', async (req, res) => {
 app.get('/api/recipes', async (req, res) => {
   try {
     const { keyword, tag } = req.query
-    let sql = 'SELECT * FROM recipes WHERE is_draft=0'
+    let sql = 'SELECT * FROM recipes WHERE is_draft=0 AND is_public=1'
     const p = []
     if (keyword) { sql += ' AND name LIKE ?'; p.push('%' + keyword + '%') }
     if (tag) { sql += ' AND JSON_CONTAINS(tags, ?)'; p.push(JSON.stringify(tag)) }
@@ -479,4 +505,4 @@ app.get('/api/qrcode', async (req, res) => {
   } catch (e) { res.status(500).json({ code: -1, msg: e.message }) }
 })
 
-app.listen(3000, () => console.log('食光服务器: http://localhost:3000'))
+server.listen(3000, () => console.log('食光服务器: http://localhost:3000 (WS:/ws)'))
