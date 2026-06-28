@@ -233,12 +233,19 @@ Page({
     const menuAll = activeRest ? (activeRest.menu || []) : []
     const menu = menuAll.filter((m: any) => m.onShelf)
     const restId = activeRest ? (activeRest.originalId || activeRest.id) : 0
-    const filteredOrders = activeRest ? orders.filter((o: any) => o.restaurantId === restId || o.restaurantId === activeRest.id) : []
+    // 收集当前餐厅的所有关联ID（自身+originalId+关联副本）
+    const relatedIds = new Set<number>([restId, activeRest?.id].filter(Boolean) as number[])
+    if (activeRest) {
+      allRests.forEach((r: any) => {
+        if (r.originalId === activeRest.id || r.id === activeRest.originalId) relatedIds.add(r.id)
+      })
+    }
+    const filteredOrders = activeRest ? orders.filter((o: any) => relatedIds.has(o.restaurantId)) : []
     this.syncOrdersFromCloud()
     this.setData({
       hasRestaurant: has, restaurants: rests, activeRest, menu, menuAll,
       orders: filteredOrders, filteredOrders: filteredOrders, feeds: this.filterFeeds(feeds), activeRestIdx: idx,
-      allRestsForOrder: allRests.filter((r: any) => !r.closed),
+      allRestsForOrder: rests.filter((r: any) => orders.some((o: any) => o.restaurantId === r.id || o.restaurantId === (r.originalId || r.id))),
     })
     this.updateAvgRating()
   },
