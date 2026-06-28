@@ -151,7 +151,7 @@ Page({
     }
     // 口袋小鸟显示模式
     const mode = wx.getStorageSync('birdDisplayMode') || 'all'
-    const pages = wx.getStorageSync('birdPages') || ['home','diy','restaurant','profile']
+    const rawPages = wx.getStorageSync('birdPages'); const pages = (rawPages && rawPages.length > 0) ? rawPages : ['home','diy','restaurant','profile']
     let showBird = false, interiorOnly = false
     if (mode === 'all') showBird = true
     else if (mode === 'custom') showBird = pages.indexOf('restaurant') >= 0
@@ -270,7 +270,8 @@ Page({
 
   switchRest(e: any) {
     const idx = parseInt(e.currentTarget.dataset.index)
-    // 切换餐厅时重置订单筛选，订单跟随当前餐厅
+    // 切换餐厅时重置_lastRestId让refreshAll用idx定位
+    ;(this as any)._lastRestId = 0
     this.setData({ activeRestIdx: idx, tab: 'menu', orderRestFilter: 0, orderFilter: 'all' })
     this.refreshAll()
   },

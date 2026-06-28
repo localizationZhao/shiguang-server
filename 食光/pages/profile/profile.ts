@@ -51,7 +51,7 @@ Page({
       this.getTabBar().setData({ selected: 3 })
     }
     const birdMode = wx.getStorageSync('birdDisplayMode') || 'all'
-    const birdPages = wx.getStorageSync('birdPages') || ['home', 'diy', 'restaurant', 'profile']
+    const rawPages = wx.getStorageSync('birdPages'); const birdPages = (rawPages && rawPages.length > 0) ? rawPages : ['home','diy','restaurant','profile']
     let showBird = false
     if (birdMode === 'all') showBird = true
     else if (birdMode === 'custom') showBird = birdPages.indexOf('profile') >= 0

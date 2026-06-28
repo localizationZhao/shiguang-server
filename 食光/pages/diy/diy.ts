@@ -72,7 +72,7 @@ Page({
     }
     // 口袋小鸟显示模式
     const mode = wx.getStorageSync('birdDisplayMode') || 'all'
-    const pages = wx.getStorageSync('birdPages') || ['home','diy','restaurant','profile']
+    const rawPages = wx.getStorageSync('birdPages'); const pages = (rawPages && rawPages.length > 0) ? rawPages : ['home','diy','restaurant','profile']
     let showBird = false
     if (mode === 'all') showBird = true
     else if (mode === 'custom') showBird = pages.indexOf('diy') >= 0
