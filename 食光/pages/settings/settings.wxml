@@ -1,29 +1,7 @@
 <navigation-bar title="设置" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
 <scroll-view class="page" scroll-y>
 
-  <!-- 🐦 口袋小鸟 -->
-  <view class="bird-section">
-    <view class="bird-section-hd">
-      <text class="bird-icon">🐦</text>
-      <text class="bird-title">口袋小鸟</text>
-    </view>
-    <text class="bird-desc">一只会蹦会跳的像素小鸟，陪你一起做菜~</text>
-    <view class="bird-mode-grid">
-      <view
-        wx:for="{{birdModes}}"
-        wx:key="key"
-        class="bird-mode-chip {{birdDisplayMode === item.key ? 'active' : ''}}"
-        data-mode="{{item.key}}"
-        bindtap="setBirdMode"
-      >
-        <text class="bird-mode-icon">{{item.icon}}</text>
-        <text class="bird-mode-label">{{item.label}}</text>
-        <view wx:if="{{birdDisplayMode === item.key}}" class="bird-mode-check">✓</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 其他设置项 -->
+  <!-- 设置项 -->
   <view class="glass" style="margin:8px">
     <text style="font-weight:600">个人资料</text>
   </view>

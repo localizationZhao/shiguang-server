@@ -244,6 +244,10 @@ Component({
       if (this._bh) this._bh.setFlyMode(m);
       wx.showToast({ title: '【状态】: ' + (m ? '自由' : '底部'), icon: 'none', duration: 1000 });
     },
+    tapBirdSettings: function () {
+      this.closeMenu();
+      wx.switchTab({ url: '/pages/profile/profile' });
+    },
     tapUnlockAll: function () {
       var bh = this._bh; if (bh) { bh.unlockAll(); }
       wx.showToast({ title: '已全部解锁!', icon: 'success' });

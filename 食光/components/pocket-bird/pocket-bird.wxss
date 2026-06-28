@@ -14,12 +14,12 @@
 
 /* === 菜单：Pixel Note 便签风 === */
 .menu-mask{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10002;background:transparent;}
-.menu-pop{position:fixed;z-index:10003;background:#ffecda;min-width:180rpx;
-  box-shadow:3rpx 0 #ffa3cb,-3rpx 0 #ffa3cb,0 -3rpx #ffa3cb,0 3rpx #ffa3cb,
-    6rpx 0 #d43d7e,-6rpx 0 #d43d7e,0 -6rpx #d43d7e,0 6rpx #d43d7e,
-    0 0 0 3rpx #ffa3cb,0 0 0 6rpx #fff,
-    6rpx 0 0 3rpx #fff,-6rpx 0 0 3rpx #fff,
-    0 -6rpx 0 3rpx #fff,0 6rpx 0 3rpx #fff;}
+.menu-pop{position:fixed;z-index:10003;background:#ffecda;min-width:180rpx;border-radius:4rpx;
+  box-shadow:2rpx 0 #ffa3cb,-2rpx 0 #ffa3cb,0 -2rpx #ffa3cb,0 2rpx #ffa3cb,
+    4rpx 0 #ffa3cb,-4rpx 0 #ffa3cb,0 -4rpx #ffa3cb,0 4rpx #ffa3cb,
+    0 0 0 2rpx #ffa3cb,0 0 0 4rpx #fff,
+    4rpx 0 0 2rpx #fff,-4rpx 0 0 2rpx #fff,
+    0 -4rpx 0 2rpx #fff,0 4rpx 0 2rpx #fff;}
 /* 标题栏 */
 .menu-hd{display:flex;justify-content:space-between;align-items:center;
   background:#ffa3cb;padding:6rpx 12rpx 6rpx 24rpx;}

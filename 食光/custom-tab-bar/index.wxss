@@ -28,8 +28,8 @@
   animation: tabFlash .25s ease;
 }
 @keyframes tabFlash {
-  0%   { background: var(--tab-color); transform: scale(.85) translateY(4rpx); }
-  100% { background: transparent; transform: scale(1) translateY(0); }
+  0%   { transform: scale(.88) translateY(4rpx); }
+  100% { transform: scale(1) translateY(0); }
 }
 
 /* 像素图标 */
@@ -56,11 +56,11 @@
   font-weight: 500;
 }
 
-/* ===== 选中态——纯色加深填充 + 图标放大 ===== */
+/* ===== 选中态——图标放大 + 文字橘色小底块 ===== */
 .tab-item.active {
-  background: var(--tab-color, #FF9A56);
-  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.15), 0 2rpx 0 rgba(0,0,0,0.1);
-  margin: 2rpx 6rpx;
+  background: transparent;
+  box-shadow: none;
+  margin: 4rpx 8rpx;
 }
 .tab-item.active .tab-icon-img {
   width: 56rpx; height: 56rpx;
@@ -68,15 +68,18 @@
   opacity: 1;
 }
 .tab-item.active .tab-text {
-  font-size: 26rpx; font-weight: 800;
-  color: #fff;
-  text-shadow: 0 1rpx 2rpx rgba(0,0,0,0.15);
+  font-size: 24rpx; font-weight: 700;
+  color: #FF9A56;
+  background: rgba(255,154,86,0.15);
+  border-radius: 10rpx;
+  padding: 2rpx 16rpx;
+  text-shadow: none;
 }
 
-/* 选中指示线——白色短线 */
+/* 选中指示线——橘色短线 */
 .tab-line {
-  width: 36rpx; height: 6rpx;
+  width: 28rpx; height: 5rpx;
   border-radius: 3rpx;
-  background: rgba(255,255,255,0.8);
+  background: #FF9A56;
   margin-top: 2rpx;
 }

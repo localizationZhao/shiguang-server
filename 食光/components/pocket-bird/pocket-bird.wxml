@@ -26,6 +26,7 @@
   <view class="menu-item" bindtap="tapFreeze"><text>{{birdFrozen ? '恢复小鸟' : '暂停小鸟'}}</text></view>
   <view class="menu-item" bindtap="tapFlyMode"><text>状态: {{birdFlyMode ? '自由' : '底部'}}</text></view>
   <view class="menu-sep"></view>
+  <view class="menu-item" bindtap="tapBirdSettings"><text>⚙️ 小鸟位置</text></view>
   <view class="menu-item" bindtap="tapUnlockAll"><text>解锁全部</text></view>
   <view class="menu-item" bindtap="tapReset"><text>重置数据</text></view>
 </view>

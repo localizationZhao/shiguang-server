@@ -56,26 +56,29 @@
 
   <!-- 🐦 小鸟设置 -->
   <view class="bird-section">
-    <view class="bird-hd"><text class="bird-title">小鸟位置</text></view>
+    <view class="bird-hd"><text class="bird-title">🐦 口袋小鸟</text></view>
     <view class="bird-modes">
       <view class="bird-mode {{birdMode==='all'?'active':''}}" data-m="all" bindtap="setBirdMode">
-        <text>全页</text>
+        <text>🌐 全页</text>
       </view>
       <view class="bird-mode {{birdMode==='custom'?'active':''}}" data-m="custom" bindtap="setBirdMode">
-        <text>自定义</text>
+        <text>🎯 自定义</text>
+      </view>
+      <view class="bird-mode {{birdMode==='none'?'active':''}}" data-m="none" bindtap="setBirdMode">
+        <text>🚫 关闭</text>
       </view>
     </view>
-    <view class="bird-pages" wx:if="{{birdMode==='custom'}}">
-      <view class="bird-page {{birdPages.indexOf('home')>=0?'on':''}}" data-p="home" bindtap="toggleBirdPage">
+    <view class="bird-pages" wx:if="{{birdMode==='custom'}}" style="z-index:1">
+      <view class="bird-page {{birdPages.indexOf('home')>=0?'on':''}}" data-p="home" bindtap="toggleBirdPage" hover-class="bird-page-hover">
         <text>🏠 首页</text><text class="bp-check">{{birdPages.indexOf('home')>=0 ? '✓' : ''}}</text>
       </view>
-      <view class="bird-page {{birdPages.indexOf('diy')>=0?'on':''}}" data-p="diy" bindtap="toggleBirdPage">
+      <view class="bird-page {{birdPages.indexOf('diy')>=0?'on':''}}" data-p="diy" bindtap="toggleBirdPage" hover-class="bird-page-hover">
         <text>🔧 DIY</text><text class="bp-check">{{birdPages.indexOf('diy')>=0 ? '✓' : ''}}</text>
       </view>
-      <view class="bird-page {{birdPages.indexOf('restaurant')>=0?'on':''}}" data-p="restaurant" bindtap="toggleBirdPage">
+      <view class="bird-page {{birdPages.indexOf('restaurant')>=0?'on':''}}" data-p="restaurant" bindtap="toggleBirdPage" hover-class="bird-page-hover">
         <text>🍽️ 餐厅</text><text class="bp-check">{{birdPages.indexOf('restaurant')>=0 ? '✓' : ''}}</text>
       </view>
-      <view class="bird-page {{birdPages.indexOf('profile')>=0?'on':''}}" data-p="profile" bindtap="toggleBirdPage">
+      <view class="bird-page {{birdPages.indexOf('profile')>=0?'on':''}}" data-p="profile" bindtap="toggleBirdPage" hover-class="bird-page-hover">
         <text>👤 我的</text><text class="bp-check">{{birdPages.indexOf('profile')>=0 ? '✓' : ''}}</text>
       </view>
     </view>
