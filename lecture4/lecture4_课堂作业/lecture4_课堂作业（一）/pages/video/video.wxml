@@ -1,0 +1,25 @@
+<view class="page-container">
+  <view class="page-title">{{title}}</view>
+  <scroll-view scroll-y="true" style="width:100%;height:{{viewHeight}}px" lower-threshold="50" bindscrolltolower="addMoreData" refresher-enabled="true" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <block wx:for="{{videoList}}" wx:key="id">
+      <view class="video-card">
+        <view class="video-wrapper">
+          <video class="video-player" src="{{item.videoUrl}}" duration="{{item.duration}}" bindplay="onPlay" bindpause="onPause" bindended="onEnded">
+          </video>
+          <image class="video-cover" src="{{item.poster}}" mode="aspectFill"></image>
+          <view class="play-btn">
+            <text class="play-icon">▶</text>
+          </view>
+        </view>
+        <view class="video-info">
+          <text class="video-title">{{item.title}}</text>
+          <view class="video-meta">
+            <text class="meta-item">{{item.author}}</text>
+            <text class="meta-item">{{item.playCount}}播放</text>
+            <text class="meta-item">{{item.publishTime}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+</view>
