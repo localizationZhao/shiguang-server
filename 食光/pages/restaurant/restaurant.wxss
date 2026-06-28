@@ -15,10 +15,28 @@
 .hint-text{font-size:20rpx;color:rgba(63,44,21,0.3);text-align:center}
 
 /* ===== 餐厅标签 ===== */
-.rest-tabs-scroll{display:flex;flex-shrink:0;gap:8rpx;white-space:nowrap;padding:0 4rpx}
-.rest-tab{display:inline-flex;align-items:center;gap:4rpx;padding:10rpx 18rpx;font-size:22rpx;background:var(--bg);color:rgba(63,44,21,0.5);border:2rpx solid var(--hl);margin-right:6rpx}
-.rest-tab.active{background:var(--hl);color:var(--bg);font-weight:700}
-.rest-tab-add{display:inline-flex;align-items:center;justify-content:center;width:40rpx;height:40rpx;background:var(--bg);color:var(--hl);font-size:24rpx;border:2rpx dashed var(--hl)}
+.rest-tabs-scroll{display:flex;flex-shrink:0;gap:8rpx;white-space:nowrap;padding:4rpx 4rpx}
+.rest-tab{display:inline-flex;align-items:center;gap:6rpx;padding:10rpx 18rpx;font-size:22rpx;background:rgba(255,255,255,0.85);color:rgba(63,44,21,0.5);border:2rpx solid #e0d8cc;border-radius:24rpx;margin-right:6rpx;transition:all .2s ease;position:relative}
+/* 店主餐厅标签 */
+.rest-tab.owner-tab{border-color:#ffb37c;color:#c97a3a}
+/* 食客加入的餐厅标签 */
+.rest-tab.join-tab{border-color:#79bcff;color:#5a90d4}
+/* 当前所在餐厅 —— 高亮 */
+.rest-tab.active{font-weight:700;box-shadow:0 2rpx 12rpx rgba(0,0,0,0.1)}
+.rest-tab.owner-tab.active{background:#ffb37c;color:#fff;border-color:#ffb37c;transform:translateY(-2rpx)}
+.rest-tab.join-tab.active{background:#79bcff;color:#fff;border-color:#79bcff;transform:translateY(-2rpx)}
+/* 状态圆点 */
+.rest-tab-dot{width:12rpx;height:12rpx;border-radius:50%;flex-shrink:0;transition:all .2s}
+.dot-owner{background:#ffb37c;box-shadow:0 0 6rpx rgba(255,179,124,0.6)}
+.dot-join{background:#79bcff;box-shadow:0 0 6rpx rgba(121,188,255,0.6)}
+.rest-tab.active .dot-owner{background:#fff;box-shadow:0 0 8rpx rgba(255,255,255,0.8)}
+.rest-tab.active .dot-join{background:#fff;box-shadow:0 0 8rpx rgba(255,255,255,0.8)}
+/* 角色小标签 */
+.rest-tab-role{font-size:18rpx;padding:2rpx 8rpx;border-radius:8rpx;font-weight:700;flex-shrink:0}
+.rest-tab.owner-tab .rest-tab-role{background:rgba(255,179,124,0.2);color:#c97a3a}
+.rest-tab.join-tab .rest-tab-role{background:rgba(121,188,255,0.2);color:#5a90d4}
+.rest-tab.active .rest-tab-role{background:rgba(255,255,255,0.35);color:#fff}
+.rest-tab-add{display:inline-flex;align-items:center;justify-content:center;width:40rpx;height:40rpx;background:rgba(255,255,255,0.85);color:var(--hl);font-size:24rpx;border:2rpx dashed var(--hl);border-radius:12rpx}
 
 /* ===== 操作栏 ===== */
 .top-bar{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:12rpx 16rpx;background:var(--bg);
