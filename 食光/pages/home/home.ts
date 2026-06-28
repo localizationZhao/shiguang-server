@@ -84,7 +84,8 @@ Page({
       success: (res: any) => {
         if (res.data?.code === 0 && res.data.data?.length > 0) {
           const recipes = res.data.data
-            .filter((r: any) => r.is_public == 1) // 只显示公开菜谱，过滤掉用户DIY的
+            .filter((r: any) => r.is_public == 1 || r.is_public === '1') // 只要公开菜谱
+            .filter((r: any) => !r.source || r.source !== 'copy') // 排除复刻来源
             .map((r: any) => ({...r,color:r.color||CAT_COLORS[r.category_id]||'#ff8baa'}))
           if (recipes.length > 0) {
             this.setData({ allRecipes: recipes, displayRecipes: recipes, scrollNames: recipes.map((r: any, i: number) => ({id: i, text: (r.cover_emoji || ':)') + ' ' + r.name})) })
@@ -305,8 +306,8 @@ Page({
       createdAt: new Date().toISOString().slice(0, 10), source: 'copy', copiedFrom: recipe.id, draft: false,
     }
     addRecipe(copied)
-    // 同步到云端
-    api.addRecipe(copied).catch(() => {})
+    // 同步到云端（明确标记为私有菜谱）
+    api.addRecipe({ ...copied, is_public: 0, is_draft: 0 }).catch(() => {})
     const newId = copied.id
     wx.showModal({
       title: '复刻成功 🎉',
