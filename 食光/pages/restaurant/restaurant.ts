@@ -268,7 +268,8 @@ Page({
 
   switchRest(e: any) {
     const idx = parseInt(e.currentTarget.dataset.index)
-    this.setData({ activeRestIdx: idx, tab: 'menu' })
+    // 切换餐厅时重置订单筛选，订单跟随当前餐厅
+    this.setData({ activeRestIdx: idx, tab: 'menu', orderRestFilter: 0, orderFilter: 'all' })
     this.refreshAll()
   },
 
