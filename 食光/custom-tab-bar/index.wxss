@@ -58,7 +58,7 @@
 
 /* ===== 选中态——纯色加深填充 + 图标放大 ===== */
 .tab-item.active {
-  background: var(--tab-color, #ff4997);
+  background: var(--tab-color, #FF9A56);
   box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.15), 0 2rpx 0 rgba(0,0,0,0.1);
   margin: 2rpx 6rpx;
 }
