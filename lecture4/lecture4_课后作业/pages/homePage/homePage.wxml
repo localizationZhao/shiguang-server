@@ -1,0 +1,36 @@
+<view class="mainViewClass">
+  <view wx:if="{{!loading}}" class="loading-view">
+    <text>加载中...</text>
+  </view>
+
+  <view class="topTabBarClass">
+    <scroll-view scroll-x="true" enable-flex="true" style="width: 90%;height: 100%; white-space:nowrap;display: flex">
+      <block wx:for="{{tArray}}" wx:key="category">
+        <view animation="{{animation}}" class="topTypeListClass {{index==curpage?'curPage':''}}" bindtap="typeClick" id="{{index}}" data-idx="{{item.category}}">
+          {{item.name}}
+        </view>
+      </block>
+    </scroll-view>
+    <view class="rightview">
+      <image mode="aspectFit" src="../../images/addChannel.png" class="addImage">
+      </image>
+    </view>
+  </view>
+
+  <scroll-view scroll-y="true" style="width:100%;height:{{viewHeight}}px" lower-threshold="50" bindscrolltolower="addMoreData">
+    <block wx:for="{{detaildata}}" wx:key="title">
+      <view class="cellClass">
+        <text>{{item.title}}</text>
+        <view class="imageClass" hidden="{{!item.has_image}}">
+          <image class="imageshow" src="{{item.image_list[0].url}}" mode="scaleToFill"></image>
+          <image class="imageshow" src="{{item.image_list[1].url}}" mode="scaleToFill"></image>
+          <image class="imageshow" src="{{item.image_list[2].url}}" mode="scaleToFill"></image>
+        </view>
+        <view class="cellbottomClass">
+          <text style="margin-right:10rpx">{{item.comment_count}}评论</text>
+          <text>{{item.publish_time}}</text>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+</view>
