@@ -134,7 +134,11 @@ Page({
     if (Math.abs(deltaX) < 60) return
     const TABS = ['/pages/diy/diy', '/pages/home/home', '/pages/restaurant/restaurant', '/pages/profile/profile']
     const next = deltaX < 0 ? Math.min(this._tabIndex + 1, 3) : Math.max(this._tabIndex - 1, 0)
-    if (next !== this._tabIndex) wx.switchTab({ url: TABS[next] })
+    if (next !== this._tabIndex) {
+      const tabBar = this.getTabBar()
+      if (tabBar) tabBar.setData({ selected: next })
+      wx.switchTab({ url: TABS[next] })
+    }
   },
 
   onShow() {
