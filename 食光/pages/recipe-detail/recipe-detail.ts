@@ -58,11 +58,11 @@ Page({
     if (this.data.faved) {
       removeFavorite(this.data.recipe.id)
       api.removeFavorite(this.data.recipe.id).catch(()=>{})
-      wx.showToast({ title: '已取消收藏', icon: 'none' })
+      wx.showToast({ title: '已取消🤍', icon: 'none' })
     } else {
       addFavorite(this.data.recipe)
       api.addFavorite(this.data.recipe.id).catch(()=>{})
-      wx.showToast({ title: '已收藏 ❤️', icon: 'success' })
+      wx.showToast({ title: '已收藏 ❤️', icon: 'none' })
     }
     this.setData({ faved: !this.data.faved })
   },

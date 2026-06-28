@@ -11,6 +11,16 @@ App<IAppOption>({
 
   onLaunch() {
     wx.cloud.init({ env: 'prod-d0g68hmay4c8d10e3' })
+    // WebSocket 实时通信
+    const { wsConnect } = require('./utils/api')
+    wsConnect()
+    // 云连通测试
+    wx.cloud.callContainer({
+      config: { env: 'prod-d0g68hmay4c8d10e3' },
+      path: '/api/restaurants', header: { 'X-WX-SERVICE': 'express-rtm4' }, method: 'GET',
+      success: () => console.log('[云] 连通OK'),
+      fail: (e: any) => console.error('[云] 连通失败:', e.errMsg || e)
+    })
 
     // 隐私协议处理
     if (wx.onNeedPrivacyAuthorization) {
@@ -53,6 +63,9 @@ App<IAppOption>({
     }
     if (!wx.getStorageSync('feeds')) {
       wx.setStorageSync('feeds', [])
+    }
+    if (!wx.getStorageSync('birdDisplayMode')) {
+      wx.setStorageSync('birdDisplayMode', 'all')
     }
 
     // 首次启动检查

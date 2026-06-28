@@ -1,0 +1,12 @@
+<navigation-bar title="自制菜谱记录" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
+<scroll-view class="page" scroll-y>
+  <view wx:if="{{recipes.length === 0}}" class="empty">还没有自制菜谱~ 去DIY页面创建吧！</view>
+  <view class="list-card" wx:for="{{recipes}}" wx:key="id" data-id="{{item.id}}" bindtap="toDetail">
+    <text class="lc-emoji">{{item.coverEmoji || '🍽️'}}</text>
+    <view class="lc-info">
+      <text class="lc-name">{{item.name}}</text>
+      <text class="lc-meta">{{item.category || '未分类'}} · {{item.createdAt || ''}}</text>
+    </view>
+    <text class="lc-arrow">›</text>
+  </view>
+</scroll-view>

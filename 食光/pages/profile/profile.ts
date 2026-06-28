@@ -1,29 +1,30 @@
 // 个人中心
-import { getRecipes, getOrders, getCookingRecords, getFavorites, getUserProfile, SYSTEM_CATEGORIES } from '../../utils/storage'
+import { getRecipes, getOrders, getCookingRecords, getFavorites, getUserProfile, SYSTEM_CATEGORIES, saveCookingRecords } from '../../utils/storage'
+import { api } from '../../utils/api'
 
 Page({
   data: {
-    user: { nick: '美食家', avatar: '', id: '10001' } as any,
-    recipeCount: 0,
-    cookingCount: 0,
-    orderCount: 0,
-    favCount: 0,
+    user: { nick: '美食家', avatar: '', id: '10001', birthday: '' } as any,
+    recipeCount: 0, cookingCount: 0, orderCount: 0, favCount: 0,
+    cookingExpanded: false,
+    recentRecords: [] as any[],
 
-    menuItems: [
-      { icon: '📖', title: '做菜记录', key: 'cooking' },
-      { icon: '🏪', title: '我的餐厅', key: 'restaurant' },
-      { icon: '📋', title: '订单记录', key: 'orders' },
-      { icon: '❤️', title: '我的收藏', key: 'favorites' },
-      { icon: '💬', title: '在线客服', key: 'support' },
+    showPocketBird: true,
+    birdTargets: [] as any[],
+    birdMode: 'all',
+    birdPages: [] as string[],
+
+    // 快捷入口
+    quickLinks: [
+      { icon: '📖', title: '自制菜谱', key: 'recipes', count: 0, color: '#ff8baa', desc: '已同步云端' },
+      { icon: '📋', title: '历史订单', key: 'orders', count: 0, color: '#79bcff', desc: '点单记录' },
+      { icon: '❤️', title: '我的收藏', key: 'favorites', count: 0, color: '#ffb37c', desc: '喜爱菜谱' },
+      { icon: '🏪', title: '我的餐厅', key: 'restaurant', count: 0, color: '#d18bff', desc: '经营管理' },
     ],
 
-    settingsItems: [
-      { icon: '✏️', title: '个人资料', key: 'profile' },
-      { icon: '🔒', title: '隐私设置', key: 'settings' },
-      { icon: '❓', title: '帮助中心', key: 'help' },
-      { icon: 'ℹ️', title: '关于食光', key: 'about' },
-      { icon: '🔧', title: '异常数据修复', key: 'repair' },
-    ],
+    showEditProfile: false,
+    editNick: '', editBirthday: '',
+    showRepairConfirm: false,
   },
 
   preventClose() {},
@@ -31,95 +32,136 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 3 })
     }
+    const birdMode = wx.getStorageSync('birdDisplayMode') || 'all'
+    const birdPages = wx.getStorageSync('birdPages') || ['home', 'diy', 'restaurant', 'profile']
+    this.setData({ showPocketBird: birdMode === 'all' || (birdMode === 'custom' && birdPages.indexOf('profile') >= 0), birdMode, birdPages })
+    this._scanBirdTargets()
+    this._refresh()
+  },
+
+  // 小鸟设置
+  setBirdMode(e: any) {
+    const m = e.currentTarget.dataset.m
+    wx.setStorageSync('birdDisplayMode', m)
+    this.setData({ birdMode: m, showPocketBird: m !== 'none' })
+  },
+  toggleBirdPage(e: any) {
+    const p = e.currentTarget.dataset.p
+    let pages = this.data.birdPages.slice()
+    const idx = pages.indexOf(p)
+    if (idx >= 0) pages.splice(idx, 1)
+    else pages.push(p)
+    wx.setStorageSync('birdPages', pages)
+    this.setData({ birdPages: pages })
+  },
+
+  _refresh() {
     const recipes = getRecipes().filter(r => !r.draft)
     const orders = getOrders()
     const records = getCookingRecords()
     const favs = getFavorites()
     const user = getUserProfile()
-
+    // 最近3条记录
+    const recent = records.slice(-3).reverse()
+    const restaurants = wx.getStorageSync('restaurants') || []
+    const links = this.data.quickLinks.map(l => ({
+      ...l,
+      count: l.key === 'recipes' ? recipes.length : l.key === 'orders' ? orders.length : l.key === 'favorites' ? favs.length : restaurants.length
+    }))
     this.setData({
-      user,
-      recipeCount: recipes.length,
-      cookingCount: records.length,
-      orderCount: orders.length,
-      favCount: favs.length,
+      user, recipeCount: recipes.length, cookingCount: records.length,
+      orderCount: orders.length, favCount: favs.length,
+      recentRecords: recent, quickLinks: links
     })
   },
 
-  // ============ 功能入口 ============
-  onMenuItem(e: any) {
-    const key = e.currentTarget.dataset.key
-    switch (key) {
-      case 'cooking':
-        wx.navigateTo({ url: '/pages/cooking-record/cooking-record' })
-        break
-      case 'restaurant':
-        wx.switchTab({ url: '/pages/restaurant/restaurant' })
-        break
-      case 'orders':
-        wx.navigateTo({ url: '/pages/my-orders/my-orders' })
-        break
-      case 'favorites':
-        wx.navigateTo({ url: '/pages/favorites/favorites' })
-        break
-      case 'support':
-        wx.showToast({ title: '客服功能即将上线', icon: 'none' })
-        break
-    }
+  // 快捷键
+  onQuickLink(e: any) {
+    const k = e.currentTarget.dataset.key
+    if (k === 'recipes') wx.navigateTo({ url: '/pages/my-recipes/my-recipes' })
+    else if (k === 'orders') wx.navigateTo({ url: '/pages/my-orders/my-orders' })
+    else if (k === 'favorites') wx.navigateTo({ url: '/pages/favorites/favorites' })
+    else if (k === 'restaurant') wx.navigateTo({ url: '/pages/my-restaurants/my-restaurants' })
   },
 
-  onSettingsItem(e: any) {
-    const key = e.currentTarget.dataset.key
-    switch (key) {
-      case 'profile':
-        this.editProfile()
-        break
-      case 'settings':
-        wx.navigateTo({ url: '/pages/settings/settings' })
-        break
-      case 'help':
-        wx.showToast({ title: '帮助中心即将上线', icon: 'none' })
-        break
-      case 'about':
-        wx.showModal({
-          title: '关于食光',
-          content: '食光 v1.0.0\n\n美食创作 + 居家烹饪 + 熟人社交\n全链路闭环工具\n\n非商业用途',
-          showCancel: false,
-        })
-        break
-      case 'repair':
-        wx.showModal({
-          title: '数据修复',
-          content: '将重置所有本地数据，此操作不可恢复！',
-          confirmText: '确认修复',
-          confirmColor: '#e74c3c',
-          success: (res) => {
-            if (res.confirm) {
-              wx.clearStorageSync()
-              // 重新初始化
-              wx.setStorageSync('categories', SYSTEM_CATEGORIES)
-              wx.showToast({ title: '数据已修复', icon: 'success' })
-              setTimeout(() => this.onShow(), 500)
-            }
-          }
-        })
-        break
-    }
+  toggleCooking() {
+    this.setData({ cookingExpanded: !this.data.cookingExpanded })
   },
 
-  // ============ 编辑资料 ============
-  editProfile() {
+  toCookingRecord() {
+    wx.navigateTo({ url: '/pages/cooking-record/cooking-record' })
+  },
+
+  // 编辑资料
+  openEditProfile() {
+    this.setData({
+      showEditProfile: true,
+      editNick: this.data.user.nick || '',
+      editBirthday: this.data.user.birthday || ''
+    })
+  },
+  closeEditProfile() { this.setData({ showEditProfile: false }) },
+  onNickInput(e: any) { this.setData({ editNick: e.detail.value }) },
+  onBirthdayChange(e: any) { this.setData({ editBirthday: e.detail.value }) },
+  saveProfile() {
+    const user = { ...this.data.user, nick: this.data.editNick || '美食家', birthday: this.data.editBirthday || '' }
+    wx.setStorageSync('userProfile', user)
+    this.setData({ user, showEditProfile: false })
+    wx.showToast({ title: '资料已更新', icon: 'success' })
+  },
+
+  // 设置
+  toSettings() { wx.navigateTo({ url: '/pages/settings/settings' }) },
+  toAbout() {
+    wx.showModal({ title: '关于食光', content: '食光 v1.0\n美食创作 · 居家烹饪 · 熟人社交', showCancel: false })
+  },
+  confirmRepair() {
     wx.showModal({
-      title: '修改昵称',
-      editable: true,
-      placeholderText: this.data.user.nick,
+      title: '数据修复', content: '将重置所有本地数据，不可恢复！', confirmText: '确认', confirmColor: '#e74c3c',
       success: (res) => {
-        if (res.confirm && res.content) {
-          const user = { ...this.data.user, nick: res.content }
-          wx.setStorageSync('userProfile', user)
-          this.setData({ user })
-          wx.showToast({ title: '昵称已更新', icon: 'success' })
+        if (res.confirm) {
+          wx.clearStorageSync()
+          wx.setStorageSync('categories', SYSTEM_CATEGORIES)
+          wx.showToast({ title: '已修复', icon: 'success' })
+          setTimeout(() => this.onShow(), 500)
         }
+      }
+    })
+  },
+
+  // 同步烹饪记录到云端
+  syncCookingCloud() {
+    const records = getCookingRecords()
+    if (records.length === 0) {
+      wx.showToast({ title: '暂无记录可同步', icon: 'none' })
+      return
+    }
+    wx.showLoading({ title: '同步中...' })
+    const ps = records.map(r => api.addCookingRecord(r).catch(() => {}))
+    Promise.all(ps).then(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '已同步' + records.length + '条记录', icon: 'success' })
+    }).catch(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '部分同步失败，可重试', icon: 'none' })
+    })
+  },
+
+  _scanBirdTargets() {
+    var self = this
+    var q = wx.createSelectorQuery()
+    q.selectAll('.card,.glass,.user-card,.btn,.chip,.sticky-card').boundingClientRect()
+    q.exec(function (res: any[]) {
+      var rects = res[0]
+      if (rects && rects.length > 0) {
+        var targets: any[] = []
+        for (var i = 0; i < rects.length; i++) {
+          var r = rects[i]
+          if (r && r.width > 40 && r.height > 20 && r.top > 10) {
+            targets.push({ x: r.left, y: r.top, w: r.width, h: r.height })
+          }
+        }
+        self.setData({ birdTargets: targets })
       }
     })
   },

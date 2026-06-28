@@ -17,6 +17,8 @@ Page({
     allRecipes: [] as Recipe[],
     filteredRecipes: [] as Recipe[],
     searchKeyword: '',
+    showPocketBird: true,
+    birdTargets: [] as any[],
 
     // 状态
     isEmpty: false,
@@ -51,6 +53,11 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 0 })
     }
+    // 口袋小鸟显示模式
+    const mode = wx.getStorageSync('birdDisplayMode') || 'all'
+    const pages = wx.getStorageSync('birdPages') || ['home','diy','restaurant','profile']
+    this.setData({ showPocketBird: mode === 'all' || (mode === 'custom' && pages.indexOf('diy') >= 0) })
+    this._scanBirdTargets()
     this.refreshAll()
   },
 
@@ -376,5 +383,24 @@ Page({
     } else {
       this.setData({ selectedIds: this.data.filteredRecipes.map(r => r.id) })
     }
+  },
+
+  _scanBirdTargets() {
+    var self = this;
+    var q = wx.createSelectorQuery();
+    q.selectAll('.card,.glass,.chip,.btn,.search-bar,.cat-sidebar,.diy-card').boundingClientRect();
+    q.exec(function (res: any[]) {
+      var rects = res[0];
+      if (rects && rects.length > 0) {
+        var targets: any[] = [];
+        for (var i = 0; i < rects.length; i++) {
+          var r = rects[i];
+          if (r && r.width > 40 && r.height > 20 && r.top > 10) {
+            targets.push({ x: r.left, y: r.top, w: r.width, h: r.height });
+          }
+        }
+        self.setData({ birdTargets: targets });
+      }
+    });
   },
 })

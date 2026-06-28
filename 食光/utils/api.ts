@@ -31,9 +31,13 @@ export const api = {
   createRestaurant: (data: any) => cloudCall('/api/restaurants', 'POST', data),
   updateRestaurant: (id: number, data: any) => cloudCall('/api/restaurants/' + id, 'PUT', data),
   deleteRestaurant: (id: number) => cloudCall('/api/restaurants/' + id, 'DELETE'),
+  getRestaurantByCode: (code: string) => cloudCall('/api/restaurants/by-code/' + encodeURIComponent(code)),
+  getRestaurantMenu: (code: string) => cloudCall('/api/restaurants/menu-by-code/' + encodeURIComponent(code)),
+  addRestaurantMenu: (code: string, data: any) => cloudCall('/api/restaurants/menu-by-code/' + encodeURIComponent(code), 'POST', data),
+  removeRestaurantMenu: (code: string, recipeId: number) => cloudCall('/api/restaurants/menu-by-code/' + encodeURIComponent(code) + '/' + recipeId, 'DELETE'),
   
   // 订单
-  getOrders: () => cloudCall('/api/orders'),
+  getOrders: (inviteCode?: string) => cloudCall('/api/orders' + (inviteCode ? '?invite_code=' + encodeURIComponent(inviteCode) : '')),
   createOrder: (data: any) => cloudCall('/api/orders', 'POST', data),
   updateOrder: (id: number, data: any) => cloudCall('/api/orders/' + id, 'PUT', data),
 
@@ -44,10 +48,46 @@ export const api = {
   // 收藏
   getFavorites: () => cloudCall('/api/favorites'),
   addFavorite: (recipeId: number) => cloudCall('/api/favorites', 'POST', { recipe_id: recipeId }),
+  removeFavorite: (recipeId: number) => cloudCall('/api/favorites/' + recipeId, 'DELETE'),
 
   // 做菜记录
   getCookingRecords: () => cloudCall('/api/cooking-records'),
   addCookingRecord: (data: any) => cloudCall('/api/cooking-records', 'POST', data),
+
+  // 餐厅成员
+  getMembers: (restaurantId: number) => cloudCall('/api/restaurant-members/' + restaurantId),
+  addMember: (data: any) => cloudCall('/api/restaurant-members', 'POST', data),
+  removeMember: (restaurantId: number, userId: number) => cloudCall('/api/restaurant-members/' + restaurantId + '/' + userId, 'DELETE'),
+
+  // 订单聊天
+  getOrderChat: (orderId: number) => cloudCall('/api/order-chat/' + orderId),
+  addOrderChat: (data: any) => cloudCall('/api/order-chat', 'POST', data),
+
+  // 分类标签
+  getCategories: () => cloudCall('/api/categories'),
+  saveCategory: (data: any) => cloudCall('/api/categories', 'POST', data),
+  deleteCategory: (name: string) => cloudCall('/api/categories/' + encodeURIComponent(name), 'DELETE'),
+}
+
+// ======================== WebSocket 实时通信 ========================
+let _ws: any = null, _wsListeners: Record<string, Function[]> = {}
+
+export function wsConnect() {
+  if (_ws) return
+  _ws = wx.connectSocket({ url: 'wss://prod-d0g68hmay4c8d10e3.service.tcloudbase.com/ws' })
+  _ws.onOpen(() => console.log('[WS] 已连接'))
+  _ws.onMessage((res: any) => {
+    try { const d = JSON.parse(res.data); (_wsListeners[d.type] || []).forEach(fn => fn(d.payload)) } catch (e) {}
+  })
+  _ws.onClose(() => { _ws = null; setTimeout(wsConnect, 3000) })
+  _ws.onError(() => { _ws = null })
+}
+export function wsOn(type: string, fn: Function) {
+  if (!_wsListeners[type]) _wsListeners[type] = []
+  _wsListeners[type].push(fn)
+}
+export function wsSend(type: string, payload: any) {
+  if (_ws) _ws.send({ data: JSON.stringify({ type, payload }) })
 }
 
 // 生成餐厅邀请小程序码（调用自己服务器的 /api/qrcode）

@@ -28,6 +28,9 @@ Page({
     themeDark: '#4a9e56',
     themeLight: '#b7e4c7',
     showFilter: false,
+    showPocketBird: true,
+    birdTargets: [] as any[],
+    birdScrollTop: 0 as number,
     selectedIngCat: '全部',
     allRecipes: [] as any[],
     displayRecipes: [] as any[],
@@ -53,7 +56,7 @@ Page({
     const CAT_COLORS: Record<string,string>={'荤菜':'#ff8baa','素菜':'#79bcff','凉菜':'#d18bff','汤羹':'#ffb37c','主食':'#6de192','甜点':'#6de192','酒水':'#d18bff'}
     const useLocal = () => {
       const recipes = PUBLIC_RECIPES.map((r:any)=>({...r,color:r.color||CAT_COLORS[r.category]||'#ff8baa'}))
-      this.setData({ allRecipes: recipes, displayRecipes: recipes, scrollNames: recipes.map((r:any)=>r.coverEmoji+' '+r.name) })
+      this.setData({ allRecipes: recipes, displayRecipes: recipes, scrollNames: recipes.map((r:any,i:number)=>({id:i, text:r.coverEmoji+' '+r.name})) })
     }
     useLocal() // 先秒显本地
     // 后台静默从云端更新
@@ -63,16 +66,26 @@ Page({
       success: (res: any) => {
         if (res.data?.code === 0 && res.data.data?.length > 0) {
           const recipes = res.data.data.map((r: any) => ({...r,color:r.color||CAT_COLORS[r.category_id]||'#ff8baa'}))
-          this.setData({ allRecipes: recipes, displayRecipes: recipes, scrollNames: recipes.map((r: any) => (r.cover_emoji || ':)') + ' ' + r.name) })
+          this.setData({ allRecipes: recipes, displayRecipes: recipes, scrollNames: recipes.map((r: any, i: number) => ({id: i, text: (r.cover_emoji || ':)') + ' ' + r.name})) })
         }
       }, fail: () => {}
     })
+  },
+
+  onPageScroll(e: any) {
+    this.setData({ birdScrollTop: e.scrollTop });
   },
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 1 })
     }
+    // 口袋小鸟显示模式
+    const mode = wx.getStorageSync('birdDisplayMode') || 'all'
+    const pages = wx.getStorageSync('birdPages') || ['home','diy','restaurant','profile']
+    this.setData({ showPocketBird: mode === 'all' || (mode === 'custom' && pages.indexOf('home') >= 0) })
+    // 扫描页面元素给小鸟停靠
+    this._scanBirdTargets()
     // 首次启动欢迎弹窗
     const app = getApp<IAppOption>()
     if (app.globalData.needWelcome) {
@@ -265,5 +278,25 @@ Page({
       createdAt: new Date().toISOString().slice(0, 10), source: 'copy', copiedFrom: recipe.id, draft: false,
     })
     wx.showToast({ title: '已复刻到DIY', icon: 'success' })
+  },
+
+  // 扫描页面元素给小鸟做停靠目标
+  _scanBirdTargets() {
+    var self = this;
+    var q = wx.createSelectorQuery();
+    q.selectAll('.card,.glass,.search-bar,.search-wrap,.chip,.btn,.cat-sidebar,.user-card,.diy-card').boundingClientRect();
+    q.exec(function (res: any[]) {
+      var rects = res[0];
+      if (rects && rects.length > 0) {
+        var targets: any[] = [];
+        for (var i = 0; i < rects.length; i++) {
+          var r = rects[i];
+          if (r && r.width > 40 && r.height > 20 && r.top > 10) {
+            targets.push({ x: r.left, y: r.top, w: r.width, h: r.height });
+          }
+        }
+        self.setData({ birdTargets: targets });
+      }
+    });
   },
 })

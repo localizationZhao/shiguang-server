@@ -1,6 +1,7 @@
 // 做菜记录
 import { getCookingRecords, saveCookingRecords, getRecipes } from '../../utils/storage'
 import { generateId, chooseImage, chooseAndCropImage, formatDateOnly } from '../../utils/util'
+import { api } from '../../utils/api'
 import type { CookingRecord } from '../../utils/storage'
 
 Page({
@@ -16,8 +17,10 @@ Page({
       cookedAt: '',
       img: '',
       notes: '',
+      voice: '',
     },
     diyRecipes: [] as any[],
+    recording: false,
   },
 
   onShow() {
@@ -27,11 +30,11 @@ Page({
   preventClose() {},
 
   refresh() {
-    this.setData({
-      records: getCookingRecords().sort((a, b) =>
-        new Date(b.cookedAt).getTime() - new Date(a.cookedAt).getTime()
-      ),
-    })
+    const colors = ['n1','n2','n3','n4','n5']
+    const records = getCookingRecords().sort((a, b) =>
+      new Date(b.cookedAt).getTime() - new Date(a.cookedAt).getTime()
+    ).map((r: any, i: number) => ({ ...r, color: colors[i % 5] }))
+    this.setData({ records })
   },
 
   // ============ 新增 ============
@@ -65,6 +68,7 @@ Page({
         cookedAt: record.cookedAt,
         img: record.img || '',
         notes: record.notes || '',
+        voice: (record as any).voice || '',
       },
       diyRecipes: getRecipes().filter(r => !r.draft),
     })
@@ -107,18 +111,19 @@ Page({
   // 保存
   saveRecord() {
     const f = this.data.form
-    if (!f.recipeName) {
-      wx.showToast({ title: '请选择菜谱', icon: 'none' })
+    if (!f.recipeName && !f.notes && !f.img && !f.voice) {
+      wx.showToast({ title: '至少写点什么吧~', icon: 'none' })
       return
     }
 
     const record: CookingRecord = {
       id: this.data.editId || generateId(),
       recipeId: f.recipeId,
-      recipeName: f.recipeName,
+      recipeName: f.recipeName || '食光日记',
       cookedAt: f.cookedAt,
       img: f.img,
       notes: f.notes,
+      voice: f.voice || '',
     }
 
     const records = getCookingRecords()
@@ -158,5 +163,56 @@ Page({
     if (src) {
       wx.previewImage({ urls: [src], current: src })
     }
+  },
+
+  onNameInput(e: any) {
+    this.setData({ 'form.recipeName': e.detail.value })
+  },
+
+  // 语音录制
+  toggleVoice() {
+    const that = this
+    if (this.data.recording) {
+      this._recorder.stop()
+      this.setData({ recording: false })
+      return
+    }
+    this.setData({ recording: true })
+    const rec = wx.getRecorderManager()
+    this._recorder = rec
+    rec.onStop((res: any) => {
+      // 持久化保存录音文件
+      wx.saveFile({
+        tempFilePath: res.tempFilePath,
+        success: (saved: any) => {
+          that.setData({ 'form.voice': saved.savedFilePath, recording: false })
+        },
+        fail: () => {
+          that.setData({ 'form.voice': res.tempFilePath, recording: false })
+        }
+      })
+    })
+    rec.start({ duration: 60000, format: 'mp3' })
+  },
+  playVoice() {
+    if (this.data.form.voice) {
+      const inner = wx.createInnerAudioContext()
+      inner.src = this.data.form.voice
+      inner.play()
+    }
+  },
+
+  syncToCloud() {
+    const records = getCookingRecords()
+    if (records.length === 0) { wx.showToast({ title: '暂无记录', icon: 'none' }); return }
+    wx.showLoading({ title: '同步中...' })
+    const ps = records.map(r => api.addCookingRecord(r).catch(() => {}))
+    Promise.all(ps).then(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '已同步 ' + records.length + ' 条', icon: 'success' })
+    }).catch(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '部分失败，可重试', icon: 'none' })
+    })
   },
 })

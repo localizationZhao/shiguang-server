@@ -1,1 +1,49 @@
-.page{height:100vh;padding:0 8px}.glass{background:rgba(255,255,255,0.25);border-radius:16px;padding:16px;border:1px solid rgba(255,255,255,0.15)}
+.page{height:100vh;padding:0 8px}
+.glass{background:rgba(255,255,255,0.25);border-radius:16px;padding:16px;border:1px solid rgba(255,255,255,0.15)}
+
+/* 口袋小鸟设置 */
+.bird-section{
+  margin:8px;
+  background:rgba(255,255,255,0.5);
+  border-radius:16px;
+  padding:16px;
+  border:1px solid rgba(255,163,203,0.4);
+}
+.bird-section-hd{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:4px;
+}
+.bird-icon{font-size:28px}
+.bird-title{font-weight:700;font-size:18px;color:#1a1a2e}
+.bird-desc{font-size:12px;color:rgba(26,26,46,0.5);display:block;margin-bottom:12px}
+.bird-mode-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.bird-mode-chip{
+  position:relative;
+  background:rgba(255,255,255,0.6);
+  border:2rpx solid rgba(26,26,46,0.1);
+  border-radius:12px;
+  padding:12px 10px;
+  text-align:center;
+  transition:all .2s;
+}
+.bird-mode-chip.active{
+  background:#ffecda;
+  border-color:#ffa3cb;
+  box-shadow:0 0 0 2rpx #ffa3cb;
+}
+.bird-mode-icon{font-size:22px;display:block}
+.bird-mode-label{font-size:13px;font-weight:600;color:#3f2c15;display:block;margin-top:4px}
+.bird-mode-check{
+  position:absolute;
+  top:4px;
+  right:8px;
+  font-size:14px;
+  color:#ff4997;
+  font-weight:700;
+}

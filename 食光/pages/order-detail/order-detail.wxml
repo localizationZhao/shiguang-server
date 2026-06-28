@@ -35,11 +35,15 @@
     <text class="stars">{{starsStr}}</text>
   </view>
 
-  <!-- 操作按钮 -->
-  <view class="card">
+  <!-- 店主操作按钮 -->
+  <view class="card" wx:if="{{role === 'owner'}}">
     <button wx:if="{{order.status === 'pending'}}" class="btn-accept" bindtap="acceptOrder">✅ 接单</button>
     <button wx:if="{{order.status === 'pending'}}" class="btn-reject" bindtap="rejectOrder">❌ 拒单</button>
     <button wx:if="{{order.status === 'cooking'}}" class="btn-accept" bindtap="finishOrder">🍽️ 出餐</button>
+  </view>
+
+  <!-- 食客操作按钮 -->
+  <view class="card" wx:if="{{role === 'customer'}}">
     <button wx:if="{{order.status === 'pending' || order.status === 'cooking'}}" class="btn-outline" bindtap="urgeOrder">🔔 催单</button>
     <button wx:if="{{order.status === 'done' && !order.rating}}" class="btn-rate" bindtap="rateOrder">⭐ 评价</button>
   </view>

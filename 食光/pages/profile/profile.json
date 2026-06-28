@@ -1,6 +1,7 @@
 {
   "usingComponents": {
-    "navigation-bar": "/components/navigation-bar/navigation-bar"
+    "navigation-bar": "/components/navigation-bar/navigation-bar",
+    "pocket-bird": "/components/pocket-bird/pocket-bird"
   },
   "navigationStyle": "custom"
 }

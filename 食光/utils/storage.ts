@@ -111,6 +111,7 @@ export interface Restaurant {
   inviteCode: string
   codeExpire: number
   originalId?: number  // 加入的餐厅的原ID
+  closed?: boolean     // 餐厅是否已闭店
 }
 
 // 可选的鸟型图片列表
@@ -127,6 +128,7 @@ export interface CookingRecord {
   cookedAt: string // 做菜日期
   img?: string // 成品图
   notes?: string
+  voice?: string // 语音录音
 }
 
 export interface Feed {

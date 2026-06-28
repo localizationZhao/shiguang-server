@@ -1,0 +1,53 @@
+/* === 鸟容器 === */
+.bird-wrap{position:fixed;z-index:10000;display:flex;align-items:center;justify-content:center;}
+.bird-wrap.hidden{opacity:0;}
+.bird-canvas{image-rendering:pixelated;}
+
+/* === 气泡 === */
+.bubble{position:absolute;bottom:calc(100% + 5rpx);left:50%;transform:translateX(-50%);
+  background:#ffecda;border:3rpx solid #ffa3cb;padding:6rpx 14rpx;font-size:22rpx;
+  color:#3f2c15;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;}
+.bubble.on{opacity:1;}
+
+/* === 羽毛/帽子掉落 === */
+.feather{position:fixed;z-index:10001;font-size:36rpx;padding:8rpx;}
+
+/* === 菜单：Pixel Note 便签风 === */
+.menu-mask{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10002;background:transparent;}
+.menu-pop{position:fixed;z-index:10003;background:#ffecda;min-width:180rpx;
+  box-shadow:3rpx 0 #ffa3cb,-3rpx 0 #ffa3cb,0 -3rpx #ffa3cb,0 3rpx #ffa3cb,
+    6rpx 0 #d43d7e,-6rpx 0 #d43d7e,0 -6rpx #d43d7e,0 6rpx #d43d7e,
+    0 0 0 3rpx #ffa3cb,0 0 0 6rpx #fff,
+    6rpx 0 0 3rpx #fff,-6rpx 0 0 3rpx #fff,
+    0 -6rpx 0 3rpx #fff,0 6rpx 0 3rpx #fff;}
+/* 标题栏 */
+.menu-hd{display:flex;justify-content:space-between;align-items:center;
+  background:#ffa3cb;padding:6rpx 12rpx 6rpx 24rpx;}
+.menu-title{color:#ffecda;font-weight:700;font-size:24rpx;}
+/* 像素锯齿X */
+.menu-x{color:#fff;font-size:24rpx;font-weight:900;padding:2rpx 8rpx;line-height:1;margin-left:auto;}
+/* 菜单项 */
+.menu-item{display:flex;align-items:center;gap:8rpx;padding:10rpx 20rpx;font-size:24rpx;
+  color:#3f2c15;opacity:0.7;}
+.menu-item:active{opacity:1;background:#ffa3cb;color:#fff;}
+.menu-sep{height:2rpx;background:#ffa3cb;margin:6rpx 14rpx;opacity:0.35;}
+
+/* === 选择面板：便签风底部弹出 === */
+.panel-mask{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10004;background:rgba(0,0,0,0.4);}
+.panel-sheet{position:fixed;bottom:0;left:0;right:0;z-index:10005;background:#ffecda;
+  border-radius:0;max-height:60vh;padding-bottom:env(safe-area-inset-bottom);
+  box-shadow:0 -4rpx 0 #ffa3cb,0 -8rpx 0 #fff,0 -10rpx 0 #ffa3cb;}
+.panel-hd{font-weight:700;display:flex;justify-content:space-between;align-items:center;
+  padding:16rpx 28rpx;font-size:28rpx;color:#fff;background:#ffa3cb;}
+.panel-close{font-size:34rpx;color:#fff;padding:8rpx;}
+.panel-scroll{max-height:50vh;padding:10rpx;}
+.panel-item{display:flex;align-items:center;gap:14rpx;padding:14rpx 22rpx;
+  border-radius:6rpx;margin:4rpx 0;font-size:26rpx;color:#3f2c15;opacity:0.75;}
+.panel-item.active{opacity:1;background:rgba(255,163,203,0.25);}
+.panel-item.locked{opacity:0.3;}
+.pi-hat-img{width:48rpx;height:48rpx;flex-shrink:0;image-rendering:pixelated;}
+.pi-color{width:36rpx;height:36rpx;border-radius:2rpx;flex-shrink:0;
+  box-shadow:2rpx 2rpx 0 rgba(0,0,0,0.3);}
+.pi-name{flex:1;font-weight:600;}
+.pi-lock{font-size:22rpx;}
+.pi-check{color:#ff4797;font-weight:700;font-size:24rpx;}

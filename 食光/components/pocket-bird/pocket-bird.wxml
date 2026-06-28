@@ -1,0 +1,57 @@
+<!-- 口袋小鸟 -->
+
+<!-- 鸟容器 -->
+<view class="bird-wrap {{birdHidden ? 'hidden' : ''}} {{bouncing ? 'bouncing' : ''}}" style="width:{{hitW}}px;height:{{hitH}}px;left:{{birdLeft}}px;bottom:{{birdBottom}}px;"
+  bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd">
+  <canvas type="2d" id="bird-canvas" class="bird-canvas" style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;"></canvas>
+  <view class="bubble {{showBubble?'on':''}}" wx:if="{{bubbleText}}" style="color:{{bubbleColor}};border-color:{{bubbleColor}};"><text>{{bubbleText}}</text></view>
+</view>
+
+<!-- 羽毛 -->
+<view class="feather" wx:if="{{showFeather}}" style="left:{{featherLeft}}px;top:{{featherTop}}px;" bindtap="collectFeather"><text>🪶</text></view>
+
+<!-- 帽子掉落 -->
+<view class="feather" wx:if="{{showHatDrop}}" style="left:{{hatDropX}}px;top:{{hatDropY}}px;" bindtap="collectHat"><text>🎩</text></view>
+
+<!-- 可拖拽菜单 -->
+<view class="menu-mask" wx:if="{{showMenu}}" bindtap="closeMenu" catchtouchmove=""></view>
+<view class="menu-pop" wx:if="{{showMenu}}" style="left:{{menuLeft}}px;top:{{menuTop}}px;">
+  <view class="menu-hd"><text class="menu-title">birbOS</text><view class="menu-x" bindtap="closeMenu">✕</view></view>
+  <view class="menu-item" bindtap="tapPet"><text>抚摸小鸟</text></view>
+  <view class="menu-item" bindtap="tapSpecies"><text>野外指南</text></view>
+  <view class="menu-item" bindtap="tapHats"><text>衣柜</text></view>
+  <view class="menu-item" bindtap="tapFeather"><text>掉落羽毛</text></view>
+  <view class="menu-sep"></view>
+  <view class="menu-item" bindtap="tapHide"><text>{{birdHidden ? '显示小鸟' : '隐藏小鸟'}}</text></view>
+  <view class="menu-item" bindtap="tapFreeze"><text>{{birdFrozen ? '恢复小鸟' : '暂停小鸟'}}</text></view>
+  <view class="menu-item" bindtap="tapFlyMode"><text>状态: {{birdFlyMode ? '自由' : '底部'}}</text></view>
+  <view class="menu-sep"></view>
+  <view class="menu-item" bindtap="tapUnlockAll"><text>解锁全部</text></view>
+  <view class="menu-item" bindtap="tapReset"><text>重置数据</text></view>
+</view>
+
+<!-- 鸟类/帽子选择面板 -->
+<view class="panel-mask" wx:if="{{showPanel}}" bindtap="closePanel" catchtouchmove=""></view>
+<view class="panel-sheet" wx:if="{{showPanel}}">
+  <view class="panel-hd"><text>{{panelMode==='species'?'野外指南':'衣柜'}}</text><view class="panel-close" bindtap="closePanel">✕</view></view>
+  <scroll-view class="panel-scroll" scroll-y>
+    <block wx:if="{{panelMode==='species'}}">
+      <view wx:for="{{speciesList}}" wx:key="key" class="panel-item {{item.active?'active':''}} {{!item.unlocked?'locked':''}}"
+        data-key="{{item.key}}" data-unlocked="{{item.unlocked}}" bindtap="selectSpecies">
+        <view class="pi-color" style="background:{{item.color}};"></view>
+        <text class="pi-name">{{item.name}}</text>
+        <text wx:if="{{!item.unlocked}}" class="pi-lock">🔒</text>
+        <text wx:if="{{item.active}}" class="pi-check">✓</text>
+      </view>
+    </block>
+    <block wx:if="{{panelMode==='hats'}}">
+      <view wx:for="{{hatList}}" wx:key="key" class="panel-item {{item.active?'active':''}} {{!item.unlocked?'locked':''}}"
+        data-key="{{item.key}}" data-unlocked="{{item.unlocked}}" bindtap="selectHat">
+        <text class="pi-icon">🎩</text>
+        <text class="pi-name">{{item.name}}</text>
+        <text wx:if="{{!item.unlocked}}" class="pi-lock">🔒</text>
+        <text wx:if="{{item.active}}" class="pi-check">✓</text>
+      </view>
+    </block>
+  </scroll-view>
+</view>

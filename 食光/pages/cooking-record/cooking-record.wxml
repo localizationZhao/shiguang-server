@@ -1,87 +1,91 @@
-<!-- 做菜记录 -->
-<navigation-bar title="做菜记录" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
+<!-- 🍳 烹饪食光 - 便签日记 -->
+<navigation-bar title="烹饪食光" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
 
 <scroll-view class="page" scroll-y enhanced show-scrollbar="{{false}}">
-  <!-- 添加按钮 -->
-  <view class="glass" style="text-align:center;margin:8px" bindtap="openNew">
-    <text style="font-size:16px;color:#ff4997;font-weight:600">＋ 记录一次做菜</text>
+
+  <!-- 顶部操作 -->
+  <view class="top-bar">
+    <view class="add-btn" bindtap="openNew"><text>＋ 记一笔</text></view>
+    <view class="sync-btn" bindtap="syncToCloud"><text>☁️ 同步</text></view>
   </view>
 
-  <!-- 记录列表 -->
-  <view wx:if="{{records.length > 0}}">
-    <view class="glass record-card" wx:for="{{records}}" wx:key="id">
-      <view class="record-header">
-        <view>
-          <text class="record-name">{{item.recipeName}}</text>
-          <text class="record-date">📅 {{item.cookedAt}}</text>
+  <!-- 交错瀑布流 -->
+  <view class="masonry" wx:if="{{records.length > 0}}">
+    <view class="masonry-col">
+      <block wx:for="{{records}}" wx:key="id" wx:if="{{index % 2 === 0}}">
+        <view class="sticky {{item.color || 'n1'}}" data-id="{{item.id}}" bindtap="editRecord" data-id="{{item.id}}">
+          <image wx:if="{{item.img}}" src="{{item.img}}" mode="aspectFill" class="sticky-img" data-src="{{item.img}}" catchtap="previewImg"></image>
+          <view class="sticky-bd">
+            <text class="sticky-title">{{item.recipeName}}</text>
+            <text class="sticky-date">📅 {{item.cookedAt}}</text>
+            <text class="sticky-notes" wx:if="{{item.notes}}">{{item.notes}}</text>
+          </view>
+          <view class="sticky-actions">
+            <text data-id="{{item.id}}" catchtap="deleteRecord">🗑️</text>
+            <text>☁️</text>
+          </view>
         </view>
-        <view class="record-actions">
-          <text data-id="{{item.id}}" bindtap="editRecord">✏️</text>
-          <text data-id="{{item.id}}" bindtap="deleteRecord" style="color:#e74c3c;margin-left:12px">🗑️</text>
+      </block>
+    </view>
+    <view class="masonry-col">
+      <block wx:for="{{records}}" wx:key="id" wx:if="{{index % 2 === 1}}">
+        <view class="sticky {{item.color || 'n2'}}" data-id="{{item.id}}" bindtap="editRecord" data-id="{{item.id}}">
+          <image wx:if="{{item.img}}" src="{{item.img}}" mode="aspectFill" class="sticky-img" data-src="{{item.img}}" catchtap="previewImg"></image>
+          <view class="sticky-bd">
+            <text class="sticky-title">{{item.recipeName}}</text>
+            <text class="sticky-date">📅 {{item.cookedAt}}</text>
+            <text class="sticky-notes" wx:if="{{item.notes}}">{{item.notes}}</text>
+          </view>
+          <view class="sticky-actions">
+            <text data-id="{{item.id}}" catchtap="deleteRecord">🗑️</text>
+            <text>☁️</text>
+          </view>
         </view>
-      </view>
-      <image wx:if="{{item.img}}" src="{{item.img}}" mode="aspectFill" class="record-img" data-src="{{item.img}}" bindtap="previewImg"></image>
-      <text wx:if="{{item.notes}}" class="record-notes">💬 {{item.notes}}</text>
+      </block>
     </view>
   </view>
 
-  <!-- 空状态 -->
-  <view class="empty-state" wx:if="{{records.length === 0}}">
-    <text style="font-size:64px">🍳</text>
-    <text style="color:rgba(26,26,46,0.45)">还没有做菜记录</text>
-    <text style="font-size:12px;color:rgba(26,26,46,0.35)">记录你的每一次烹饪</text>
+  <view class="empty" wx:if="{{records.length === 0}}">
+    <text style="font-size:64rpx">🍳</text>
+    <text>还没有烹饪记录</text>
+    <text style="font-size:22rpx;color:rgba(63,44,21,0.25)">点击上方 ＋ 记下你的美食时光</text>
   </view>
 
-  <view style="height:80px"></view>
+  <view style="height:100rpx"></view>
 </scroll-view>
 
-<!-- 新增/编辑弹窗 -->
+<!-- 编辑弹窗 -->
 <view class="modal-overlay {{showForm ? 'show' : ''}}" bindtap="closeForm">
   <view class="modal-sheet" catchtap="preventClose">
-    <view class="modal-header">
-      <text class="modal-title">{{editId ? '编辑记录' : '记录做菜'}}</text>
-      <view class="modal-close" bindtap="closeForm">✕</view>
-    </view>
+    <view class="modal-hd"><text>{{editId ? '编辑便签' : '记一笔'}}</text><view class="modal-x" bindtap="closeForm">✕</view></view>
     <view class="modal-body">
-      <!-- 选择菜谱 -->
-      <view class="form-group">
-        <text class="form-label">选择菜谱</text>
-        <scroll-view scroll-y style="max-height:200px" wx:if="{{diyRecipes.length > 0}}">
-          <view class="recipe-pick-item {{form.recipeId === item.id ? 'selected' : ''}}"
-            wx:for="{{diyRecipes}}" wx:key="id" wx:for-index="ri"
-            data-index="{{ri}}" bindtap="pickRecipe">
+      <view class="fg"><text class="fl">菜谱</text>
+        <scroll-view scroll-y style="max-height:160rpx" wx:if="{{diyRecipes.length > 0}}">
+          <view class="pick {{form.recipeId === item.id ? 'on' : ''}}" wx:for="{{diyRecipes}}" wx:key="id" wx:for-index="ri" data-index="{{ri}}" bindtap="pickRecipe">
             <text>{{item.coverEmoji || '🍽️'}} {{item.name}}</text>
-            <text wx:if="{{form.recipeId === item.id}}" style="color:#ff4997">✓</text>
           </view>
         </scroll-view>
-        <view wx:else style="padding:20px;text-align:center;color:rgba(26,26,46,0.45)">暂无DIY菜谱</view>
-        <input wx:if="{{diyRecipes.length === 0}}" class="form-input" placeholder="手动输入菜名" value="{{form.recipeName}}" bindinput="onNameInput"/>
+        <input wx:else class="fi" placeholder="菜名" value="{{form.recipeName}}" bindinput="onNameInput"/>
       </view>
-
-      <!-- 做菜日期 -->
-      <view class="form-group">
-        <text class="form-label">做菜日期</text>
-        <picker mode="date" value="{{form.cookedAt}}" bindchange="onDateChange">
-          <view class="form-input">{{form.cookedAt || '选择日期'}}</view>
-        </picker>
+      <view class="fg"><text class="fl">日期</text>
+        <picker mode="date" value="{{form.cookedAt}}" bindchange="onDateChange"><view class="fp">{{form.cookedAt || '选择日期'}}</view></picker>
       </view>
-
-      <!-- 成品图 -->
-      <view class="form-group">
-        <text class="form-label">成品实拍</text>
-        <view class="record-img-pick" bindtap="pickImg">
-          <image class="record-img-inner" wx:if="{{form.img}}" src="{{form.img}}" mode="aspectFill"></image>
-          <text wx:else style="font-size:32px;color:rgba(26,26,46,0.35)">📸</text>
+      <view class="fg"><text class="fl">语音</text>
+        <view wx:if="{{form.voice}}" class="voice-done" bindtap="playVoice"><text>🔊 点击播放</text></view>
+        <view wx:else class="voice-btn {{recording ? 'ing' : ''}}" bindtap="toggleVoice">
+          <text>{{recording ? '🔴 录制中...' : '🎤 录音'}}</text>
         </view>
       </view>
-
-      <!-- 备注 -->
-      <view class="form-group">
-        <text class="form-label">备注</text>
-        <textarea class="form-input" style="min-height:60px" placeholder="味道怎么样？有什么改进？" value="{{form.notes}}" bindinput="onNotesInput"/>
+      <view class="fg"><text class="fl">照片</text>
+        <view class="img-pick" bindtap="pickImg">
+          <image wx:if="{{form.img}}" src="{{form.img}}" mode="aspectFill" class="img-inner"></image>
+          <text wx:else>📸 拍照</text>
+        </view>
       </view>
-
-      <button class="btn-primary" bindtap="saveRecord">{{editId ? '保存修改' : '记录完成'}}</button>
+      <view class="fg"><text class="fl">备注</text>
+        <textarea class="fi ta" placeholder="味道如何？" value="{{form.notes}}" bindinput="onNotesInput"/>
+      </view>
+      <button class="btn-save" bindtap="saveRecord">📌 钉上便签</button>
     </view>
   </view>
 </view>

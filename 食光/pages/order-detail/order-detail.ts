@@ -6,12 +6,12 @@ Page({
   data: {
     order: null as Order | null,
     starsStr: '',
-    showMsgInput: false,
-    msgText: '',
+    role: 'customer',
   },
 
   onLoad(options: any) {
     const id = parseInt(options.id)
+    this.setData({ role: options.role || 'customer' })
     if (id) {
       const order = getOrders().find(o => o.id === id)
       if (order) this.setData({ order, starsStr: this.getStars(order.rating) })

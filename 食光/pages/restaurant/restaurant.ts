@@ -1,7 +1,7 @@
 // 餐厅页面
 import { getRecipes, getRestaurants, saveRestaurants, getOrders, saveOrders, getFeeds, saveFeeds, getUserProfile, BIRD_TYPES, SEAT_POSITIONS, ACCESSORIES, randomSoulColor, SOUL_COLORS } from '../../utils/storage'
 import { generateId, chooseImage } from '../../utils/util'
-import { generateQRCode } from '../../utils/api'
+import { generateQRCode, api } from '../../utils/api'
 import type { Restaurant, Order, Feed, Member } from '../../utils/storage'
 
 Page({
@@ -28,16 +28,25 @@ Page({
     feedVisibilityOptions: ['all','restaurant','self'],
     feedFilter: 'all',
     feedImages: [] as string[],
+    feedIdentity: 'role',
+    feedRestId: 0,
+    feedRestList: [] as any[],
+    feedLocDisplay: '',
     feedIsTimePublic: true,
     feedShowLocation: true,
     feedIsLocationPublic: true,
     feedCustomLocation: '',
     feedLocation: '',
     feedLocPrecision: 'exact',
+    feedLng: 0, feedLat: 0,
+    feedMarker: [] as any[],
     showShareSheet: false,
     showRestDetail: false,
     restDescription: '',
     orderFilter: 'all',
+    filteredOrders: [] as any[],
+    allRestsForOrder: [] as any[],
+    orderRestFilter: 0,
     menuAll: [] as any[],
     showMsgModal: false,
     msgTargetId: 0,
@@ -77,10 +86,30 @@ Page({
     soulColors: SOUL_COLORS,
     selectedSoulColor: SOUL_COLORS[0],
     showColorPick: false,
+    isMystery: false,
 
     // ===== 新增：小程序码 =====
     qrCodePath: '',
     generatingQR: false,
+    seatToast: '',
+    // 餐厅配色
+    restTheme: '#79bcff',
+    restThemeDark: '#5a90d4',
+    restThemeLight: '#b8d8f0',
+    restThemes: [
+      { key: 'blue', name: '蓝', main: '#79bcff', dark: '#5a90d4', light: '#b8d8f0' },
+      { key: 'pink', name: '粉', main: '#ffa3cb', dark: '#e892b5', light: '#e8c0d4' },
+      { key: 'orange', name: '橘', main: '#ffb37c', dark: '#c97a3a', light: '#ffe0c0' },
+      { key: 'green', name: '绿', main: '#6bcb77', dark: '#4a9e56', light: '#b7e4c7' },
+      { key: 'purple', name: '紫', main: '#d18bff', dark: '#a060d4', light: '#e4c8f8' },
+    ],
+    showRestTheme: false,
+    submitting: false,
+
+    // ===== 口袋小鸟 =====
+    showPocketBird: true,
+    birdInteriorOnly: false,
+    birdTargets: [] as any[],
 
     // ===== 新增：状态面板 =====
     showStatus: false,
@@ -99,6 +128,18 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 2 })
     }
+    // 口袋小鸟显示模式
+    const mode = wx.getStorageSync('birdDisplayMode') || 'all'
+    const pages = wx.getStorageSync('birdPages') || ['home','diy','restaurant','profile']
+    this.setData({
+      showPocketBird: mode === 'all' || (mode === 'custom' && pages.indexOf('restaurant') >= 0),
+      birdInteriorOnly: false,
+    })
+    this._scanBirdTargets()
+    // 加载保存的餐厅配色
+    const saved = wx.getStorageSync('restTheme') || 'blue'
+    const t = this.data.restThemes.find((tc: any) => tc.key === saved)
+    if (t) this.setData({ restTheme: t.main, restThemeDark: t.dark, restThemeLight: t.light })
     this.refreshAll()
 
     // 处理扫码进店
@@ -106,23 +147,27 @@ Page({
     if (app.globalData.pendingInviteCode) {
       const code = app.globalData.pendingInviteCode
       app.globalData.pendingInviteCode = ''
-      // 自动分配空座
       const rests = getRestaurants()
-      const target = rests.find((r: any) => r.inviteCode === code)
-      if (target) {
-        const occupied = (target.members || []).map((m: any) => m.seatIndex)
-        const freeSeats = SEAT_POSITIONS.filter(s => s.id !== 4 && !occupied.includes(s.id)).map(s => s.id)
-        const autoSeat = freeSeats.length > 0 ? freeSeats[0] : 0
-        this.setData({
-          joinCode: code,
-          selectedSeat: autoSeat,
-          selectedBird: '32x32x1',
-          selectedAccessory: '',
-          selectedSoulColor: randomSoulColor()
-        })
-      } else {
-        this.setData({ joinCode: code })
+      let target = rests.find((r: any) => r.inviteCode === code)
+      if (!target) {
+        // 本地没找到，从云端查
+        api.getRestaurantByCode(code).then((cloudRest: any) => {
+          if (cloudRest && cloudRest.invite_code) {
+            this._joinByCloudRest(cloudRest, code)
+          }
+        }).catch(() => {})
+        return
       }
+      const occupied = (target.members || []).map((m: any) => m.seatIndex)
+      const freeSeats = SEAT_POSITIONS.filter(s => s.id !== 4 && !occupied.includes(s.id)).map(s => s.id)
+      const autoSeat = freeSeats.length > 0 ? freeSeats[0] : 0
+      this.setData({
+        joinCode: code,
+        selectedSeat: autoSeat,
+        selectedBird: '32x32x1',
+        selectedAccessory: '',
+        selectedSoulColor: randomSoulColor()
+      })
       setTimeout(() => { this.confirmJoinRest() }, 500)
     }
   },
@@ -130,34 +175,54 @@ Page({
   refreshAll() {
     const allRests = getRestaurants()
     const orders = getOrders()
+    // 从云端拉取feed
+    api.getFeeds().then((cloudFeeds: any[]) => {
+      if (cloudFeeds && cloudFeeds.length > 0) {
+        const merged = cloudFeeds.map((f: any) => ({
+          id: f.id, content: f.content, images: f.images ? (typeof f.images === 'string' ? JSON.parse(f.images) : f.images) : [],
+          restaurantName: f.restaurant_name, nickname: f.nickname || '美食家', posterRole: f.poster_role,
+          visibility: f.visibility, createTime: new Date(f.created_at).getTime(),
+          isTimePublic: f.is_time_public, showLocation: f.show_location,
+          isLocationPublic: f.is_location_public, location: f.location,
+          locPrecision: f.loc_precision, customLocation: f.custom_location,
+          timeDisplay: f.is_time_public ? this.computeTimeDisplay(new Date(f.created_at).getTime()) : '时间都去哪了',
+          locDisplay: f.show_location ? (f.is_location_public ? (f.loc_precision === 'fuzzy' ? (f.location||'').slice(0,6)+'...附近' : f.location) : (f.custom_location || '神秘地点')) : '',
+        }))
+        saveFeeds(merged)
+        this.setData({ feeds: this.filterFeeds(merged) })
+      }
+    }).catch(() => {})
     const feeds = getFeeds().map((f: any) => ({
       ...f, timeDisplay: f.isTimePublic ? this.computeTimeDisplay(f.createTime) : '时间都去哪了',
       locDisplay: f.showLocation ? (f.isLocationPublic ? (f.locPrecision === 'fuzzy' ? (f.location||'').slice(0,6)+'...附近' : f.location) : (f.customLocation || '神秘地点')) : '',
     }))
     const r = this.data.role
-    const rests = r === 'owner' ? allRests.filter((x: any) => x.owner) : allRests
+    const rests = (r === 'owner' ? allRests.filter((x: any) => x.owner) : allRests.filter((x: any) => !x.owner)).filter((x: any) => !x.closed)
     const has = rests.length > 0
     const idx = this.data.activeRestIdx < rests.length ? this.data.activeRestIdx : 0
     const activeRest = has ? rests[idx] : null
     const menuAll = activeRest ? (activeRest.menu || []) : []
     const menu = menuAll.filter((m: any) => m.onShelf)
-    const filteredOrders = activeRest ? orders.filter((o: any) => o.restaurantId === activeRest.id) : []
+    const restId = activeRest ? (activeRest.originalId || activeRest.id) : 0
+    const filteredOrders = activeRest ? orders.filter((o: any) => o.restaurantId === restId || o.restaurantId === activeRest.id) : []
+    this.syncOrdersFromCloud()
     this.setData({
       hasRestaurant: has, restaurants: rests, activeRest, menu, menuAll,
-      orders: filteredOrders, feeds: this.filterFeeds(feeds), activeRestIdx: idx,
+      orders: filteredOrders, filteredOrders: filteredOrders, feeds: this.filterFeeds(feeds), activeRestIdx: idx,
+      allRestsForOrder: allRests,
     })
     this.updateAvgRating()
   },
 
   computeTimeDisplay(ts: number): string {
     if (!ts) return ''
-    const diff = Date.now() - ts
-    if (diff < 60000) return '刚刚'
-    if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前'
-    if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前'
-    if (diff < 604800000) return Math.floor(diff / 86400000) + '天前'
     const d = new Date(ts)
-    return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0')
+    const Y = d.getFullYear()
+    const M = String(d.getMonth()+1).padStart(2,'0')
+    const D = String(d.getDate()).padStart(2,'0')
+    const H = String(d.getHours()).padStart(2,'0')
+    const m = String(d.getMinutes()).padStart(2,'0')
+    return Y + '年' + M + '月' + D + '日 ' + H + ':' + m
   },
 
   switchRest(e: any) {
@@ -167,13 +232,80 @@ Page({
   },
 
   switchTab(e: any) {
-    this.setData({ tab: e.currentTarget.dataset.tab })
+    const t = e.currentTarget.dataset.tab
+    this.setData({ tab: t })
+    if (t === 'orders') this.syncOrdersFromCloud()
+  },
+
+  forceEnter() {
+    const all = getRestaurants().filter((r: any) => !r.closed)
+    const ownerRests = all.filter((x: any) => x.owner)
+    const joinedRests = all.filter((x: any) => !x.owner)
+    const autoRole = ownerRests.length > 0 ? 'owner' : (joinedRests.length > 0 ? 'customer' : this.data.role)
+    const rests = autoRole === 'owner' ? ownerRests : joinedRests
+    if (rests.length > 0) {
+      this.setData({ hasRestaurant: true, restaurants: rests, activeRest: rests[0], activeRestIdx: 0, role: autoRole, tab: 'menu' })
+      const menu = (rests[0].menu || []).filter((m: any) => m.onShelf)
+      this.setData({ menu, menuAll: rests[0].menu || [] })
+    } else {
+      this.setData({ hasRestaurant: false })
+    }
+  },
+
+  syncOrdersFromCloud() {
+    const rest = this.data.activeRest
+    if (!rest?.inviteCode) return
+    const restId = rest.originalId || rest.id
+    api.getOrders(rest.inviteCode).then((cloudOrders: any[]) => {
+      if (!cloudOrders || cloudOrders.length === 0) return
+      const merged = cloudOrders.map((o: any) => ({
+        id: generateId(), restaurantId: restId,
+        restaurantName: o.restaurant_name, items: o.items,
+        itemList: o.item_list ? (typeof o.item_list === 'string' ? JSON.parse(o.item_list) : o.item_list) : [],
+        status: o.status, customer: o.customer_name || '食客',
+        createdAt: o.created_at, time: o.status === 'cooking' ? '制作中...' : '',
+        rating: o.rating, review: o.review, urgeCount: o.urge_count || 0,
+        cloudId: o.id
+      }))
+      // 合并到本地：云端来的覆盖本地同cloudId的
+      let localOrders = getOrders()
+      merged.forEach((mo: any) => {
+        const exist = localOrders.findIndex((lo: any) => lo.cloudId === mo.cloudId)
+        if (exist >= 0) {
+          // 更新状态
+          localOrders[exist].status = mo.status
+          localOrders[exist].rating = mo.rating
+          localOrders[exist].review = mo.review
+          localOrders[exist].urgeCount = mo.urgeCount
+        } else {
+          localOrders.unshift(mo)
+        }
+      })
+      saveOrders(localOrders)
+      const filtered = localOrders.filter((o: any) => o.restaurantId === restId || o.restaurantId === rest.id)
+      this.setData({ orders: filtered })
+      // 重新应用筛选
+      if (this.data.orderFilter && this.data.orderFilter !== 'all') {
+        this.filterOrders({ currentTarget: { dataset: { filter: this.data.orderFilter } } })
+      } else {
+        this.setData({ filteredOrders: filtered })
+      }
+    }).catch(() => {})
   },
 
   switchRole() {
     const newRole = this.data.role === 'owner' ? 'customer' : 'owner'
     this.setData({ role: newRole, tab: 'menu', activeRestIdx: 0 })
     this.refreshAll()
+  },
+
+  pickRestTheme(e: any) {
+    const key = e.currentTarget.dataset.theme
+    const t = this.data.restThemes.find((tc: any) => tc.key === key)
+    if (t) {
+      this.setData({ restTheme: t.main, restThemeDark: t.dark, restThemeLight: t.light })
+      wx.setStorageSync('restTheme', key)
+    }
   },
 
   preventClose() {},
@@ -187,29 +319,34 @@ Page({
   confirmCreateRest() {
     const name = (this.data.restName || '').trim()
     if (!name) { wx.showToast({ title: '请输入餐厅名称', icon: 'none' }); return }
+    if (name.length > 8) { wx.showToast({ title: '餐厅名称最多8个字', icon: 'none' }); return }
     const rests = getRestaurants()
-    const code = 'SG' + Date.now().toString(36).toUpperCase().slice(-8)
-    const profile = getUserProfile()
-    // 店主坐主座(4号)
-    const ownerMember: Member = {
-      nickname: profile.nick || '店主',
-      birdType: '32x32x1',
-      online: true,
-      joinedAt: new Date().toISOString(),
-      seatIndex: 4,
-      accessory: '',
-      soulColor: randomSoulColor()
-    }
-    rests.push({
+    const owned = rests.filter((r: any) => r.owner)
+    if (owned.length >= 5) { wx.showToast({ title: '最多创建5个餐厅', icon: 'none' }); return }
+    const code = 'SG' + Date.now().toString(36).toUpperCase().slice(-6)
+    const newRest: any = {
       id: generateId(), name, owner: true,
       description: this.data.restDescription || '',
-      menu: [], members: [ownerMember],
-      inviteCode: code, codeExpire: Date.now() + 600000
-    })
+      menu: [], members: [],
+      inviteCode: code, codeExpire: Date.now() + 86400000
+    }
+    // 主人自动加入
+    const profile = wx.getStorageSync('userProfile') || { nick: '店主' }
+    newRest.members.push({ nick: profile.nick || '店主', seatIndex: 4, birdType: '32x32x1', soulColor: randomSoulColor(), online: true })
+    rests.push(newRest)
     saveRestaurants(rests)
-    this.setData({ showCreateRest: false, restName: '', hasRestaurant: true, activeRestIdx: rests.length - 1 })
+    // 同步云端
+    api.createRestaurant(newRest).then(() => {
+      wx.showToast({ title: '已同步云端', icon: 'success', duration: 1000 })
+    }).catch((e: any) => {
+      console.error('[创建餐厅] 云端同步失败:', e)
+    })
+    const ownerRests = rests.filter((r: any) => r.owner)
+    const newIdx = ownerRests.length - 1
+    this.setData({ showCreateRest: false, restName: '', hasRestaurant: true, activeRestIdx: newIdx, role: 'owner' })
     this.refreshAll()
-    wx.showToast({ title: '餐厅开业啦！邀请码：' + code, icon: 'success' })
+    this.showCustomToast('邀请码：' + code + '（已复制）', '#7ee787')
+    wx.setClipboardData({ data: code })
   },
 
   // ===== 编辑餐厅 =====
@@ -246,11 +383,18 @@ Page({
       success(res: any) {
         if (res.confirm) {
           const rests = getRestaurants()
-          rests.splice(that.data.activeRestIdx, 1)
+          const rest = rests[that.data.activeRestIdx]
+          if (rest) {
+            rest.closed = true
+            // 标记所有加入此店的副本为闭店
+            rests.forEach((r: any) => { if (r.originalId === rest.id) r.closed = true })
+          }
           saveRestaurants(rests)
+          // 云端同步闭店
+          api.deleteRestaurant(rest.id).catch(() => {})
           that.setData({ activeRestIdx: 0 })
           that.refreshAll()
-          that.showCustomToast('餐厅已删除', '#f85149')
+          that.showCustomToast('餐厅已闭店，云端已同步', '#f85149')
         }
       }
     })
@@ -347,8 +491,11 @@ Page({
       seatMap,
       statusOnline: onlineCount,
       statusOffline: (rest.members || []).length - onlineCount,
-      statusMembers: rest.members || []
+      statusMembers: rest.members || [],
+      welcomeMsg: '欢迎老吃家 ' + nick + ' 大家光临！',
+      showWelcome: true
     })
+    setTimeout(() => { this.setData({ showWelcome: false }) }, 10500)
   },
   leaveInterior() {
     // 标记离线
@@ -387,10 +534,12 @@ Page({
       joinNickname: profile.nick || '美食家',
       selectedSeat: 0, availableSeats: [],
       selectedAccessory: '',
-      selectedSoulColor: randomSoulColor()
+      selectedSoulColor: randomSoulColor(),
+      isMystery: false
     })
   },
   closeJoinRest() { this.setData({ showJoinRest: false, showBirdPicker: false }) },
+  toggleMystery() { this.setData({ isMystery: !this.data.isMystery }) },
 
   onJoinCodeInput(e: any) { this.setData({ joinCode: e.detail.value }) },
 
@@ -404,10 +553,11 @@ Page({
     if (!input || input.length < 6) return
     const rests = getRestaurants()
     const target = rests.find((r: any) => r.inviteCode === input)
-    if (!target) return
-    const occupied = (target.members || []).map((m: Member) => m.seatIndex)
-    const available = SEAT_POSITIONS.filter(s => s.id !== 4 && !occupied.includes(s.id)).map(s => s.id)
-    this.setData({ availableSeats: available, selectedSeat: available.length > 0 ? available[0] : 0 })
+    if (target) {
+      const occupied = (target.members || []).map((m: Member) => m.seatIndex)
+      const available = SEAT_POSITIONS.filter(s => s.id !== 4 && !occupied.includes(s.id)).map(s => s.id)
+      this.setData({ availableSeats: available, selectedSeat: available.length > 0 ? available[0] : 0 })
+    }
   },
 
   selectSeat(e: any) {
@@ -458,26 +608,82 @@ Page({
     const input = (this.data.joinCode || '').trim().toUpperCase()
     if (!input) { wx.showToast({ title: '请输入邀请码', icon: 'none' }); return }
     const rests = getRestaurants()
-    const target = rests.find((r: any) => r.inviteCode === input)
-    if (!target) { wx.showToast({ title: '邀请码无效', icon: 'none' }); return }
-    if (target.codeExpire && Date.now() > target.codeExpire) {
+    let target = rests.find((r: any) => r.inviteCode === input)
+    if (!target) {
+      // 本地没有，查云端
+      wx.showLoading({ title: '查找餐厅...' })
+      wx.cloud.callContainer({
+        config: { env: 'prod-d0g68hmay4c8d10e3' },
+        path: '/api/restaurants/by-code/' + encodeURIComponent(input),
+        header: { 'X-WX-SERVICE': 'express-rtm4' },
+        method: 'GET',
+        success: (res: any) => {
+          wx.hideLoading()
+          if (res.data?.code === 0 && res.data.data) {
+            const cloudRest = res.data.data
+            // 构造成本地格式
+            const r: Restaurant = {
+              id: cloudRest.id,
+              name: cloudRest.name,
+              description: cloudRest.description || '',
+              owner: true, // 原始店
+              menu: [],
+              members: (cloudRest.members || []).map((m: any) => ({
+                nickname: m.nickname, birdType: m.bird_type || '32x32x1',
+                online: false, joinedAt: m.joined_at || '', seatIndex: m.seat_index || 0,
+                accessory: m.accessory || '', soulColor: m.soul_color || randomSoulColor()
+              })),
+              inviteCode: cloudRest.invite_code || '',
+              codeExpire: cloudRest.code_expire || 0
+            }
+            this.doJoinRest(rests, r)
+          } else {
+            wx.showToast({ title: '邀请码无效', icon: 'none' })
+          }
+        },
+        fail: () => { wx.hideLoading(); wx.showToast({ title: '网络错误，请重试', icon: 'none' }) }
+      })
+      return
+    }
+    // 邀请码有效期延长到24小时
+    if (target.codeExpire && Date.now() > target.codeExpire + 86400000) {
       wx.showToast({ title: '邀请码已过期，请联系店主刷新', icon: 'none' }); return
     }
     if (target.owner) {
-      if (target.id === this.data.activeRest?.id) {
-        wx.showToast({ title: '这是你自己的店', icon: 'none' }); return
-      }
-      const joined = rests.filter((r: any) => !r.owner)
-      if (joined.length >= 3) { wx.showToast({ title: '最多加入3个', icon: 'none' }); return }
-      if (rests.find((r: any) => !r.owner && r.originalId === target.id)) {
-        wx.showToast({ title: '已加入过了', icon: 'none' }); return
+      this.doJoinRest(rests, target)
+    }
+  },
+
+  doJoinRest(rests: Restaurant[], target: Restaurant) {
+    if (target.owner) {
+      const isOwn = target.id === this.data.activeRest?.id
+      if (!isOwn) {
+        const joined = rests.filter((r: any) => !r.owner)
+        if (joined.length >= 3) { wx.showToast({ title: '最多加入3个', icon: 'none' }); return }
+        if (rests.find((r: any) => !r.owner && r.originalId === target.id)) {
+          wx.showToast({ title: '已加入过了', icon: 'none' }); return
+        }
       }
 
       const profile = getUserProfile()
-      const nick = profile.nick || '美食家'
-      const seatIdx = this.data.selectedSeat
+      const nick = this.data.isMystery ? '神秘食客' : (profile.nick || '美食家')
+      const seatIdx = isOwn ? 4 : this.data.selectedSeat
 
-      // 创建"已加入"副本
+      // 在原餐厅添加成员（跳过重复检查，允许店主以食客身份加入）
+      if (!target.members) target.members = []
+      if (!target.members.find((m: any) => m.nickname === nick)) {
+        target.members.push({
+          nickname: nick,
+          birdType: this.data.selectedBird,
+          online: true,
+          joinedAt: new Date().toISOString(),
+          seatIndex: seatIdx,
+          accessory: this.data.selectedAccessory,
+          soulColor: this.data.selectedSoulColor
+        })
+      }
+
+      // 创建"已加入"副本（食客视角用）
       const joinedRest: Restaurant = {
         id: generateId(), name: target.name, owner: false,
         description: target.description || '',
@@ -491,32 +697,40 @@ Page({
           accessory: this.data.selectedAccessory,
           soulColor: this.data.selectedSoulColor
         }],
-        inviteCode: '',
+        inviteCode: target.inviteCode || '',
         codeExpire: 0
       }
       rests.push(joinedRest)
 
-      // 在原餐厅也添加成员
-      if (!target.members) target.members = []
-      target.members.push({
-        nickname: nick,
-        birdType: this.data.selectedBird,
-        online: true,
-        joinedAt: new Date().toISOString(),
-        seatIndex: seatIdx,
-        accessory: this.data.selectedAccessory,
-        soulColor: this.data.selectedSoulColor
-      })
+      // 从云端拉取菜单
+      if (target.inviteCode) {
+        api.getRestaurantMenu(target.inviteCode).then((menu: any[]) => {
+          if (menu && menu.length > 0) {
+            target.menu = menu.map((m: any) => ({
+              recipeId: m.recipe_id, name: m.name, price: m.price,
+              emoji: m.emoji, onShelf: !!m.on_shelf
+            }))
+            saveRestaurants(rests)
+            this.refreshAll()
+          }
+        }).catch(() => {})
+      }
 
       saveRestaurants(rests)
-      this.setData({ showJoinRest: false, joinCode: '', showBirdPicker: false, activeRestIdx: rests.length - 1 })
+      const newIdx = rests.length - 1
+      const newRole = isOwn ? 'customer' : this.data.role
+      this.setData({ showJoinRest: false, joinCode: '', showBirdPicker: false, activeRestIdx: newIdx >= 0 ? newIdx : 0, role: newRole })
       this.refreshAll()
 
       const seatLabel = SEAT_POSITIONS.find(s => s.id === seatIdx)?.label || ''
-      this.setData({ showToast: true, toastMsg: '尊驾已落座' + target.name + '【' + seatLabel + '】', toastColor: '#ffa3cb' })
+      const joinMsg = isOwn
+        ? '您成功作为食客加入自己的店，可以体验点单功能啦~'
+        : '尊驾已落座' + target.name + '【' + seatLabel + '】'
+      this.setData({ showToast: true, toastMsg: joinMsg, toastColor: '#ffa3cb' })
       setTimeout(() => { this.setData({ showToast: false }) }, 3000)
 
-      this.setData({ showWelcome: true, welcomeMsg: '欢迎老吃家 ' + nick + ' 大家光临~' })
+      this.setData({ showWelcome: true, welcomeMsg: '欢迎老吃家 ' + nick + ' 大家光临！' })
+      setTimeout(() => { this.setData({ showWelcome: false }) }, 10500)
     }
   },
 
@@ -569,7 +783,62 @@ Page({
       statusOffline: (rest.members || []).length - onlineCount,
       statusMembers: rest.members || []
     })
-    wx.showToast({ title: '已搬到新座位~', icon: 'success' })
+    this.setData({ seatToast: '已搬到新座位~' })
+    setTimeout(() => { this.setData({ seatToast: '' }) }, 2500)
+  },
+
+  // ===== 踢出食客 =====
+  kickMember(e: any) {
+    const nick = e.currentTarget.dataset.nick
+    wx.showModal({
+      title: '踢出食客',
+      content: '确定要将「' + nick + '」踢出餐厅吗？踢出后需要重新加入。',
+      confirmColor: '#f85149',
+      success: (res: any) => {
+        if (!res.confirm) return
+        const rests = getRestaurants()
+        const rest = rests.find((r: any) => r.id === this.data.activeRest.id)
+        if (!rest) return
+        rest.members = (rest.members || []).filter((m: any) => m.nickname !== nick)
+        // 同时删除该食客加入的本店副本
+        const joinedIdx = rests.findIndex((r: any) => !r.owner && r.originalId === rest.id && (r.members || []).some((m: any) => m.nickname === nick))
+        if (joinedIdx >= 0) rests.splice(joinedIdx, 1)
+        saveRestaurants(rests)
+        this.refreshAll()
+        wx.showToast({ title: '已踢出 ' + nick, icon: 'none' })
+      }
+    })
+  },
+
+  // ===== 食客主动退出 =====
+  leaveRestaurant() {
+    const rests = getRestaurants()
+    const rest = rests.find((r: any) => r.id === this.data.activeRest.id)
+    if (!rest || rest.owner) return
+    const profile = getUserProfile()
+    const nick = profile.nick || '美食家'
+    wx.showModal({
+      title: '退出餐厅',
+      content: '确定要退出「' + rest.name + '」吗？',
+      confirmColor: '#f85149',
+      success: (res: any) => {
+        if (!res.confirm) return
+        // 从本店移除自己
+        const idx = rests.findIndex((r: any) => r.id === rest.id)
+        if (idx >= 0) rests.splice(idx, 1)
+        // 也从原店移除自己的成员记录
+        if (rest.originalId) {
+          const original = rests.find((r: any) => r.id === rest.originalId)
+          if (original && original.members) {
+            original.members = original.members.filter((m: any) => m.nickname !== nick)
+          }
+        }
+        saveRestaurants(rests)
+        this.setData({ activeRestIdx: 0 })
+        this.refreshAll()
+        wx.showToast({ title: '已退出餐厅', icon: 'none' })
+      }
+    })
   },
 
   closeWelcome() { this.setData({ showWelcome: false }) },
@@ -580,7 +849,11 @@ Page({
 
   // ===== 上架管理 =====
   openShelf() {
-    const recipes = getRecipes().filter((r: any) => !r.draft)
+    let recipes = getRecipes().filter((r: any) => !r.draft)
+    // 如果没有DIY菜谱，拉公共菜谱
+    if (recipes.length === 0) {
+      recipes = PUBLIC_RECIPES.map((r: any, i: number) => ({ ...r, id: 10000 + i }))
+    }
     const menu = this.data.activeRest?.menu || []
     const ids = menu.map((m: any) => m.recipeId)
     this.setData({ showShelf: true, shelfSearch: '', diyRecipes: recipes.map((r: any) => ({ ...r, onShelf: ids.includes(r.id) })) })
@@ -602,6 +875,7 @@ Page({
     if (!rest || !rest.menu) return
     rest.menu = rest.menu.filter((m: any) => m.recipeId !== recipeId)
     saveRestaurants(rests)
+    api.removeRestaurantMenu(rest.inviteCode, recipeId).catch(() => {})
     this.refreshAll()
     wx.showToast({ title: '已下架', icon: 'none' })
   },
@@ -613,10 +887,15 @@ Page({
     if (!rest) return
     if (!rest.menu) rest.menu = []
     const idx = rest.menu.findIndex((m: any) => m.recipeId === recipeId)
-    if (idx >= 0) { rest.menu.splice(idx, 1) }
-    else {
+    if (idx >= 0) {
+      rest.menu.splice(idx, 1)
+      api.removeRestaurantMenu(rest.inviteCode, recipeId).catch(() => {})
+    } else {
       const r = this.data.diyRecipes.find((r: any) => r.id === recipeId)
-      if (r) rest.menu.push({ recipeId: r.id, name: r.name, price: r.price, emoji: r.coverEmoji, onShelf: true })
+      if (r) {
+        rest.menu.push({ recipeId: r.id, name: r.name, price: r.price, emoji: r.coverEmoji, onShelf: true })
+        api.addRestaurantMenu(rest.inviteCode, { recipeId: r.id, name: r.name, price: r.price, emoji: r.coverEmoji }).catch(() => {})
+      }
     }
     saveRestaurants(rests)
     const updated = this.data.diyRecipes.map((r: any) => ({ ...r, onShelf: r.id === recipeId ? !r.onShelf : r.onShelf }))
@@ -630,25 +909,46 @@ Page({
   },
 
   submitOrder() {
+    if (this.data.submitting) return
+    if (this.data.activeRest?.closed) {
+      wx.showModal({ title: '⚠️', content: '您所在的餐厅已被该店店主删除！', showCancel: false, confirmText: '知道了' })
+      return
+    }
     const ordered = this.data.menuAll.filter((m: any) => m.ordered)
     if (ordered.length === 0) { wx.showToast({ title: '请先选择菜品', icon: 'none' }); return }
+    this.setData({ submitting: true })
     const items = ordered.map((m: any) => m.name).join('、')
+    const restId = this.data.activeRest.originalId || this.data.activeRest.id
     const order: Order = {
-      id: generateId(), restaurantId: this.data.activeRest.id, restaurantName: this.data.activeRest.name,
+      id: generateId(), restaurantId: restId, restaurantName: this.data.activeRest.name,
       items, itemList: ordered.map((m: any) => ({ recipeId: m.recipeId, name: m.name, price: m.price, emoji: m.emoji })),
       status: 'pending', customer: '我', createdAt: new Date().toISOString(),
     }
     const orders = getOrders(); orders.unshift(order); saveOrders(orders)
-    this.setData({ menuAll: this.data.menuAll.map((m: any) => ({ ...m, ordered: false })) })
+    // 同步到云端
+    api.createOrder({
+      restaurant_id: this.data.activeRest.inviteCode,
+      restaurant_name: this.data.activeRest.name,
+      customer_name: order.customer,
+      items: order.items,
+      item_list: order.itemList,
+      status: 'pending'
+    }).then((res: any) => {
+      if (res?.id) {
+        order.cloudId = res.id
+        saveOrders(orders)
+      }
+    }).catch(() => {})
+    this.setData({ menuAll: this.data.menuAll.map((m: any) => ({ ...m, ordered: false })), submitting: false })
     this.refreshAll()
-    wx.showToast({ title: '下单成功！', icon: 'success' })
+    wx.showToast({ title: '下单成功！等待店主接单...', icon: 'success' })
   },
 
   // ===== 订单管理 =====
   acceptOrder(e: any) {
     const id = e.currentTarget.dataset.id
     this.updateOrder(id, 'cooking', '制作中...')
-    this.showCustomToast('已接单，开始制作！', '#7ee787')
+    this.showCustomToast('已接单，制作中...', '#7ee787')
   },
   finishOrder(e: any) {
     const id = e.currentTarget.dataset.id
@@ -673,7 +973,15 @@ Page({
   updateOrder(id: number, status: string, time?: string) {
     const orders = getOrders()
     const idx = orders.findIndex((o: any) => o.id === id)
-    if (idx >= 0) { orders[idx].status = status as any; if (time) orders[idx].time = time; saveOrders(orders) }
+    if (idx >= 0) {
+      orders[idx].status = status as any
+      if (time) orders[idx].time = time
+      saveOrders(orders)
+      // 同步状态到云端
+      if (orders[idx].cloudId) {
+        api.updateOrder(orders[idx].cloudId, { status }).catch(() => {})
+      }
+    }
     this.refreshAll()
   },
 
@@ -683,10 +991,82 @@ Page({
   },
   closeToast() { this.setData({ showToast: false }) },
 
+  checkRestClosed(): boolean {
+    const rest = this.data.activeRest
+    if (rest && rest.closed) {
+      wx.showModal({
+        title: '该餐厅已闭店~',
+        content: '店主已关闭了这家温暖的餐厅。',
+        confirmText: '不再怀念',
+        cancelText: '留作纪念',
+        confirmColor: '#f85149',
+        success: (res: any) => {
+          if (res.confirm) {
+            const rests = getRestaurants().filter((r: any) => r.id !== rest.id && r.originalId !== rest.id)
+            saveRestaurants(rests)
+            this.refreshAll()
+          }
+        }
+      })
+      return true
+    }
+    return false
+  },
+
   rateOrder(e: any) {
     this.setData({ showRateModal: true, rateOrderId: e.currentTarget.dataset.id, rateStars: 5, rateText: '' })
   },
   closeRateModal() { this.setData({ showRateModal: false }) },
+  skipRating() {
+    const orders = getOrders()
+    const idx = orders.findIndex((o: any) => o.id === this.data.rateOrderId)
+    if (idx >= 0) {
+      orders[idx].rating = -1 // -1 表示拒评
+      orders[idx].review = ''
+      orders[idx].reviewFeatured = false
+      // 添加店主端聊天记录
+      if (!orders[idx].chat) orders[idx].chat = []
+      orders[idx].chat.push({
+        txt: '呦呵！您的厨艺可能赛东坡呀~您亲爱的食客拒绝点评~宫廷御厨都比不上您！订单结束啦！',
+        from: 'owner', time: new Date().toLocaleTimeString()
+      })
+      if (orders[idx].cloudId) api.updateOrder(orders[idx].cloudId, { status: 'done', rating: -1 }).catch(() => {})
+      saveOrders(orders)
+    }
+    this.closeRateModal()
+    this.refreshAll()
+    this.showCustomToast('订单结束啦！亲亲欢迎下次再来小馆呦~~', '#ffb37c')
+  },
+  urgeRating(e: any) {
+    const id = e.currentTarget.dataset.id
+    const orders = getOrders()
+    const idx = orders.findIndex((o: any) => o.id === id)
+    if (idx >= 0) {
+      if (orders[idx].ownerUrged) {
+        this.showCustomToast('您已催评价八百次啦~赶火车都没您嘿嘿~', '#f85149')
+        return
+      }
+      orders[idx].ownerUrged = true
+      // 添加聊天记录
+      if (!orders[idx].chat) orders[idx].chat = []
+      const profile = getUserProfile()
+      orders[idx].chat.push({
+        txt: '已向食客催评价',
+        from: 'owner',
+        time: new Date().toLocaleTimeString()
+      })
+      orders[idx].chat.push({
+        txt: (profile.nick || '店主') + ' 大店主邀请您老吃家评价菜肴啦~~',
+        from: 'customer',
+        time: new Date().toLocaleTimeString()
+      })
+      saveOrders(orders)
+      // 同步到云端
+      if (orders[idx].cloudId) api.updateOrder(orders[idx].cloudId, { status: 'done', urge_count: (orders[idx].urgeCount || 0) + 1 }).catch(() => {})
+    }
+    this.refreshAll()
+    this.showCustomToast('已催促食客评价~', '#ffb37c')
+  },
   setRateStars(e: any) { this.setData({ rateStars: parseFloat(e.currentTarget.dataset.star) }) },
   onRateTextInput(e: any) { this.setData({ rateText: e.detail.value }) },
   submitRating() {
@@ -696,10 +1076,12 @@ Page({
       orders[idx].rating = this.data.rateStars
       orders[idx].review = this.data.rateText.trim()
       orders[idx].reviewFeatured = false
+      if (orders[idx].cloudId) api.updateOrder(orders[idx].cloudId, { status: 'done', rating: this.data.rateStars, review: this.data.rateText.trim() }).catch(() => {})
       saveOrders(orders)
     }
     this.updateAvgRating()
     this.closeRateModal()
+    this.refreshAll()
     this.showCustomToast('评价成功！欢迎下次再来！', '#7ee787')
   },
   updateAvgRating() {
@@ -728,18 +1110,45 @@ Page({
   },
   viewOrderDetail(e: any) {
     const id = e.currentTarget.dataset.id
-    wx.navigateTo({ url: '/pages/order-detail/order-detail?id=' + id })
+    wx.navigateTo({ url: '/pages/order-detail/order-detail?id=' + id + '&role=' + this.data.role })
   },
-  filterOrders(e: any) { this.setData({ orderFilter: e.currentTarget.dataset.filter }) },
+  filterOrdersByRest(e: any) {
+    const restId = parseInt(e.currentTarget.dataset.id)
+    const allRests = getRestaurants()
+    const filtered = getOrders().filter((o: any) => {
+      const rest = allRests.find((r: any) => r.id === restId)
+      return rest && (o.restaurantId === rest.id || o.restaurantId === (rest.originalId || rest.id))
+    })
+    this.setData({ orderRestFilter: restId, orders: filtered, orderFilter: 'all', filteredOrders: filtered })
+  },
+
+  filterOrders(e: any) {
+    const f = e.currentTarget.dataset.filter
+    const orders = this.data.orders
+    let filtered = orders
+    if (f === 'all') filtered = orders
+    else if (f === 'pending') filtered = orders.filter((o: any) => o.status === 'pending')
+    else if (f === 'cooking') filtered = orders.filter((o: any) => o.status === 'cooking')
+    else if (f === 'rating') filtered = orders.filter((o: any) => o.status === 'done' && !o.rating)
+    else if (f === 'done') filtered = orders.filter((o: any) => (o.status === 'done' && o.rating) || o.status === 'rejected')
+    this.setData({ orderFilter: f, filteredOrders: filtered })
+  },
 
   // ===== 感受分享 =====
   openNewFeed() {
+    const rests = getRestaurants()
+    const r = this.data.role
+    const feedRestList = r === 'owner' ? rests.filter((x: any) => x.owner) : rests.filter((x: any) => !x.owner)
     this.setData({
       showNewFeed: true, feedContent: '', feedImages: [],
       feedIsTimePublic: true, feedShowLocation: true,
       feedIsLocationPublic: true, feedCustomLocation: '', feedLocation: '', feedLocPrecision: 'exact',
+      feedIdentity: 'role', feedRestId: feedRestList[0]?.id || 0, feedRestList,
     })
   },
+  pickFeedIdentity(e: any) { this.setData({ feedIdentity: e.currentTarget.dataset.id }) },
+  setFeedVisibility(e: any) { this.setData({ feedVisibility: e.currentTarget.dataset.v }) },
+  pickFeedRest(e: any) { this.setData({ feedRestId: parseInt(e.currentTarget.dataset.id) }) },
   closeNewFeed() { this.setData({ showNewFeed: false }) },
   onFeedInput(e: any) { this.setData({ feedContent: e.detail.value }) },
   async addFeedImage() {
@@ -754,14 +1163,18 @@ Page({
     const i = opts.indexOf(this.data.feedVisibility)
     this.setData({ feedVisibility: opts[(i + 1) % opts.length] })
   },
-  toggleLocPrecision() { this.setData({ feedLocPrecision: this.data.feedLocPrecision === 'exact' ? 'fuzzy' : 'exact' }) },
+  toggleLocPrecision() {
+    this.setData({ feedLocPrecision: this.data.feedLocPrecision === 'exact' ? 'fuzzy' : 'exact' })
+    this.updateFeedLocDisplay()
+  },
   getVisLabel(v: string) { const m: any = { all: '🌐 公开', restaurant: '🏪 餐厅', self: '🔒 仅自己' }; return m[v] || v },
   setFeedFilter(e: any) { this.setData({ feedFilter: e.currentTarget.dataset.f }); this.refreshAll() },
   filterFeeds(feeds: any[]) {
     const f = this.data.feedFilter
     if (f === 'all') return feeds
-    if (f === 'restaurant') return feeds.filter((x: any) => x.restaurantName === this.data.activeRest?.name)
-    if (f === 'self') return feeds.filter((x: any) => x.nickname === '美食家')
+    if (f === 'public') return feeds.filter((x: any) => x.visibility === 'all')
+    if (f === 'restaurant') return feeds.filter((x: any) => x.visibility === 'restaurant' && x.restaurantName === this.data.activeRest?.name)
+    if (f === 'self') return feeds.filter((x: any) => x.visibility === 'self')
     return feeds
   },
 
@@ -779,7 +1192,7 @@ Page({
   toggleFeedTimePublic(e: any) { this.setData({ feedIsTimePublic: e.detail.value }) },
 
   toggleFeedLocationMode(e: any) {
-    const mode = e.currentTarget.dataset.mode
+    const mode = e.currentTarget.dataset.m
     if (mode === 'public') {
       this.setData({ feedShowLocation: true, feedIsLocationPublic: true })
       this.getFeedLocation()
@@ -796,7 +1209,14 @@ Page({
     const that = this
     wx.chooseLocation({
       success(res) {
-        that.setData({ feedLocation: res.address || res.name || '已选位置' })
+        const loc = res.address || res.name || '已选位置'
+        const lng = res.longitude || 0
+        const lat = res.latitude || 0
+        that.setData({
+          feedLocation: loc, feedLocDisplay: loc,
+          feedLng: lng, feedLat: lat,
+          feedMarker: [{ id: 0, longitude: lng, latitude: lat, iconPath: '/sptites/menu.png', width: 30, height: 30 }]
+        })
         wx.showToast({ title: '位置已选择', icon: 'success' })
       },
       fail() {
@@ -804,13 +1224,27 @@ Page({
       }
     })
   },
+  previewFeedLocation() {
+    const lat = this.data.feedLat, lng = this.data.feedLng
+    if (lat && lng) {
+      wx.openLocation({ latitude: lat, longitude: lng, name: this.data.feedLocation, scale: 14 })
+    }
+  },
+  updateFeedLocDisplay() {
+    const loc = this.data.feedLocation || ''
+    const prec = this.data.feedLocPrecision
+    this.setData({ feedLocDisplay: prec === 'exact' ? loc : (loc.length > 6 ? loc.slice(0,6)+'...附近' : loc) })
+  },
   publishFeed() {
     if (!this.data.feedContent.trim() && this.data.feedImages.length === 0) {
       wx.showToast({ title: '请输入内容或添加图片', icon: 'none' }); return
     }
+    const identity = this.data.feedIdentity === 'role' ? (this.data.role === 'owner' ? '👨‍🍳店主' : '🍽️食客') : this.data.feedIdentity
+    const restName = this.data.feedRestId ? (this.data.feedRestList.find((r: any) => r.id === this.data.feedRestId)?.name || '') : ''
     const feed: Feed = {
       id: generateId(), content: this.data.feedContent.trim(), images: this.data.feedImages,
-      restaurantName: this.data.activeRest?.name || '', nickname: '美食家',
+      restaurantName: this.data.feedVisibility === 'restaurant' ? restName : '',
+      nickname: identity,
       posterRole: this.data.role,
       visibility: this.data.feedVisibility as 'all' | 'restaurant',
       createdAt: new Date().toISOString(), comments: [],
@@ -823,6 +1257,14 @@ Page({
       customLocation: this.data.feedCustomLocation,
     }
     const feeds = getFeeds(); feeds.unshift(feed); saveFeeds(feeds)
+    // 同步到云端
+    api.createFeed({
+      content: feed.content, images: feed.images, restaurant_name: feed.restaurantName,
+      poster_role: feed.posterRole, visibility: feed.visibility,
+      show_location: feed.showLocation, is_location_public: feed.isLocationPublic,
+      location: feed.location, loc_precision: feed.locPrecision,
+      custom_location: feed.customLocation, is_time_public: feed.isTimePublic
+    }).catch(() => {})
     this.setData({
       showNewFeed: false, feedContent: '', feedImages: [],
       feedIsTimePublic: true, feedShowLocation: true,
@@ -908,5 +1350,60 @@ Page({
       success: () => wx.showToast({ title: '已复制：' + code, icon: 'success' })
     })
     this.closeShareSheet()
+  },
+
+  // 从云端查到的餐厅加入
+  _joinByCloudRest(cloudRest: any, code: string) {
+    const rests = getRestaurants()
+    // 检查是否已经加入过
+    const existing = rests.filter((r: any) => !r.owner)
+    if (existing.find((r: any) => r.originalId === cloudRest.id)) {
+      // 已加入，直接进入
+      this.setData({ role: 'customer' })
+      this.forceEnter()
+      return
+    }
+    const occupied = (cloudRest.members || []).map((m: any) => m.seatIndex || m.seat_index)
+    const freeSeats = SEAT_POSITIONS.filter((s: any) => s.id !== 4 && !occupied.includes(s.id)).map((s: any) => s.id)
+    const autoSeat = freeSeats.length > 0 ? freeSeats[0] : 0
+    this.setData({
+      joinCode: code,
+      selectedSeat: autoSeat,
+      selectedBird: '32x32x1',
+      selectedAccessory: '',
+      selectedSoulColor: randomSoulColor(),
+      isMystery: false
+    })
+    // 直接构建并加入
+    const r: any = {
+      id: cloudRest.id, name: cloudRest.name,
+      description: cloudRest.description || '', owner: false,
+      members: (cloudRest.members || []).map((m: any) => ({
+        nickname: m.nickname, seatIndex: m.seat_index || 0, birdType: m.bird_type || '32x32x1',
+        soulColor: m.soul_color || randomSoulColor(), online: false
+      })),
+      inviteCode: cloudRest.invite_code || code,
+      originalId: cloudRest.id
+    }
+    this.doJoinRest(rests, r)
+  },
+
+  _scanBirdTargets() {
+    var self = this;
+    var q = wx.createSelectorQuery();
+    q.selectAll('.card,.glass,.btn,.rest-card,.bench-seat,.interior-signboard,.online-badge,.search-bar,.chip').boundingClientRect();
+    q.exec(function (res: any[]) {
+      var rects = res[0];
+      if (rects && rects.length > 0) {
+        var targets: any[] = [];
+        for (var i = 0; i < rects.length; i++) {
+          var r = rects[i];
+          if (r && r.width > 40 && r.height > 20 && r.top > 10) {
+            targets.push({ x: r.left, y: r.top, w: r.width, h: r.height });
+          }
+        }
+        self.setData({ birdTargets: targets });
+      }
+    });
   },
 })

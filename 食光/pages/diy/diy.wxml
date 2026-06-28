@@ -241,3 +241,6 @@
 <view class="float-food" style="left:70%;animation-delay:-12s">🍜</view>
 </view>
 
+<!-- 口袋小鸟 -->
+<pocket-bird hidden="{{!showPocketBird}}" pixelSize="3" pageTargets="{{birdTargets}}" />
+

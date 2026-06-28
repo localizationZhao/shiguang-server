@@ -4,5 +4,6 @@
   "private": true,
   "scripts": {
     "server": "cd server && node app.js"
-  }
+  },
+  "dependencies": {}
 }

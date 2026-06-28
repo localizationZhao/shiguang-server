@@ -1,0 +1,29 @@
+<navigation-bar title="我的餐厅记录" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
+<scroll-view class="page" scroll-y>
+
+  <!-- 我开的 -->
+  <view class="section-label">🏪 我开的餐厅</view>
+  <view wx:if="{{owned.length === 0}}" class="empty">还没有开过餐厅</view>
+  <view class="rest-card" wx:for="{{owned}}" wx:key="id">
+    <view class="rc-info">
+      <text class="rc-name">{{item.name}}</text>
+      <text class="rc-code">邀请码: {{item.inviteCode || '无'}}</text>
+      <text class="rc-meta">{{item.members ? item.members.length : 0}} 位食客</text>
+    </view>
+    <view class="rc-badge owner">店主</view>
+  </view>
+
+  <!-- 我加入的 -->
+  <view class="section-label">🍽️ 我加入的餐厅</view>
+  <view wx:if="{{joined.length === 0}}" class="empty">还没有加入过餐厅</view>
+  <view class="rest-card" wx:for="{{joined}}" wx:key="id">
+    <view class="rc-info">
+      <text class="rc-name">{{item.name}}</text>
+      <text class="rc-code">邀请码: {{item.inviteCode || '无'}}</text>
+      <text class="rc-meta">{{item.members ? item.members.length : 0}} 位食客</text>
+    </view>
+    <view class="rc-badge customer">食客</view>
+  </view>
+
+  <view class="goto-btn" bindtap="toRestaurant">进入餐厅</view>
+</scroll-view>

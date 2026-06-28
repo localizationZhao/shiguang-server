@@ -10,7 +10,9 @@
     "pages/cooking-record/cooking-record",
     "pages/favorites/favorites",
     "pages/my-orders/my-orders",
-    "pages/settings/settings"
+    "pages/settings/settings",
+    "pages/my-recipes/my-recipes",
+    "pages/my-restaurants/my-restaurants"
   ],
   "window": {
     "navigationBarTextStyle": "black",

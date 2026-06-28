@@ -35,9 +35,9 @@
   box-shadow:var(--border) 0 var(--th),var(--neg-border) 0 var(--th),0 calc(var(--neg-border)) var(--th),0 var(--border) var(--th),calc(var(--border)*2) 0 var(--th),calc(var(--neg-border)*2) 0 var(--th),0 calc(var(--neg-border)*2) var(--th),0 calc(var(--border)*2) var(--th),0 0 0 var(--border) var(--th),0 0 0 calc(var(--border)*2) #fff,calc(var(--border)*2) 0 0 var(--border) #fff,calc(var(--neg-border)*2) 0 0 var(--border) #fff,0 calc(var(--neg-border)*2) 0 var(--border) #fff,0 calc(var(--border)*2) 0 var(--border) #fff}
 .scroll-name-fade-top{width:100%;height:20rpx;margin-bottom:-20rpx;background:linear-gradient(180deg,var(--bg),transparent);position:relative;z-index:2}
 .scroll-name-fade-bottom{width:100%;height:20rpx;margin-top:-20rpx;background:linear-gradient(0deg,var(--bg),transparent);position:relative;z-index:2}
-.scroll-name-list{animation:scrollNames 12s linear infinite;padding:6rpx 16rpx}
+.scroll-name-list{animation:scrollNames 60s linear infinite;padding:6rpx 16rpx}
 .scroll-name-item{display:block;font-size:22rpx;color:rgba(63,44,21,0.5);padding:2rpx 0;text-align:center}
-@keyframes scrollNames{0%{transform:translateY(60rpx)}100%{transform:translateY(-180rpx)}}
+@keyframes scrollNames{0%{transform:translateY(60rpx)}100%{transform:translateY(-1600rpx)}}
 
 /* ===== 标签便签按钮 ===== */
 .pref-tags{display:flex;flex-wrap:wrap;gap:14rpx;flex-shrink:0;padding:6rpx 8rpx}

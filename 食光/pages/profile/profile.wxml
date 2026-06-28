@@ -1,76 +1,114 @@
-<!-- 个人中心 -->
+<!-- 个人中心 - 便签风 -->
 <navigation-bar title="我的" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{false}}"></navigation-bar>
 
 <scroll-view class="page" scroll-y enhanced show-scrollbar="{{false}}">
 
-  <!-- 用户信息卡片 -->
-  <view class="glass user-card">
-    <view class="user-avatar" bindtap="editProfile">
-      <image wx:if="{{user.avatar}}" src="{{user.avatar}}" mode="aspectFill" class="avatar-img"></image>
-      <text wx:else style="font-size:32px">👤</text>
+  <!-- 用户卡片 -->
+  <view class="profile-card" bindtap="openEditProfile">
+    <view class="pf-avatar-wrap">
+      <image wx:if="{{user.avatar}}" src="{{user.avatar}}" mode="aspectFill" class="pf-avatar-img"></image>
+      <text wx:else class="pf-avatar-em">👤</text>
     </view>
-
-    <view class="user-info">
-      <text class="user-nick">{{user.nick}}</text>
-      <text class="user-id">ID: {{user.id}}</text>
+    <view class="pf-info">
+      <text class="pf-nick">{{user.nick || '美食家'}}</text>
+      <text class="pf-id">ID: {{user.id || '10001'}}</text>
+      <text class="pf-birth" wx:if="{{user.birthday}}">🎂 {{user.birthday}}</text>
+      <text class="pf-birth-hint" wx:else>✏️ 设置生日</text>
     </view>
-
-    <text class="user-edit" bindtap="editProfile">编辑资料 ›</text>
   </view>
 
-
-  <!-- 数据统计 -->
-  <view class="glass stats-row">
-    <view class="stat-item">
-      <text class="stat-num">{{recipeCount}}</text>
-      <text class="stat-label">自制菜谱</text>
+  <!-- 快捷入口：4宫格 -->
+  <view class="quick-grid">
+    <view class="quick-card" wx:for="{{quickLinks}}" wx:key="key" data-key="{{item.key}}" bindtap="onQuickLink" style="--qc:{{item.color}}">
+      <text class="qc-icon">{{item.icon}}</text>
+      <text class="qc-count">{{item.count}}</text>
+      <text class="qc-title">{{item.title}}</text>
+      <text class="qc-desc">{{item.desc}}</text>
     </view>
-
-    <view class="stat-divider"></view>
-
-    <view class="stat-item">
-      <text class="stat-num">{{cookingCount}}</text>
-      <text class="stat-label">做菜次数</text>
-    </view>
-
-    <view class="stat-divider"></view>
-
-    <view class="stat-item">
-      <text class="stat-num">{{orderCount}}</text>
-      <text class="stat-label">历史订单</text>
-    </view>
-
   </view>
 
+  <!-- 📔 食光日记入口 -->
+  <view class="diary-entry" bindtap="toCookingRecord">
+    <text class="de-icon">📔</text>
+    <view class="de-info"><text class="de-title">食光日记</text><text class="de-desc">语音·文字·图片 · 便签记食光</text></view>
+    <text class="de-arrow">›</text>
+  </view>
 
-  <!-- 功能入口 -->
-  <view class="glass menu-section">
-    <view class="menu-item" wx:for="{{menuItems}}" wx:key="key" data-key="{{item.key}}" bindtap="onMenuItem">
-      <text class="menu-icon">{{item.icon}}</text>
-      <text class="menu-title">{{item.title}}</text>
-      <text class="menu-badge" wx:if="{{item.key === 'favorites' && favCount > 0}}">{{favCount}}</text>
-      <text class="menu-arrow">›</text>
+  <!-- 🍳 烹饪时光 ：奶油阴影大按钮 -->
+  <view class="cooking-section">
+    <view class="cooking-hd" bindtap="toggleCooking">
+      <text class="cooking-title">🍳 烹饪时光</text>
+      <text class="cooking-count">{{cookingCount}} 次</text>
+      <text class="cooking-arrow">{{cookingExpanded ? '▼' : '▶'}}</text>
     </view>
-
-  </view>
-
-
-  <!-- 设置 -->
-  <view class="glass menu-section">
-    <text class="section-label">设置</text>
-    <view class="menu-item" wx:for="{{settingsItems}}" wx:key="key" data-key="{{item.key}}" bindtap="onSettingsItem">
-      <text class="menu-icon">{{item.icon}}</text>
-      <text class="menu-title">{{item.title}}</text>
-      <text class="menu-arrow">›</text>
+    <view class="cooking-bd {{cookingExpanded ? 'show' : ''}}">
+      <view wx:if="{{recentRecords.length === 0}}" class="cooking-empty">还没有烹饪记录~ 去做一道菜吧！</view>
+      <view class="cooking-item" wx:for="{{recentRecords}}" wx:key="id">
+        <text class="ci-name">{{item.recipeName || '未命名'}}</text>
+        <text class="ci-date">{{item.date || ''}}</text>
+      </view>
+      <view class="cooking-actions" wx:if="{{recentRecords.length > 0}}">
+        <view class="cooking-btn" bindtap="toCookingRecord">查看全部</view>
+        <view class="cooking-btn sync" bindtap="syncCookingCloud">☁️ 同步云端</view>
+      </view>
     </view>
-
   </view>
 
-
-  <!-- 底部留白 -->
-  <view style="height:80px;text-align:center;padding-top:30px">
-    <text style="font-size:11px;color:rgba(26,26,46,0.3)">食光 v1.0.0 · 美食创作平台</text>
+  <!-- 🐦 小鸟设置 -->
+  <view class="bird-section">
+    <view class="bird-hd"><text class="bird-title">小鸟位置</text></view>
+    <view class="bird-modes">
+      <view class="bird-mode {{birdMode==='all'?'active':''}}" data-m="all" bindtap="setBirdMode">
+        <text>全页</text>
+      </view>
+      <view class="bird-mode {{birdMode==='custom'?'active':''}}" data-m="custom" bindtap="setBirdMode">
+        <text>自定义</text>
+      </view>
+    </view>
+    <view class="bird-pages" wx:if="{{birdMode==='custom'}}">
+      <view class="bird-page {{birdPages.indexOf('home')>=0?'on':''}}" data-p="home" bindtap="toggleBirdPage">
+        <text>🏠 首页</text><text class="bp-check">{{birdPages.indexOf('home')>=0 ? '✓' : ''}}</text>
+      </view>
+      <view class="bird-page {{birdPages.indexOf('diy')>=0?'on':''}}" data-p="diy" bindtap="toggleBirdPage">
+        <text>🔧 DIY</text><text class="bp-check">{{birdPages.indexOf('diy')>=0 ? '✓' : ''}}</text>
+      </view>
+      <view class="bird-page {{birdPages.indexOf('restaurant')>=0?'on':''}}" data-p="restaurant" bindtap="toggleBirdPage">
+        <text>🍽️ 餐厅</text><text class="bp-check">{{birdPages.indexOf('restaurant')>=0 ? '✓' : ''}}</text>
+      </view>
+      <view class="bird-page {{birdPages.indexOf('profile')>=0?'on':''}}" data-p="profile" bindtap="toggleBirdPage">
+        <text>👤 我的</text><text class="bp-check">{{birdPages.indexOf('profile')>=0 ? '✓' : ''}}</text>
+      </view>
+    </view>
   </view>
 
+  <!-- 设置区 -->
+  <view class="settings-section">
+    <view class="set-item" bindtap="openEditProfile"><text>✏️ 个人资料</text><text class="set-arrow">›</text></view>
+    <view class="set-item" bindtap="toSettings"><text>⚙️ 设置</text><text class="set-arrow">›</text></view>
+    <view class="set-item" bindtap="toAbout"><text>ℹ️ 关于食光</text><text class="set-arrow">›</text></view>
+    <view class="set-item warn" bindtap="confirmRepair"><text>🔧 异常数据修复</text><text class="set-arrow">›</text></view>
+  </view>
 
+  <view style="height:100rpx;text-align:center;padding-top:20rpx">
+    <text style="font-size:20rpx;color:rgba(26,26,46,0.25)">食光 v1.0 · 每一餐都有光</text>
+  </view>
 </scroll-view>
+
+<!-- 编辑资料弹窗 -->
+<view class="modal-overlay {{showEditProfile ? 'show' : ''}}" bindtap="closeEditProfile">
+  <view class="modal-sheet" catchtap="preventClose">
+    <view class="modal-hd"><text>编辑个人资料</text><view class="modal-close" bindtap="closeEditProfile">✕</view></view>
+    <view class="modal-body">
+      <view class="form-row"><text class="form-label">昵称</text>
+        <input class="form-input" value="{{editNick}}" bindinput="onNickInput" placeholder="你的昵称" maxlength="12"/></view>
+      <view class="form-row"><text class="form-label">生日</text>
+        <picker mode="date" value="{{editBirthday}}" bindchange="onBirthdayChange">
+          <view class="form-picker">{{editBirthday || '选择生日'}}</view>
+        </picker></view>
+      <button class="btn-save" bindtap="saveProfile">保存</button>
+    </view>
+  </view>
+</view>
+
+<!-- 口袋小鸟 -->
+<pocket-bird hidden="{{!showPocketBird}}" pixelSize="3" pageTargets="{{birdTargets}}" />
