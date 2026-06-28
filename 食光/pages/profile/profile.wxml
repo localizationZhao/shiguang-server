@@ -69,7 +69,7 @@
       </view>
     </view>
     <view class="bird-pages" wx:if="{{birdMode==='custom'}}" style="z-index:1">
-      <text class="bird-hint">勾选页面显示小鸟，不勾选则隐藏</text>
+      <text class="bird-hint">👇 先选「自定义」模式，再勾选页面，切过去就生效</text>
       <view class="bird-page {{birdPages.indexOf('home')>=0?'on':''}}" data-p="home" bindtap="toggleBirdPage" hover-class="bird-page-hover">
         <text>🏠 首页</text><text class="bp-check">{{birdPages.indexOf('home')>=0 ? '✓' : '✗'}}</text>
       </view>
