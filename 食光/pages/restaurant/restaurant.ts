@@ -236,6 +236,7 @@ Page({
     if (idx < 0) idx = this.data.activeRestIdx < rests.length ? this.data.activeRestIdx : 0
     const activeRest = has ? rests[idx] : null
     if (activeRest) (this as any)._lastRestId = activeRest.id
+    const menuAll = activeRest ? (activeRest.menu || []) : []
     const menu = menuAll.filter((m: any) => m.onShelf)
     const restId = activeRest ? (activeRest.originalId || activeRest.id) : 0
     // 收集当前餐厅的所有关联ID（自身+originalId+关联副本）
