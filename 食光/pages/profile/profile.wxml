@@ -23,7 +23,6 @@
       <text class="qc-icon">{{item.icon}}</text>
       <text class="qc-count">{{item.count}}</text>
       <text class="qc-title">{{item.title}}</text>
-      <text class="qc-desc">{{item.desc}}</text>
     </view>
   </view>
 

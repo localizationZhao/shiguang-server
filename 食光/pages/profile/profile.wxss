@@ -29,17 +29,17 @@
 
 /* 快捷4宫格 */
 .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:12rpx;margin-bottom:16rpx}
-.quick-card{--qc:#FF9A56;background:#ffecda;padding:16rpx 10rpx;text-align:center;
+.quick-card{--qc:#FF9A56;background:#ffecda;padding:20rpx 10rpx;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6rpx;
   box-shadow:3rpx 0 var(--qc),-3rpx 0 var(--qc),0 -3rpx var(--qc),0 3rpx var(--qc),
     6rpx 0 var(--qc),-6rpx 0 var(--qc),0 -6rpx var(--qc),0 6rpx var(--qc),
     0 0 0 3rpx var(--qc),0 0 0 6rpx #fff,
     6rpx 0 0 3rpx #fff,-6rpx 0 0 3rpx #fff,
     0 -6rpx 0 3rpx #fff,0 6rpx 0 3rpx #fff}
 .quick-card:active{transform:scale(.96)}
-.qc-icon{font-size:32rpx;display:block}
-.qc-count{font-size:28rpx;font-weight:800;color:var(--qc);display:block}
-.qc-title{font-size:22rpx;font-weight:700;color:#3f2c15;display:block}
-.qc-desc{font-size:18rpx;color:rgba(63,44,21,0.35);display:block;margin-top:4rpx}
+.qc-icon{font-size:30rpx;line-height:1}
+.qc-count{font-size:28rpx;font-weight:800;color:var(--qc);line-height:1}
+.qc-title{font-size:22rpx;font-weight:700;color:#3f2c15;line-height:1}
 
 /* 📔 食光日记入口 */
 .diary-entry{display:flex;align-items:center;gap:16rpx;padding:20rpx;margin-bottom:12rpx;
