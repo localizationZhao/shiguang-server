@@ -1,0 +1,88 @@
+<!--
+  pay.wxml - 微信支付页面结构文件
+  功能：精品书籍购买支付场景演示
+  知识点：wx.requestPayment API调用、商品信息展示、支付结果反馈
+-->
+
+<view class="container">
+  <!-- 商品信息展示区 -->
+  <view class="product-section">
+    <view class="product-card">
+      <!-- 书籍封面 -->
+      <!-- 知识点：image组件展示书籍封面 -->
+      <image class="product-image" src="{{productInfo.image}}" mode="aspectFit" binderror="handleImageError"></image>
+      
+      <!-- 书籍详情 -->
+      <view class="product-details">
+        <text class="product-title">{{productInfo.title}}</text>
+        <text class="product-desc">{{productInfo.description}}</text>
+        
+        <!-- 价格信息 -->
+        <view class="price-row">
+          <text class="price-label">应付金额：</text>
+          <text class="price-value">¥{{productInfo.price}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 支付参数展示区（知识点演示） -->
+  <view class="params-section">
+    <view class="section-title">支付参数（知识点演示）</view>
+    
+    <view class="params-card">
+      <view class="param-item">
+        <text class="param-label">timeStamp：</text>
+        <text class="param-value">{{payParams.timeStamp}}</text>
+      </view>
+      <view class="param-item">
+        <text class="param-label">nonceStr：</text>
+        <text class="param-value">{{payParams.nonceStr}}</text>
+      </view>
+      <view class="param-item">
+        <text class="param-label">package：</text>
+        <text class="param-value">{{payParams.package}}</text>
+      </view>
+      <view class="param-item">
+        <text class="param-label">signType：</text>
+        <text class="param-value">{{payParams.signType}}</text>
+      </view>
+      <view class="param-item">
+        <text class="param-label">paySign：</text>
+        <text class="param-value">{{payParams.paySign}}</text>
+      </view>
+    </view>
+    
+    <!-- 签名计算说明 -->
+    <view class="sign-info">
+      <text class="sign-title">MD5签名计算规则（课件知识点）：</text>
+      <text class="sign-text">{{signRule}}</text>
+    </view>
+  </view>
+
+  <!-- 支付结果展示区 -->
+  <view class="result-section" wx:if="{{showResult}}">
+    <view class="result-card {{paySuccess ? 'success' : 'fail'}}">
+      <view class="result-icon">
+        <icon type="{{paySuccess ? 'success' : 'warn'}}" size="64"></icon>
+      </view>
+      <text class="result-title">{{paySuccess ? '支付成功' : '支付失败'}}</text>
+      <text class="result-message">{{resultMessage}}</text>
+      
+      <!-- 支付成功显示订单信息 -->
+      <view class="order-info" wx:if="{{paySuccess}}">
+        <text class="order-text">订单号：{{orderInfo.orderId}}</text>
+        <text class="order-text">支付时间：{{orderInfo.payTime}}</text>
+        <text class="order-text">支付金额：¥{{orderInfo.amount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部支付按钮（固定定位） -->
+  <view class="pay-footer">
+    <button class="pay-button" bindtap="handlePayment" type="primary">
+      立即支付 ¥{{productInfo.price}}
+    </button>
+    <text class="pay-tip">点击按钮调用 wx.requestPayment 发起微信支付</text>
+  </view>
+</view>
