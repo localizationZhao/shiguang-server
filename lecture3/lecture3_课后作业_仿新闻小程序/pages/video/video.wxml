@@ -1,0 +1,5 @@
+<!--pages/video/video.wxml-->
+<view class="container">
+  <text class="title">视频页面</text>
+  <text class="desc">这里是视频内容展示区</text>
+</view>

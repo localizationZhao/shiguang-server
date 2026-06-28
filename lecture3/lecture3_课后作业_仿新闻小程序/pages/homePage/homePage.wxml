@@ -1,0 +1,86 @@
+<!--pages/homePage/homePage.wxml-->
+<!-- 知识点：scroll-view横向/纵向滚动、列表渲染、条件渲染、事件绑定、文件操作、网络请求模拟、交互反馈 -->
+<view class="mainViewClass">
+  <!-- 加载提示（使用 wx:if 条件渲染） -->
+  <view wx:if="{{loading}}" class="loading-view">加载中...</view>
+
+  <!-- 顶部分类菜单（横向滚动 + 可编辑） -->
+  <view class="topTabBarClass">
+    <scroll-view scroll-x="true" enable-flex="true" style="width: 80%; height: 100%; white-space: nowrap; display: flex;">
+      <block wx:for="{{tArray}}" wx:key="category">
+        <view class="category-wrapper">
+          <view 
+            class="topTypeListClass {{index == curpage ? 'curPage' : ''}}"
+            bindtap="typeClick"
+            data-idx="{{item.category}}"
+            data-index="{{index}}"
+          >
+            {{item.name}}
+          </view>
+          <!-- 删除按钮（"全部"不可删除） -->
+          <view wx:if="{{item.category !== 'all'}}" class="remove-btn" catchtap="onRemoveCategory" data-category="{{item.category}}">×</view>
+        </view>
+      </block>
+    </scroll-view>
+    <!-- 右侧添加按钮 -->
+    <view class="rightview" bindtap="onAddChannel">
+      <image mode="aspectFit" src="../../images/addChannel.png" class="addImage"></image>
+    </view>
+  </view>
+
+  <!-- 频道选择弹窗（逻辑层对组件数据的操作） -->
+  <view wx:if="{{showChannelPicker}}" class="channel-mask" bindtap="onCloseChannelPicker"></view>
+  <view wx:if="{{showChannelPicker}}" class="channel-picker">
+    <view class="channel-header">
+      <text class="channel-title">添加频道</text>
+      <view class="close-btn" bindtap="onCloseChannelPicker">×</view>
+    </view>
+    <scroll-view scroll-y="true" class="channel-list">
+      <block wx:for="{{availableCategories}}" wx:key="category">
+        <view class="channel-item" 
+              bindtap="onAddCategory" 
+              data-name="{{item.name}}" 
+              data-category="{{item.category}}">
+          <text>{{item.name}}</text>
+          <text class="add-icon">+</text>
+        </view>
+      </block>
+      <view wx:if="{{availableCategories.length === 0}}" class="empty-tip">
+        <text>所有频道已添加完毕</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 新闻列表（纵向滚动 + 下拉刷新） -->
+  <scroll-view 
+    scroll-y="true" 
+    style="width: 100%; height: {{viewHeight}}px;" 
+    lower-threshold="50" 
+    bindscrolltolower="addMoreData"
+    refresher-enabled="{{true}}"
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onRefresh"
+  >
+    <block wx:for="{{detaildata}}" wx:key="title">
+      <view class="cellClass" bindtap="goToDetail" data-news="{{item}}">
+        <!-- 标题 -->
+        <text>{{item.title}}</text>
+        <!-- 图片区域（条件渲染：有图片时显示） -->
+        <view class="imageClass" wx:if="{{item.has_image}}">
+          <block wx:for="{{item.image_list}}" wx:for-item="img" wx:key="url">
+            <image class="imageshow" src="{{img.url}}" mode="scaleToFill"></image>
+          </block>
+        </view>
+        <!-- 评论时间和来源 -->
+        <view class="cellbottomClass">
+          <text style="margin-right: 10rpx;">{{item.comment_count}}评论</text>
+          <text>{{item.publish_time}}</text>
+        </view>
+      </view>
+    </block>
+    <!-- 空状态提示 -->
+    <view wx:if="{{!loading && detaildata.length === 0}}" class="empty-tip">
+      <text>暂无新闻内容</text>
+    </view>
+  </scroll-view>
+</view>

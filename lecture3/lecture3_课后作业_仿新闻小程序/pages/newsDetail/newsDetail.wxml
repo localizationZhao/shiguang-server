@@ -1,0 +1,41 @@
+<!--pages/newsDetail/newsDetail.wxml-->
+<!-- 知识点：条件渲染、列表渲染、页面参数接收 -->
+<view class="container" wx:if="{{selectedNews}}">
+  <!-- 新闻标题 -->
+  <view class="title-section">
+    <text class="title">{{selectedNews.title}}</text>
+  </view>
+
+  <!-- 新闻信息（时间、评论数） -->
+  <view class="info-section">
+    <text class="info-text">{{selectedNews.publish_time}}</text>
+    <text class="info-text">{{selectedNews.comment_count}} 评论</text>
+  </view>
+
+  <!-- 新闻图片 -->
+  <view class="image-section" wx:if="{{selectedNews.has_image}}">
+    <block wx:for="{{selectedNews.image_list}}" wx:key="url" wx:for-item="img">
+      <image class="news-image" src="{{img.url}}" mode="widthFix"></image>
+    </block>
+  </view>
+
+  <!-- 新闻正文（模拟） -->
+  <view class="content-section">
+    <text class="content-text">
+      这是一篇关于"{{selectedNews.title}}"的详细报道。
+      该新闻发布于 {{selectedNews.publish_time}}，
+      目前已有 {{selectedNews.comment_count}} 条评论。
+      更多详细内容请关注后续报道。
+    </text>
+  </view>
+
+  <!-- 分类标签 -->
+  <view class="category-section">
+    <text class="category-tag">{{selectedNews.category}}</text>
+  </view>
+</view>
+
+<!-- 数据加载失败提示 -->
+<view class="empty-state" wx:else>
+  <text class="empty-text">暂无新闻详情</text>
+</view>
