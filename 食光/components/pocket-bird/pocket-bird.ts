@@ -48,8 +48,11 @@ Component({
       var ps = self.properties.pixelSize;
       var cw = 32 * ps, ch = 32 * ps;
       var sw = wx.getWindowInfo().windowWidth;
-      // 小鸟起始位置：底部偏上，不挡住tab bar
-      self.setData({ canvasWidth: cw, canvasHeight: ch, hitW: cw * 1.5, hitH: ch * 1.5, birdLeft: sw / 2 - cw, birdBottom: 0 });
+      var wh = wx.getWindowInfo().windowHeight;
+      // 小鸟起始位置（默认底部居中，会被 restoreState 覆盖）
+      var saved = self._restoreState();
+      var startX = saved.x || sw / 2, startY = saved.y || 120;
+      self.setData({ canvasWidth: cw, canvasHeight: ch, hitW: cw * 1.5, hitH: ch * 1.5, birdLeft: startX - cw, birdBottom: 0 });
 
       var q = self.createSelectorQuery();
       q.select('#bird-canvas').fields({ node: true, size: true }).exec(function (res) {
@@ -59,13 +62,21 @@ Component({
         cnv.width = cw * dpr; cnv.height = ch * dpr;
         ctx.scale(dpr, dpr);
         self._ctx = ctx; self._canvas = cnv;
-        self._birb = new Birb(ps);
-        self._bh = createBehavior(self._birb, wx.getWindowInfo().windowWidth, wx.getWindowInfo().windowHeight);
+        self._birb = new Birb(ps); // 构造函数内部 loadData() 恢复物种/帽子/解锁
+        self._bh = createBehavior(self._birb, sw, wh);
+        // 恢复位置（引擎不保存位置）
+        if (saved.x) self._bh.moveTo(saved.x, saved.y);
+        // 恢复行为状态（引擎不保存这些）
+        if (saved.frozen && self._bh) self._bh.setFrozen(true);
+        if (saved.flyMode === false && self._bh) self._bh.setFlyMode(false);
+        self.setData({ birdFrozen: !!saved.frozen, birdFlyMode: saved.flyMode !== false });
+        if (saved.hidden) { self.setData({ birdHidden: true }); if (self._birb) self._birb.visible = false; }
         self._startLoop();
       });
     },
 
     _teardown: function () {
+      this._saveState();
       this._pause();
       if (this._bt) clearTimeout(this._bt);
       if (this._lpt) clearTimeout(this._lpt);
@@ -99,6 +110,8 @@ Component({
         var st = self.properties.scrollTop || 0;
         self.setData({ birdLeft: x - hw / 2, birdBottom: y + st });
       }
+      // 每60帧自动保存位置（约1秒一次）
+      if (self._fc % 60 === 0) self._saveState();
       if (self.data.showFeather) self._updFeather();
       // 帽子自动掉落：每60秒20%概率
       if (self._fc % 3600 === 0 && Math.random() < 0.2) self._spawnHat();
@@ -246,8 +259,8 @@ Component({
       if (!e.currentTarget.dataset.unlocked) return;
       var bh = this._bh; if (!bh) return;
       bh.switchSpecies(k);
-      // 立即关闭面板，让用户看到鸟的变化
       this.setData({ showPanel: false });
+      this._saveState();
       wx.showToast({ title: '已切换', icon: 'success', duration: 800 });
     },
     selectHat: function (e) {
@@ -255,8 +268,8 @@ Component({
       if (!e.currentTarget.dataset.unlocked) return;
       var bh = this._bh; if (!bh) return;
       bh.switchHat(k);
-      // 立即关闭面板，让用户看到帽子效果
       this.setData({ showPanel: false });
+      this._saveState();
       wx.showToast({ title: '已换帽', icon: 'success', duration: 800 });
     },
     closePanel: function () { this.setData({ showPanel: false }); },
@@ -341,6 +354,28 @@ Component({
       if (this._raf && cnv && cnv.cancelAnimationFrame) { cnv.cancelAnimationFrame(this._raf); this._raf = 0; }
       if (this._tick) { clearInterval(this._tick); this._tick = 0; }
     },
+    // ======== 跨页面状态持久化 ========
+    _saveState: function () {
+      var self = this;
+      var bh = self._bh;
+      if (!bh) return;
+      try {
+        wx.setStorageSync('pocketBirdState', {
+          x: bh.getX(), y: bh.getY(),
+          frozen: self.data.birdFrozen,
+          flyMode: self.data.birdFlyMode,
+          hidden: self.data.birdHidden,
+          ts: Date.now()
+        });
+      } catch(e) {}
+    },
+    _restoreState: function () {
+      try {
+        var s = wx.getStorageSync('pocketBirdState');
+        return s || {};
+      } catch(e) { return {}; }
+    },
+
     _onShow: function () {
       if (!this._paused) return;
       this._paused = false;
@@ -349,6 +384,9 @@ Component({
       if (this._birb) { this._birb.visible = true; this._birb.animStart = Date.now(); }
       this._startLoop();
     },
-    _onHide: function () { this._pause(); },
+    _onHide: function () {
+      this._saveState();
+      this._pause();
+    },
   },
 });
