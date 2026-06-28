@@ -18,7 +18,7 @@ App<IAppOption>({
     try {
       const fs = wx.getFileSystemManager()
       const files = fs.readdirSync(wx.env.USER_DATA_PATH)
-      files.filter((f: string) => f.startsWith('qr_')).forEach((f: string) => {
+      files.forEach((f: string) => {
         try { fs.unlinkSync(`${wx.env.USER_DATA_PATH}/${f}`) } catch(e) {}
       })
     } catch(e) {}

@@ -66,7 +66,7 @@
 
 /* ===== 筛选行 ===== */
 .filter-row{display:flex;align-items:center;gap:6rpx;flex-shrink:0;padding:0 2rpx}
-.filter-btn{padding:6rpx 14rpx;background:var(--bg);border:2rpx solid var(--th);font-size:19rpx;color:rgba(63,44,21,0.4);box-shadow:2rpx 2rpx 0 var(--thl)}
+.filter-btn{padding:10rpx 22rpx;background:var(--bg);border:2rpx solid var(--th);font-size:24rpx;color:rgba(63,44,21,0.4);box-shadow:2rpx 2rpx 0 var(--thl)}
 .filter-btn:active{transform:translate(2rpx,2rpx);box-shadow:1rpx 1rpx 0 var(--thl)}
 
 .flex-1{flex:1;overflow:hidden;padding:0 16rpx}
@@ -117,7 +117,7 @@
   text-shadow:3rpx 0 0 #fff,-3rpx 0 0 #fff,0 3rpx 0 #fff,0 -3rpx 0 #fff,3rpx 3rpx 0 rgba(0,0,0,0.3),-3rpx 3rpx 0 rgba(0,0,0,0.3),3rpx -3rpx 0 rgba(0,0,0,0.3),-3rpx -3rpx 0 rgba(0,0,0,0.3)}
 
 .pet-avatar{width:100rpx;height:100rpx;border:3rpx solid var(--th);overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:3rpx 3rpx 0 var(--thl)}
-.pet-avatar image{width:100%;height:100%}
+.pet-avatar .pf-avatar-img{width:100%;height:100%}
 
 .pet-menu-label{font-size:20rpx;font-weight:700;color:var(--th);padding:12rpx 24rpx 6rpx;font-family:monospace}
 .pet-menu-row{display:flex;gap:12rpx;padding:6rpx 24rpx}

@@ -356,7 +356,7 @@
 .feed-vis-tag{font-size:18rpx;margin-left:8rpx}
 .feed-content{font-size:24rpx;color:#3f2c15;line-height:1.7;display:block;margin-bottom:12rpx}
 .feed-imgs{display:flex;gap:8rpx;flex-wrap:wrap;margin-bottom:10rpx}
-.feed-imgs image{width:120rpx;height:120rpx;border:2rpx solid var(--hl)}
+.feed-img-item{width:120rpx;height:120rpx;border:2rpx solid var(--hl)}
 .feed-ft{display:flex;align-items:center;justify-content:space-between;padding-top:14rpx;border-top:2rpx dashed var(--hl)}
 .feed-loc{display:flex;align-items:center;gap:6rpx}.feed-loc-icon{font-size:18rpx}.feed-loc-text{font-size:20rpx;color:rgba(63,44,21,0.5)}
 .feed-rest{font-size:20rpx;color:var(--hl)}
