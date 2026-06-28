@@ -307,7 +307,18 @@ Page({
     addRecipe(copied)
     // 同步到云端
     api.addRecipe(copied).catch(() => {})
-    wx.showToast({ title: '已复刻到DIY', icon: 'success' })
+    const newId = copied.id
+    wx.showModal({
+      title: '复刻成功 🎉',
+      content: `"${copied.name}"已添加到你的DIY菜谱~`,
+      confirmText: '去编辑',
+      cancelText: '好的',
+      success: (res: any) => {
+        if (res.confirm) {
+          wx.navigateTo({ url: `/pages/recipe-edit/recipe-edit?id=${newId}` })
+        }
+      }
+    })
   },
 
   // 扫描页面元素给小鸟做停靠目标
