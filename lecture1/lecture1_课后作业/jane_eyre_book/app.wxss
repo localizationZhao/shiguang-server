@@ -1,0 +1,8 @@
+/* app.wxss - 全局样式文件 */
+page {
+  background-color: #F5F0EB; /* 莫兰迪浅米色背景 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+  color: #3D3D3D; /* 深灰色文字 */
+  font-size: 28rpx; /* 基础字体大小 */
+  line-height: 1.8; /* 统一行高 */
+}
