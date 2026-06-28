@@ -1,0 +1,69 @@
+<view class="container">
+  <view class="section">
+    <view class="section-title">模块一：横向滚动多媒体展示区</view>
+    <view class="section-desc">左右滑动查看所有媒体内容</view>
+    <scroll-view scroll-x="true" class="scroll-x-container" scroll-with-animation="true">
+      <view class="card-wrapper">
+        <view class="media-card">
+          <view class="card-header">
+            <text class="card-title">文字展示</text>
+          </view>
+          <view class="card-content">
+            <text class="text-content">{{textContent}}</text>
+          </view>
+        </view>
+        <view class="media-card">
+          <view class="card-header">
+            <text class="card-title">图片展示</text>
+          </view>
+          <view class="card-content">
+            <image class="image-content" src="{{imageSrc}}" mode="aspectFit" binderror="handleImageError"></image>
+          </view>
+        </view>
+        <view class="media-card">
+          <view class="card-header">
+            <text class="card-title">音频播放</text>
+          </view>
+          <view class="card-content">
+            <audio class="audio-content" src="{{audioSrc}}" controls="true" binderror="handleAudioError" name="音频播放" author="小程序"></audio>
+          </view>
+        </view>
+        <view class="media-card">
+          <view class="card-header">
+            <text class="card-title">视频播放</text>
+          </view>
+          <view class="card-content">
+            <video class="video-content" src="{{videoSrc}}" controls="true" binderror="handleVideoError"></video>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="scroll-tip">
+      <text>左右滑动查看更多</text>
+    </view>
+  </view>
+  <view class="divider"></view>
+  <view class="section">
+    <view class="section-title">模块二：媒体源控制操作区</view>
+    <view class="section-desc">修改数据源后，上方滚动区实时更新</view>
+    <view class="section2">
+      <view class="section2-title">文字源控制</view>
+      <input class="input" placeholder="请输入文字内容" value="{{textInput}}" bindinput="handleTextInput" maxlength="50"></input>
+      <button class="btn btn-primary" bindtap="updateText">修改文字</button>
+    </view>
+    <view class="section2">
+      <view class="section2-title">图片源控制</view>
+      <button class="btn btn-success" bindtap="chooseImage">从相册选择图片</button>
+      <button class="btn btn-default" bindtap="resetImage">重置为默认图片</button>
+    </view>
+    <view class="section2">
+      <view class="section2-title">音频源控制</view>
+      <input class="input" placeholder="请输入音频URL地址" value="{{audioInput}}" bindinput="handleAudioInput" maxlength="200"></input>
+      <button class="btn btn-warning" bindtap="updateAudio">更新音频源</button>
+    </view>
+    <view class="section2">
+      <view class="section2-title">视频源控制</view>
+      <button class="btn btn-danger" bindtap="chooseVideo">拍摄/选择视频</button>
+    </view>
+  </view>
+</view>
