@@ -2,6 +2,7 @@
 import { PUBLIC_RECIPES } from '../../utils/storage'
 import { randomPick, chooseImage, chooseAndCropImage, generateId } from '../../utils/util'
 import { addRecipe, getCategories, saveCategories, SYSTEM_CATEGORIES } from '../../utils/storage'
+import { api } from '../../utils/api'
 
 Page({
   data: {
@@ -42,6 +43,9 @@ Page({
     welcomeNick: '',
   },
 
+  _tabIndex: 1, // 首页在TabBar中的位置
+  _touchStartX: 0,
+
   onLoad() {
     // 加载保存的主题色
     const savedTheme = wx.getStorageSync('themeColor') || 'green'
@@ -50,6 +54,16 @@ Page({
       this.setData({ themeMain: t.main, themeDark: t.dark, themeLight: t.light, themeColor: t.key, petColor: t.key })
     }
     this.fetchRecipes()
+  },
+
+  // ===== 左右滑动切换Tab =====
+  onTouchStart(e: any) { this._touchStartX = e.touches[0].clientX },
+  onTouchEnd(e: any) {
+    const deltaX = e.changedTouches[0].clientX - this._touchStartX
+    if (Math.abs(deltaX) < 60) return
+    const TABS = ['/pages/diy/diy', '/pages/home/home', '/pages/restaurant/restaurant', '/pages/profile/profile']
+    const next = deltaX < 0 ? Math.min(this._tabIndex + 1, 3) : Math.max(this._tabIndex - 1, 0)
+    if (next !== this._tabIndex) wx.switchTab({ url: TABS[next] })
   },
 
   fetchRecipes() {
@@ -258,8 +272,9 @@ Page({
   },
 
   quickCopy(e: any) {
-    const recipe = this.data.allRecipes.find((r: any) => r.id === e.currentTarget.dataset.id)
-    if (!recipe) return
+    const recipeId = Number(e.currentTarget.dataset.id)
+    const recipe = this.data.allRecipes.find((r: any) => r.id === recipeId)
+    if (!recipe) { console.warn('[quickCopy] 未找到菜谱, id:', recipeId); return }
 
     // 确保分类标签存在（系统标签被删除后自动补回）
     const cats = getCategories()
@@ -273,10 +288,13 @@ Page({
       saveCategories(cats)
     }
 
-    addRecipe({
+    const copied = {
       ...recipe, id: generateId(), name: recipe.name + '(复刻)',
       createdAt: new Date().toISOString().slice(0, 10), source: 'copy', copiedFrom: recipe.id, draft: false,
-    })
+    }
+    addRecipe(copied)
+    // 同步到云端
+    api.addRecipe(copied).catch(() => {})
     wx.showToast({ title: '已复刻到DIY', icon: 'success' })
   },
 

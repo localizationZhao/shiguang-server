@@ -174,9 +174,14 @@
 .bench-seat.owner-seat{background:rgba(255,179,124,0.12);outline:2rpx dashed rgba(255,179,124,0.4)}
 
 /* 鸟在板凳上 */
-.bird-on-bench{width:72rpx;height:72rpx;z-index:3;margin-bottom:-6rpx}
-.bird-alive{animation:birdFlash 1.2s ease-in-out infinite;filter:drop-shadow(0 0 14rpx var(--soul, #ffa3cb)) drop-shadow(0 0 6rpx rgba(255,255,255,0.7)) drop-shadow(0 0 20rpx var(--soul, #ffa3cb))}
+.bird-on-bench{width:72rpx;height:72rpx;z-index:3;margin-bottom:-6rpx;image-rendering:pixelated}
+.bird-alive{animation:birdFlash 1.2s ease-in-out infinite;
+  filter:drop-shadow(0 0 14rpx var(--soul,#ffa3cb)) drop-shadow(0 0 6rpx rgba(255,255,255,0.7)) drop-shadow(0 0 20rpx var(--soul,#ffa3cb))}
 .bird-away{opacity:0.25;filter:grayscale(1);transform:scale(0.7)}
+.bird-owner{width:88rpx;height:88rpx;border:4rpx solid #ffa3cb;border-radius:4rpx}
+/* 鸟选择器 */
+.bird-color-dot{width:48rpx;height:48rpx;border-radius:6rpx;image-rendering:pixelated}
+.bird-name-sm{font-size:20rpx;color:#3f2c15;text-align:center}
 
 /* 店主鸟 1.5倍大 */
 .bird-owner{width:108rpx !important;height:108rpx !important;margin-bottom:-10rpx;filter:drop-shadow(0 0 16rpx rgba(255,179,124,0.9)) drop-shadow(0 0 6rpx rgba(255,163,203,0.6)) !important}

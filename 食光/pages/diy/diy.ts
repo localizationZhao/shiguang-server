@@ -45,8 +45,21 @@ Page({
     shoppingItems: [] as { name: string; amount: string; count: number }[],
   },
 
+  _tabIndex: 0, // DIY在TabBar中的位置
+  _touchStartX: 0,
+
   onLoad() {
     this.refreshAll()
+  },
+
+  // ===== 左右滑动切换Tab =====
+  onTouchStart(e: any) { this._touchStartX = e.touches[0].clientX },
+  onTouchEnd(e: any) {
+    const deltaX = e.changedTouches[0].clientX - this._touchStartX
+    if (Math.abs(deltaX) < 60) return
+    const TABS = ['/pages/diy/diy', '/pages/home/home', '/pages/restaurant/restaurant', '/pages/profile/profile']
+    const next = deltaX < 0 ? Math.min(this._tabIndex + 1, 3) : Math.max(this._tabIndex - 1, 0)
+    if (next !== this._tabIndex) wx.switchTab({ url: TABS[next] })
   },
 
   onShow() {
@@ -239,7 +252,7 @@ Page({
 
   // 长按菜谱
   longPressRecipe(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     const recipe = this.data.allRecipes.find(r => r.id === id)
     if (recipe) {
       this.setData({ showContextMenu: true, contextRecipe: recipe })
@@ -329,7 +342,7 @@ Page({
 
   toggleSelect(e: any) {
     if (!this.data.isManageMode) return
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     let selected = [...this.data.selectedIds]
     const idx = selected.indexOf(id)
     if (idx >= 0) selected.splice(idx, 1)

@@ -1,7 +1,7 @@
 <!-- DIY 自制菜谱页面 -->
 <navigation-bar title="DIY 自制菜谱" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{false}}"></navigation-bar>
 
-<view class="page">
+<view class="page" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
   <!-- 左右分栏布局 -->
   <view class="diy-layout">
 

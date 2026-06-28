@@ -7,19 +7,27 @@ App<IAppOption>({
     categories: ['荤菜', '素菜', '凉菜', '汤羹', '主食', '甜点', '酒水'],
     userInfo: null,
     isLogin: false,
+    cloudOnline: false, // 云端连通状态
   },
 
   onLaunch() {
     wx.cloud.init({ env: 'prod-d0g68hmay4c8d10e3' })
-    // WebSocket 实时通信
-    const { wsConnect } = require('./utils/api')
-    wsConnect()
-    // 云连通测试
+    // WebSocket: 部署server/后再启用
+    // const { wsConnect } = require('./utils/api'); wsConnect()
+    // 云连通测试（5秒超时，失败不影响功能）
+    const app = this
     wx.cloud.callContainer({
       config: { env: 'prod-d0g68hmay4c8d10e3' },
       path: '/api/restaurants', header: { 'X-WX-SERVICE': 'express-rtm4' }, method: 'GET',
-      success: () => console.log('[云] 连通OK'),
-      fail: (e: any) => console.error('[云] 连通失败:', e.errMsg || e)
+      timeout: 5000,
+      success: () => {
+        console.log('[云] 连通OK')
+        app.globalData.cloudOnline = true
+      },
+      fail: (e: any) => {
+        console.warn('[云] 连通跳过（离线模式可用）:', (e.errMsg || e).slice(0, 50))
+        app.globalData.cloudOnline = false
+      }
     })
 
     // 隐私协议处理

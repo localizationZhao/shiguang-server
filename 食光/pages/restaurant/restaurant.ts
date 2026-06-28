@@ -74,7 +74,7 @@ Page({
     // ===== 新增：选鸟 =====
     showBirdPicker: false,
     birdTypes: BIRD_TYPES,
-    selectedBird: '32x32x1',
+    selectedBird: 'bluebird',
     joinNickname: '',
 
     // ===== 新增：配饰 =====
@@ -124,6 +124,19 @@ Page({
     availableSeats: [] as number[],  // 可选座位号列表
   },
 
+  _tabIndex: 2, // 餐厅在TabBar中的位置
+  _touchStartX: 0,
+
+  // ===== 左右滑动切换Tab =====
+  onTouchStart(e: any) { this._touchStartX = e.touches[0].clientX },
+  onTouchEnd(e: any) {
+    const deltaX = e.changedTouches[0].clientX - this._touchStartX
+    if (Math.abs(deltaX) < 60) return
+    const TABS = ['/pages/diy/diy', '/pages/home/home', '/pages/restaurant/restaurant', '/pages/profile/profile']
+    const next = deltaX < 0 ? Math.min(this._tabIndex + 1, 3) : Math.max(this._tabIndex - 1, 0)
+    if (next !== this._tabIndex) wx.switchTab({ url: TABS[next] })
+  },
+
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 2 })
@@ -150,12 +163,21 @@ Page({
       const rests = getRestaurants()
       let target = rests.find((r: any) => r.inviteCode === code)
       if (!target) {
-        // 本地没找到，从云端查
+        // 本地没找到，从云端查（离线模式跳过）
+        const app2 = getApp<IAppOption>()
+        if (!app2.globalData.cloudOnline) {
+          wx.showToast({ title: '离线模式：仅支持本机已有餐厅', icon: 'none', duration: 2000 })
+          return
+        }
         api.getRestaurantByCode(code).then((cloudRest: any) => {
           if (cloudRest && cloudRest.invite_code) {
             this._joinByCloudRest(cloudRest, code)
+          } else {
+            wx.showToast({ title: '邀请码无效或餐厅不存在', icon: 'none' })
           }
-        }).catch(() => {})
+        }).catch(() => {
+          wx.showToast({ title: '云端不可达，请确认网络', icon: 'none' })
+        })
         return
       }
       const occupied = (target.members || []).map((m: any) => m.seatIndex)
@@ -164,7 +186,7 @@ Page({
       this.setData({
         joinCode: code,
         selectedSeat: autoSeat,
-        selectedBird: '32x32x1',
+        selectedBird: 'bluebird',
         selectedAccessory: '',
         selectedSoulColor: randomSoulColor()
       })
@@ -453,7 +475,8 @@ Page({
         const seat = freeSeats.length > 0 ? freeSeats[0].id : 0
         member = {
           nickname: nick,
-          birdType: this.data.selectedBird || '32x32x1',
+          birdType: this.data.selectedBird || 'bluebird',
+          birdColor: (BIRD_TYPES.find((b: any) => b.key === this.data.selectedBird) || {} as any).color || '#639bff',
           online: true,
           joinedAt: new Date().toISOString(),
           seatIndex: seat,
@@ -530,7 +553,7 @@ Page({
     const profile = getUserProfile()
     this.setData({
       showJoinRest: true, joinCode: '',
-      showBirdPicker: true, selectedBird: '32x32x1',
+      showBirdPicker: true, selectedBird: 'bluebird',
       joinNickname: profile.nick || '美食家',
       selectedSeat: 0, availableSeats: [],
       selectedAccessory: '',
@@ -611,12 +634,22 @@ Page({
     let target = rests.find((r: any) => r.inviteCode === input)
     if (!target) {
       // 本地没有，查云端
-      wx.showLoading({ title: '查找餐厅...' })
+      const app = getApp<IAppOption>()
+      if (!app.globalData.cloudOnline) {
+        wx.showModal({
+          title: '离线模式',
+          content: '当前为离线模式，只能加入本机已有的餐厅。\n\n💡 在同一台手机上：\n1. 切换到"店主"角色创建餐厅\n2. 获得邀请码\n3. 切换回"食客"输入邀请码即可',
+          showCancel: false, confirmText: '知道了'
+        })
+        return
+      }
+      wx.showLoading({ title: '云端查找...' })
       wx.cloud.callContainer({
         config: { env: 'prod-d0g68hmay4c8d10e3' },
         path: '/api/restaurants/by-code/' + encodeURIComponent(input),
         header: { 'X-WX-SERVICE': 'express-rtm4' },
         method: 'GET',
+        timeout: 8000,
         success: (res: any) => {
           wx.hideLoading()
           if (res.data?.code === 0 && res.data.data) {
@@ -641,7 +674,14 @@ Page({
             wx.showToast({ title: '邀请码无效', icon: 'none' })
           }
         },
-        fail: () => { wx.hideLoading(); wx.showToast({ title: '网络错误，请重试', icon: 'none' }) }
+        fail: () => {
+          wx.hideLoading()
+          wx.showModal({
+            title: '云端不可达',
+            content: '真机调试时云托管未发布，跨设备功能不可用。\n\n💡 单设备测试：在同一台手机上，店主创建餐厅后，切换到"食客"角色，输入邀请码即可体验完整流程。',
+            showCancel: false, confirmText: '知道了'
+          })
+        }
       })
       return
     }
@@ -675,6 +715,7 @@ Page({
         target.members.push({
           nickname: nick,
           birdType: this.data.selectedBird,
+          birdColor: (BIRD_TYPES.find((b: any) => b.key === this.data.selectedBird) || {} as any).color || '#639bff',
           online: true,
           joinedAt: new Date().toISOString(),
           seatIndex: seatIdx,
@@ -691,6 +732,7 @@ Page({
         members: [{
           nickname: nick,
           birdType: this.data.selectedBird,
+          birdColor: (BIRD_TYPES.find((b: any) => b.key === this.data.selectedBird) || {} as any).color || '#639bff',
           online: true,
           joinedAt: new Date().toISOString(),
           seatIndex: seatIdx,
@@ -869,7 +911,7 @@ Page({
   },
 
   unshelfFromMenu(e: any) {
-    const recipeId = e.currentTarget.dataset.id
+    const recipeId = Number(e.currentTarget.dataset.id)
     const rests = getRestaurants()
     const rest = rests[this.data.activeRestIdx]
     if (!rest || !rest.menu) return
@@ -881,7 +923,7 @@ Page({
   },
 
   toggleShelfRecipe(e: any) {
-    const recipeId = e.currentTarget.dataset.id
+    const recipeId = Number(e.currentTarget.dataset.id)
     const rests = getRestaurants()
     const rest = rests[this.data.activeRestIdx]
     if (!rest) return
@@ -904,7 +946,7 @@ Page({
 
   // ===== 点餐 =====
   toggleOrderItem(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     this.setData({ menuAll: this.data.menuAll.map((m: any) => m.recipeId === id ? { ...m, ordered: !m.ordered } : m) })
   },
 
@@ -946,18 +988,18 @@ Page({
 
   // ===== 订单管理 =====
   acceptOrder(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     this.updateOrder(id, 'cooking', '制作中...')
     this.showCustomToast('已接单，制作中...', '#7ee787')
   },
   finishOrder(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     this.updateOrder(id, 'done')
     const r = this.data.role
     this.showCustomToast(r === 'owner' ? '恭喜您，订单完成啦！' : '佳肴已做好，请您尽情享用吧~', '#e3b341')
   },
   rejectOrder(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     const msg = this.data.rejectMsgs[Math.floor(Math.random() * this.data.rejectMsgs.length)]
     const that = this
     wx.showModal({
@@ -1038,7 +1080,7 @@ Page({
     this.showCustomToast('订单结束啦！亲亲欢迎下次再来小馆呦~~', '#ffb37c')
   },
   urgeRating(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     const orders = getOrders()
     const idx = orders.findIndex((o: any) => o.id === id)
     if (idx >= 0) {
@@ -1091,13 +1133,13 @@ Page({
     this.setData({ avgRating: avg.toFixed(1) })
   },
   toggleFeatured(e: any) {
-    const oid = e.currentTarget.dataset.id
+    const oid = Number(e.currentTarget.dataset.id)
     const orders = getOrders()
     const idx = orders.findIndex((o: any) => o.id === oid)
     if (idx >= 0) { orders[idx].reviewFeatured = !orders[idx].reviewFeatured; saveOrders(orders); this.refreshAll() }
   },
   rateOrder_old(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     wx.showActionSheet({
       itemList: ['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
       success: (res: any) => {
@@ -1275,10 +1317,10 @@ Page({
 
   // ===== 消息 =====
   openMsgModal(e: any) {
-    this.setData({ showMsgModal: true, msgTargetId: e.currentTarget.dataset.id, msgText: '', msgMode: 'owner' })
+    this.setData({ showMsgModal: true, msgTargetId: Number(e.currentTarget.dataset.id), msgText: '', msgMode: 'owner' })
   },
   openUrgeModal(e: any) {
-    this.setData({ showMsgModal: true, msgTargetId: e.currentTarget.dataset.id, msgText: '', msgMode: 'customer' })
+    this.setData({ showMsgModal: true, msgTargetId: Number(e.currentTarget.dataset.id), msgText: '', msgMode: 'customer' })
   },
   closeMsgModal() { this.setData({ showMsgModal: false, msgTargetId: 0, msgText: '' }) },
   onMsgInput(e: any) { this.setData({ msgText: e.detail.value.slice(0, 25) }) },
@@ -1307,7 +1349,7 @@ Page({
     this.refreshAll()
   },
   deleteOrderChat(e: any) {
-    const orderId = e.currentTarget.dataset.id
+    const orderId = Number(e.currentTarget.dataset.id)
     const chatIdx = e.currentTarget.dataset.ci
     const orders = getOrders()
     const oi = orders.findIndex((o: any) => o.id === orderId)
@@ -1369,7 +1411,7 @@ Page({
     this.setData({
       joinCode: code,
       selectedSeat: autoSeat,
-      selectedBird: '32x32x1',
+      selectedBird: 'bluebird',
       selectedAccessory: '',
       selectedSoulColor: randomSoulColor(),
       isMystery: false

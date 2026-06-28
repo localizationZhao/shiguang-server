@@ -1,5 +1,6 @@
 // 云托管 API 封装
 const ENV = 'prod-d0g68hmay4c8d10e3'
+const CLOUD_TIMEOUT = 8000 // 8秒超时，避免长时间挂起
 
 export function cloudCall(path: string, method: string = 'GET', data: any = {}): Promise<any> {
   return new Promise((resolve, reject) => {
@@ -8,6 +9,7 @@ export function cloudCall(path: string, method: string = 'GET', data: any = {}):
       path,
       header: { 'X-WX-SERVICE': 'express-rtm4', 'content-type': 'application/json' },
       method: method as any,
+      timeout: CLOUD_TIMEOUT,
       data,
       success: (res: any) => {
         if (res.data && res.data.code === 0) resolve(res.data.data)

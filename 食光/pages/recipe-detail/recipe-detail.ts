@@ -94,6 +94,7 @@ Page({
       draft: false,
     }
     addRecipe(newRecipe)
+    api.addRecipe(newRecipe).catch(() => {})
     wx.showModal({
       title: '复刻成功 🎉',
       content: `"${newRecipe.name}"已添加到你的DIY菜谱，可以自由修改啦~`,

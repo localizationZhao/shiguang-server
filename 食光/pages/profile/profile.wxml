@@ -1,7 +1,7 @@
 <!-- 个人中心 - 便签风 -->
 <navigation-bar title="我的" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{false}}"></navigation-bar>
 
-<scroll-view class="page" scroll-y enhanced show-scrollbar="{{false}}">
+<scroll-view class="page" scroll-y enhanced show-scrollbar="{{false}}" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
 
   <!-- 用户卡片 -->
   <view class="profile-card" bindtap="openEditProfile">

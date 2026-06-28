@@ -1,7 +1,7 @@
 <!-- 首页 -->
 <navigation-bar title="查菜谱" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{false}}"></navigation-bar>
 
-<view class="page" style="--th:{{themeMain}};--thd:{{themeDark}};--thl:{{themeLight}}">
+<view class="page" style="--th:{{themeMain}};--thd:{{themeDark}};--thl:{{themeLight}}" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
   <view class="home-top">
     <view class="search-bar">
       <view class="search-wrap">

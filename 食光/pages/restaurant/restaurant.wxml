@@ -2,7 +2,7 @@
 <navigation-bar title="餐厅" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{false}}"></navigation-bar>
 
 <!-- 无餐厅空白页 -->
-<view class="page" style="--hl:{{restTheme}};--rhd:{{restThemeDark}};--rhl:{{restThemeLight}}" wx:if="{{!hasRestaurant}}">
+<view class="page" style="--hl:{{restTheme}};--rhd:{{restThemeDark}};--rhl:{{restThemeLight}}" wx:if="{{!hasRestaurant}}" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
   <view class="glass empty-rest">
     <text class="empty-icon">🏪</text>
     <text class="empty-title">快来创建或加入餐厅吧~</text>
@@ -17,7 +17,7 @@
 
 
 <!-- 已有餐厅 -->
-<view class="page" style="--hl:{{restTheme}};--rhd:{{restThemeDark}};--rhl:{{restThemeLight}}" wx:else>
+<view class="page" style="--hl:{{restTheme}};--rhd:{{restThemeDark}};--rhl:{{restThemeLight}}" wx:else bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
 
   <!-- 自定义提示框 -->
   <view class="custom-toast {{showToast ? 'show' : ''}}" style="background:{{toastColor}}" bindtap="closeToast">
@@ -310,18 +310,16 @@
 
       <!-- 选鸟 -->
       <view wx:if="{{showBirdPicker}}" class="bird-picker-section">
-        <text class="form-label">🐦 选择你的鸟型</text>
+        <text class="form-label">🐦 选择鸟类</text>
         <scroll-view class="bird-grid" scroll-y style="max-height:260rpx">
-          <view class="bird-option {{selectedBird === item ? 'selected' : ''}}"
-            wx:for="{{birdTypes}}" wx:key="*this"
-            data-bird="{{item}}" bindtap="selectBird">
-            <image class="bird-img" src="/sptites/birds/{{item}}.png" mode="aspectFit" style="image-rendering:pixelated"></image>
+          <view class="bird-option {{selectedBird === item.key ? 'selected' : ''}}"
+            wx:for="{{birdTypes}}" wx:key="key"
+            data-bird="{{item.key}}" bindtap="selectBird">
+            <view class="bird-color-dot" style="background:{{item.color}}"></view>
+            <text class="bird-name-sm">{{item.name}}</text>
           </view>
         </scroll-view>
-        <view class="bird-preview">
-          <text>当前鸟型：</text>
-          <image class="bird-img-lg" src="/sptites/birds/{{selectedBird}}.png" mode="aspectFit" style="image-rendering:pixelated"></image>
-        </view>
+        <text style="font-size:20rpx;color:rgba(63,44,21,0.35);margin-top:8rpx">板凳上会用鸟图显示~</text>
       </view>
 
       <!-- 选配饰 -->
@@ -444,7 +442,7 @@
             <view class="bird-wrap {{item.isOwner ? 'bird-owner-wrap' : ''}}">
               <image wx:if="{{item.member}}"
                 class="bird-on-bench {{item.member.online ? 'bird-alive' : 'bird-away'}} {{item.isOwner ? 'bird-owner' : ''}}"
-                src="/sptites/birds/{{item.member.birdType}}.png"
+                src="/sptites/birds/32x32x1.png"
                 mode="aspectFit"
                 style="image-rendering:pixelated;--soul:{{item.member.soulColor || '#ffa3cb'}}"></image>
               <text wx:if="{{item.member && item.member.accessory}}" class="bird-accessory {{item.member.online ? 'acc-glow' : ''}}">{{item.member.accessory}}</text>

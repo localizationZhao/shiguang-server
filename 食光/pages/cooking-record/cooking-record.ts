@@ -56,7 +56,7 @@ Page({
 
   // ============ 编辑 ============
   editRecord(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     const record = this.data.records.find(r => r.id === id)
     if (!record) return
     this.setData({
@@ -142,7 +142,7 @@ Page({
 
   // 删除
   deleteRecord(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     wx.showModal({
       title: '删除记录',
       content: '确定删除这条做菜记录吗？',

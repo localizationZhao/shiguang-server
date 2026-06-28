@@ -62,12 +62,13 @@ export interface Order {
 
 export interface Member {
   nickname: string
-  birdType: string   // 鸟型图片文件名，如 '32x32x1'
+  birdType: string   // 物种key，如 'bluebird'
+  birdColor?: string // 鸟颜色
   online: boolean
   joinedAt: string
   seatIndex: number  // 座位号 0-7
-  accessory: string  // 配饰emoji，如 '🎩' '👑' ''
-  soulColor: string  // 灵魂色，唯一配色 hex
+  accessory: string  // 配饰emoji
+  soulColor: string  // 灵魂色
 }
 
 // 可选配饰
@@ -116,9 +117,24 @@ export interface Restaurant {
 
 // 可选的鸟型图片列表
 export const BIRD_TYPES = [
-  '29x29x2', '29x29x3', '32x24x2', '32x24x3',
-  '32x32x1', '32x32x2', '48x48x1', '60x45x2',
-  '60x45x3', '67x50x2', '74x55x2', '96x96x1'
+  { key:'bluebird', name:'东蓝鸵', color:'#639bff' },
+  { key:'redCardinal', name:'北美红雀', color:'#e83a1b' },
+  { key:'americanGoldfinch', name:'美洲金翅雀', color:'#fff255' },
+  { key:'barnSwallow', name:'家燕', color:'#2252a9' },
+  { key:'pigeon', name:'原鸽', color:'#977699' },
+  { key:'shimaEnaga', name:'银喉长尾山雀', color:'#fff' },
+  { key:'europeanRobin', name:'欧洲知更鸟', color:'#ffaf34' },
+  { key:'blueJay', name:'冠蓝鸦', color:'#5890ff' },
+  { key:'carolinaWren', name:'卡罗莱纳鹪鹩', color:'#c58a5b' },
+  { key:'houseFinch', name:'家朱雀', color:'#cc3a3f' },
+  { key:'scarletRobin', name:'红罗宾', color:'#fc5633' },
+  { key:'americanRobin', name:'美洲知更鸟', color:'#eb7a3a' },
+  { key:'pinkRobin', name:'粉红鸲鹟', color:'#ff6eaf' },
+  { key:'paintedBunting', name:'丽彩鹀', color:'#5567f0' },
+  { key:'redAvadavat', name:'红梅花雀', color:'#cb092b' },
+  { key:'redWarbler', name:'红头虫莺', color:'#e80a28' },
+  { key:'cubanTody', name:'杂色短尾鴗', color:'#5ad63e' },
+  { key:'violetBackedStarling', name:'紫背椋鸟', color:'#9c3af2' },
 ]
 
 export interface CookingRecord {

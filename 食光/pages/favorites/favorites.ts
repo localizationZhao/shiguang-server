@@ -25,7 +25,7 @@ Page({
   },
 
   removeFav(e: any) {
-    const id = e.currentTarget.dataset.id
+    const id = Number(e.currentTarget.dataset.id)
     removeFavorite(id)
     api.removeFavorite(id).catch(() => {})
     this.setData({ favorites: this.data.favorites.filter((f: any) => f.id !== id) })

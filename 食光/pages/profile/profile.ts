@@ -27,7 +27,21 @@ Page({
     showRepairConfirm: false,
   },
 
+  _tabIndex: 3, // 我的页面在TabBar中的位置
+  _touchStartX: 0,
+
   preventClose() {},
+
+  // ===== 左右滑动切换Tab =====
+  onTouchStart(e: any) { this._touchStartX = e.touches[0].clientX },
+  onTouchEnd(e: any) {
+    const deltaX = e.changedTouches[0].clientX - this._touchStartX
+    if (Math.abs(deltaX) < 60) return
+    const TABS = ['/pages/diy/diy', '/pages/home/home', '/pages/restaurant/restaurant', '/pages/profile/profile']
+    const next = deltaX < 0 ? Math.min(this._tabIndex + 1, 3) : Math.max(this._tabIndex - 1, 0)
+    if (next !== this._tabIndex) wx.switchTab({ url: TABS[next] })
+  },
+
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 3 })
