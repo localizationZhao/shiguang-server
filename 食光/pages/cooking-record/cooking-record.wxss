@@ -1,59 +1,61 @@
-/* 🍳 烹饪食光 - 便签日记 */
+/* 🍳 食光日记 - 便签风 */
 .page{height:100vh;padding:12rpx 16rpx;box-sizing:border-box}
-.top-bar{display:flex;gap:12rpx;margin-bottom:12rpx}
-.add-btn{flex:2;text-align:center;padding:16rpx;background:#ffecda;border-radius:8rpx;
-  font-size:28rpx;font-weight:700;color:#ffa3cb;
-  box-shadow:3rpx 3rpx 0 rgba(0,0,0,0.05),0 0 0 2rpx #fff,0 0 0 4rpx #ffa3cb}
-.add-btn:active{transform:translate(2rpx,2rpx);box-shadow:1rpx 1rpx 0 rgba(0,0,0,0.05),0 0 0 2rpx #fff,0 0 0 4rpx #ffa3cb}
-.sync-btn{flex:1;text-align:center;padding:16rpx;background:#79bcff;border-radius:8rpx;
-  font-size:28rpx;font-weight:700;color:#fff;
-  box-shadow:3rpx 3rpx 0 #5a90d4}
-.sync-btn:active{transform:translate(2rpx,2rpx);box-shadow:1rpx 1rpx 0 #5a90d4}
+.top-bar{display:flex;gap:12rpx;margin-bottom:16rpx}
+.add-btn{flex:2;text-align:center;padding:16rpx;background:#ffecda;
+  font-size:26rpx;font-weight:700;color:#FF9A56;
+  box-shadow:3rpx 0 #FF9A56,-3rpx 0 #FF9A56,0 -3rpx #FF9A56,0 3rpx #FF9A56,
+    6rpx 0 #FF9A56,-6rpx 0 #FF9A56,0 -6rpx #FF9A56,0 6rpx #FF9A56,
+    0 0 0 3rpx #FF9A56,0 0 0 6rpx #fff,
+    6rpx 0 0 3rpx #fff,-6rpx 0 0 3rpx #fff,0 -6rpx 0 3rpx #fff,0 6rpx 0 3rpx #fff}
+.add-btn:active{transform:scale(.96)}
+.sync-btn{flex:1;text-align:center;padding:16rpx;background:#79bcff;
+  font-size:24rpx;font-weight:700;color:#fff;box-shadow:4rpx 4rpx 0 #5a90d4}
+.sync-btn:active{transform:translate(2rpx,2rpx);box-shadow:2rpx 2rpx 0 #5a90d4}
 
 /* 交错瀑布流 */
-.masonry{display:flex;gap:12rpx}
-.masonry-col{flex:1;display:flex;flex-direction:column;gap:12rpx}
-.masonry-col:first-child{padding-top:40rpx}
+.masonry{display:flex;gap:14rpx}
+.masonry-col{flex:1;display:flex;flex-direction:column;gap:14rpx}
+.masonry-col:first-child{padding-top:44rpx}
 
-/* 便签 - 5色 */
-.sticky{background:#ffecda;border-radius:4rpx;overflow:hidden;position:relative}
-.sticky.n1{box-shadow:3rpx 3rpx 0 #ffa3cb}
-.sticky.n2{background:#f0f7ff;box-shadow:3rpx 3rpx 0 #79bcff}
-.sticky.n3{background:#fff8ec;box-shadow:3rpx 3rpx 0 #ffb37c}
-.sticky.n4{background:#f8f0ff;box-shadow:3rpx 3rpx 0 #d18bff}
-.sticky.n5{background:#ecfff0;box-shadow:3rpx 3rpx 0 #6de192}
-.sticky:active{transform:scale(0.98)}
-
-.sticky-img{width:100%;max-height:300rpx;object-fit:cover;display:block}
-.sticky-bd{padding:16rpx}
+/* 便签卡片——像素双层边框 */
+.sticky{background:#ffecda;overflow:hidden;position:relative;
+  box-shadow:3rpx 0 #FF9A56,-3rpx 0 #FF9A56,0 -3rpx #FF9A56,0 3rpx #FF9A56,
+    6rpx 0 #FF9A56,-6rpx 0 #FF9A56,0 -6rpx #FF9A56,0 6rpx #FF9A56,
+    0 0 0 3rpx #FF9A56,0 0 0 6rpx #fff,
+    6rpx 0 0 3rpx #fff,-6rpx 0 0 3rpx #fff,0 -6rpx 0 3rpx #fff,0 6rpx 0 3rpx #fff}
+.sticky:active{transform:scale(.97)}
+.sticky-img{width:100%;display:block}
+.sticky-bd{padding:16rpx 16rpx 8rpx}
 .sticky-title{font-size:26rpx;font-weight:700;color:#3f2c15;display:block}
 .sticky-date{font-size:20rpx;color:rgba(63,44,21,0.35);display:block;margin-top:6rpx}
-.sticky-voice{font-size:20rpx;color:#79bcff;display:block;margin-top:6rpx}
-.sticky-notes{font-size:22rpx;color:rgba(63,44,21,0.55);display:block;margin-top:6rpx;line-height:1.5}
-.sticky-actions{display:flex;justify-content:flex-end;gap:16rpx;padding:8rpx 16rpx 12rpx;font-size:22rpx}
+.sticky-notes{font-size:22rpx;color:rgba(63,44,21,0.5);display:block;margin-top:6rpx;line-height:1.5}
+.sticky-actions{display:flex;justify-content:flex-end;gap:12rpx;padding:6rpx 14rpx 10rpx;font-size:20rpx;color:rgba(63,44,21,0.25)}
 
 .empty{text-align:center;padding:80rpx 20rpx;font-size:26rpx;color:rgba(63,44,21,0.35);display:flex;flex-direction:column;gap:8rpx}
 
-/* 弹窗 */
+/* 弹窗——便签风 */
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:2000;justify-content:center;align-items:center}
 .modal-overlay.show{display:flex}
-.modal-sheet{width:90%;max-width:650rpx;background:#ffecda;border-radius:12rpx;overflow:hidden;
-  box-shadow:4rpx 6rpx 0 rgba(0,0,0,0.1),0 0 0 2rpx #fff,0 0 0 4rpx #ffa3cb}
-.modal-hd{display:flex;justify-content:space-between;align-items:center;padding:16rpx 24rpx;background:#ffa3cb;color:#fff;font-weight:700;font-size:28rpx}
+.modal-sheet{width:90%;max-width:650rpx;background:#ffecda;overflow:hidden;
+  box-shadow:3rpx 0 #FF9A56,-3rpx 0 #FF9A56,0 -3rpx #FF9A56,0 3rpx #FF9A56,
+    6rpx 0 #FF9A56,-6rpx 0 #FF9A56,0 -6rpx #FF9A56,0 6rpx #FF9A56,
+    0 0 0 3rpx #FF9A56,0 0 0 6rpx #fff,
+    6rpx 0 0 3rpx #fff,-6rpx 0 0 3rpx #fff,0 -6rpx 0 3rpx #fff,0 6rpx 0 3rpx #fff}
+.modal-hd{display:flex;justify-content:space-between;align-items:center;padding:16rpx 24rpx;background:#FF9A56;color:#fff;font-weight:700;font-size:28rpx}
 .modal-x{font-size:28rpx;padding:4rpx}
 .modal-body{padding:20rpx}
 .fg{margin-bottom:16rpx}
 .fl{font-size:24rpx;color:rgba(63,44,21,0.4);display:block;margin-bottom:6rpx}
-.fi{border:2rpx solid #ffa3cb;padding:10rpx;border-radius:6rpx;font-size:26rpx;width:100%;box-sizing:border-box}
-.fp{border:2rpx solid #ffa3cb;padding:10rpx;border-radius:6rpx;font-size:26rpx;color:#3f2c15;text-align:center}
+.fi{border:2rpx solid #FF9A56;padding:10rpx;border-radius:6rpx;font-size:26rpx;width:100%;box-sizing:border-box}
+.fp{border:2rpx solid #FF9A56;padding:10rpx;border-radius:6rpx;font-size:26rpx;color:#3f2c15;text-align:center}
 .ta{min-height:80rpx}
 .pick{padding:10rpx;border-bottom:1rpx solid rgba(0,0,0,0.05);font-size:24rpx}
-.pick.on{background:rgba(255,163,203,0.2);font-weight:700}
-.img-pick{width:120rpx;height:90rpx;border:2rpx dashed #ffa3cb;border-radius:6rpx;display:flex;align-items:center;justify-content:center;font-size:24rpx;color:rgba(63,44,21,0.35)}
+.pick.on{background:rgba(255,154,86,0.15);font-weight:700}
+.img-pick{width:120rpx;height:90rpx;border:2rpx dashed #FF9A56;border-radius:6rpx;display:flex;align-items:center;justify-content:center;font-size:24rpx;color:rgba(63,44,21,0.35)}
 .img-inner{width:100%;height:100%;object-fit:cover;border-radius:4rpx}
-.voice-btn{padding:14rpx;text-align:center;border:2rpx dashed #ffa3cb;border-radius:6rpx;font-size:26rpx;color:#ffa3cb}
-.voice-btn.ing{background:#ffa3cb;color:#fff;border-style:solid}
+.voice-btn{padding:14rpx;text-align:center;border:2rpx dashed #FF9A56;border-radius:6rpx;font-size:26rpx;color:#FF9A56}
+.voice-btn.ing{background:#FF9A56;color:#fff;border-style:solid}
 .voice-done{padding:14rpx;text-align:center;background:rgba(121,188,255,0.1);border-radius:6rpx;font-size:26rpx;color:#79bcff}
-.btn-save{width:100%;padding:16rpx;background:#ffa3cb;color:#fff;font-size:28rpx;font-weight:700;border-radius:8rpx;
-  box-shadow:3rpx 3rpx 0 #d43d7e;margin-top:8rpx}
-.btn-save:active{transform:translate(2rpx,2rpx);box-shadow:1rpx 1rpx 0 #d43d7e}
+.btn-save{width:100%;padding:16rpx;background:#FF9A56;color:#fff;font-size:28rpx;font-weight:700;border:none;
+  box-shadow:4rpx 4rpx 0 #e07d3a;margin-top:8rpx}
+.btn-save:active{transform:translate(2rpx,2rpx);box-shadow:2rpx 2rpx 0 #e07d3a}

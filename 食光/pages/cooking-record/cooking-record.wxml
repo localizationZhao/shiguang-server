@@ -13,7 +13,7 @@
   <view class="masonry" wx:if="{{records.length > 0}}">
     <view class="masonry-col">
       <block wx:for="{{records}}" wx:key="id" wx:if="{{index % 2 === 0}}">
-        <view class="sticky {{item.color || 'n1'}}" data-id="{{item.id}}" bindtap="editRecord" data-id="{{item.id}}">
+        <view class="sticky" data-id="{{item.id}}" bindtap="editRecord" data-id="{{item.id}}">
           <image wx:if="{{item.img}}" src="{{item.img}}" mode="aspectFill" class="sticky-img" data-src="{{item.img}}" catchtap="previewImg"></image>
           <view class="sticky-bd">
             <text class="sticky-title">{{item.recipeName}}</text>
