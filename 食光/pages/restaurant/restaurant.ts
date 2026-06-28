@@ -431,7 +431,7 @@ Page({
     rests.push(newRest)
     saveRestaurants(rests)
     // 同步云端
-    api.createRestaurant(newRest).then(() => {
+    api.createRestaurant({ ...newRest, owner_id: 0 }).then(() => {
       wx.showToast({ title: '已同步云端', icon: 'success', duration: 1000 })
     }).catch((e: any) => {
       console.error('[创建餐厅] 云端同步失败:', e)
