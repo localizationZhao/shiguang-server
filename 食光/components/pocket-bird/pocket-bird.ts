@@ -173,6 +173,7 @@ Component({
       if (dt < 300 && Math.abs(cx - ts.x) < 15 && Math.abs(cy - ts.y) < 15) {
         if (bh.getState() === 'petting') return;
         bh.pet();
+        self._chirp();
         var msg = PET_MSGS[Math.floor(Math.random() * PET_MSGS.length)];
         var rc = '#' + Math.floor(Math.random()*256).toString(16).padStart(2,'0') + Math.floor(Math.random()*256).toString(16).padStart(2,'0') + Math.floor(Math.random()*256).toString(16).padStart(2,'0');
         self.setData({ bubbleText: msg, showBubble: true, bubbleColor: rc });
@@ -198,6 +199,7 @@ Component({
       this.closeMenu();
       var self = this, bh = self._bh; if (!bh) return;
       bh.pet();
+      self._chirp();
       var msg = PET_MSGS[Math.floor(Math.random() * PET_MSGS.length)];
       var rc = '#' + Math.floor(Math.random()*256).toString(16).padStart(2,'0') + Math.floor(Math.random()*256).toString(16).padStart(2,'0') + Math.floor(Math.random()*256).toString(16).padStart(2,'0');
       self.setData({ bubbleText: msg, showBubble: true, bubbleColor: rc });
@@ -374,6 +376,55 @@ Component({
         var s = wx.getStorageSync('pocketBirdState');
         return s || {};
       } catch(e) { return {}; }
+    },
+
+    // ======== 鸟叫（Web Audio 合成） ========
+    _chirp: function () {
+      try {
+        var count = Math.floor(1 + Math.random() * 1.5);
+        for (var i = 0; i < count; i++) {
+          var that = this;
+          setTimeout(function () {
+            try {
+              // WeChat 用 wx.createWebAudioContext，标准浏览器用 AudioContext
+              var AudioCtx = wx.createWebAudioContext ? wx.createWebAudioContext() :
+                (typeof AudioContext !== 'undefined' ? new AudioContext() :
+                (typeof webkitAudioContext !== 'undefined' ? new webkitAudioContext() : null));
+              if (!AudioCtx) return;
+
+              var TIMES = [0, 0.06, 0.10, 0.15];
+              var FREQUENCIES = [
+                2200,
+                3500 + Math.random() * 600 * count,
+                2100 + Math.random() * 200 * count,
+                1600 + Math.random() * 400 * count,
+              ];
+              var VOLUMES = [0.00005, 0.165, 0.165, 0.0001];
+
+              var oscillator = AudioCtx.createOscillator();
+              oscillator.type = "sine";
+              var gain = AudioCtx.createGain();
+              oscillator.connect(gain);
+              gain.connect(AudioCtx.destination);
+
+              var now = AudioCtx.currentTime;
+              for (var j = 0; j < TIMES.length; j++) {
+                var time = TIMES[j] + now;
+                if (j === 0) {
+                  oscillator.frequency.setValueAtTime(FREQUENCIES[j], time);
+                  gain.gain.setValueAtTime(VOLUMES[j], time);
+                } else {
+                  oscillator.frequency.exponentialRampToValueAtTime(FREQUENCIES[j], time);
+                  gain.gain.exponentialRampToValueAtTime(VOLUMES[j], time);
+                }
+              }
+
+              oscillator.start(now);
+              oscillator.stop(now + TIMES[TIMES.length - 1]);
+            } catch(e) {}
+          }, i * 120);
+        }
+      } catch(e) {}
     },
 
     _onShow: function () {
