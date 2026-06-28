@@ -42,6 +42,8 @@ Page({
     feedMarker: [] as any[],
     showShareSheet: false,
     showRestDetail: false,
+    showClosedNotice: false,
+    closedRestName: '',
     restDescription: '',
     orderFilter: 'all',
     filteredOrders: [] as any[],
@@ -957,6 +959,14 @@ Page({
   // ===== 餐厅详情 =====
   openRestDetail() { this.setData({ showRestDetail: true }) },
   closeRestDetail() { this.setData({ showRestDetail: false }) },
+  closeClosedNotice() {
+    // 清理闭店餐厅从列表中移除
+    const rests = getRestaurants()
+    const filtered = rests.filter((r: any) => !r.closed)
+    saveRestaurants(filtered)
+    this.setData({ showClosedNotice: false, activeRest: null, hasRestaurant: filtered.length > 0 })
+    this.refreshAll()
+  },
 
   // ===== 上架管理 =====
   openShelf() {
@@ -1022,7 +1032,7 @@ Page({
   submitOrder() {
     if (this.data.submitting) return
     if (this.data.activeRest?.closed) {
-      wx.showModal({ title: '⚠️', content: '您所在的餐厅已被该店店主删除！', showCancel: false, confirmText: '知道了' })
+      this.setData({ showClosedNotice: true, closedRestName: this.data.activeRest.name })
       return
     }
     const ordered = this.data.menuAll.filter((m: any) => m.ordered)

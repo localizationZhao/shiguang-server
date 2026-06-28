@@ -632,6 +632,19 @@
   </view>
 </view>
 
+<!-- 闭店通知——birb-window像素风 -->
+<view class="modal-overlay {{showClosedNotice ? 'show' : ''}}" bindtap="closeClosedNotice">
+  <view class="birb-window" catchtap="preventClose" style="width:460rpx;text-align:center">
+    <view class="birb-window-header" style="background:#e74c3c"><text>🏚️ 餐厅已闭店</text></view>
+    <view class="birb-window-content" style="padding:28rpx 24rpx">
+      <text style="font-size:56rpx;display:block;margin-bottom:12rpx">🚪</text>
+      <text style="font-size:26rpx;font-weight:700;color:#3f2c15;display:block;margin-bottom:8rpx">{{closedRestName}}</text>
+      <text style="font-size:22rpx;color:rgba(63,44,21,0.5);display:block;line-height:1.6;margin-bottom:20rpx">很遗憾，店主已关闭了这家餐厅。<br/>您无法再进行点单。</text>
+      <button class="btn-primary" style="width:100%;padding:16rpx;background:#e74c3c;color:#fff;border:none;font-size:26rpx;font-weight:700;box-shadow:4rpx 4rpx 0 #c0392b" bindtap="closeClosedNotice">知道了</button>
+    </view>
+  </view>
+</view>
+
 <!-- 餐厅详情弹窗 - 橙色便签风 -->
 <view class="modal-overlay {{showRestDetail ? 'show' : ''}}" bindtap="closeRestDetail">
   <view class="rest-detail-note" catchtap="preventClose">
