@@ -1,0 +1,420 @@
+<!--pages/index/index.wxml - 页面结构文件-->
+<view class="container">
+  
+  <!-- 模块一：封面与标题区 -->
+  <view class="cover-section">
+    <view class="cover-wrapper">
+      <image class="cover-image" src="{{cover}}" mode="aspectFit" lazy-load></image>
+      <!-- 条件渲染：根据评分显示不同标签 -->
+      <view class="score-badge" wx:if="{{score >= 9.5}}">
+        <text class="score-text">{{score}}分</text>
+        <text class="score-label">高分推荐</text>
+      </view>
+      <view class="score-badge" wx:else>
+        <text class="score-text">{{score}}分</text>
+        <text class="score-label">值得一读</text>
+      </view>
+    </view>
+    <text class="book-title">{{title}}</text>
+  </view>
+
+  <!-- 模块二：基础信息列表（使用 wx:for 列表渲染） -->
+  <view class="info-section">
+    <view class="section-header">
+      <text class="section-title">基本信息</text>
+      <view class="title-line"></view>
+    </view>
+    <block wx:for="{{infoList}}" wx:key="label">
+      <view class="info-row">
+        <text class="info-label">{{item.label}}</text>
+        <text class="info-value">{{item.value}}</text>
+      </view>
+    </block>
+  </view>
+
+  <!-- 模块三：标签区域（使用 wx:for 列表渲染） -->
+  <view class="tags-section">
+    <block wx:for="{{tags}}" wx:key="*this">
+      <view class="tag-item">
+        <text class="tag-text">{{item}}</text>
+      </view>
+    </block>
+  </view>
+
+  <!-- 模块四：书籍简介（条件渲染：展开/收起） -->
+  <view class="content-section">
+    <view class="section-header">
+      <text class="section-title">书籍简介</text>
+      <view class="title-line"></view>
+    </view>
+    <!-- 条件渲染：根据 showFullSummary 显示完整或截断内容 -->
+    <text class="content-text" wx:if="{{showFullSummary}}">{{summary}}</text>
+    <text class="content-text" wx:else>{{summary.substring(0, 50)}}...</text>
+    <!-- 展开/收起按钮（文字动态变化，带点击阴影收缩效果） -->
+    <view class="toggle-btn" hover-class="toggle-btn-hover" hover-stay-time="100" bindtap="toggleSummary">
+      <text class="toggle-text">{{showFullSummary ? '收起' : '展开全部'}}</text>
+    </view>
+  </view>
+
+  <!-- 模块五：作者简介（条件渲染：展开/收起） -->
+  <view class="content-section">
+    <view class="section-header">
+      <text class="section-title">作者简介</text>
+      <view class="title-line"></view>
+    </view>
+    <!-- 条件渲染：根据 showFullAuthorBio 显示完整或截断内容 -->
+    <text class="content-text" wx:if="{{showFullAuthorBio}}">{{authorBio}}</text>
+    <text class="content-text" wx:else>{{authorBio.substring(0, 50)}}...</text>
+    <!-- 展开/收起按钮（文字动态变化，带点击阴影收缩效果） -->
+    <view class="toggle-btn" hover-class="toggle-btn-hover" hover-stay-time="100" bindtap="toggleAuthorBio">
+      <text class="toggle-text">{{showFullAuthorBio ? '收起' : '展开全部'}}</text>
+    </view>
+  </view>
+
+  <!-- 模块六：章节目录（使用 wx:for 列表渲染，wx:key="id"） -->
+  <view class="content-section">
+    <view class="section-header">
+      <text class="section-title">章节目录</text>
+      <view class="title-line"></view>
+    </view>
+    <view class="chapter-list">
+      <block wx:for="{{chapters}}" wx:key="id">
+        <view class="chapter-item">
+          <view class="chapter-number">
+            <text class="number-text">{{item.id}}</text>
+          </view>
+          <view class="chapter-content">
+            <text class="chapter-title">{{item.title}}</text>
+            <text class="chapter-summary">{{item.summary}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 模块七：额外条件渲染示例（wx:if / wx:else） -->
+  <view class="ebook-section">
+    <view class="ebook-info" wx:if="{{hasEbook}}">
+      <text class="ebook-icon"></text>
+      <text class="ebook-text">本书支持微信读书</text>
+    </view>
+    <view class="ebook-info" wx:else>
+      <text class="ebook-icon"></text>
+      <text class="ebook-text">暂无电子版</text>
+    </view>
+  </view>
+
+  <!-- 模块八：数据绑定示例（微信官方文档数据绑定用法展示） -->
+  <view class="content-section">
+    <view class="section-header">
+      <text class="section-title">数据绑定示例</text>
+      <view class="title-line"></view>
+    </view>
+    
+    <!-- 1. 简单绑定：内容 -->
+    <view class="binding-item">
+      <text class="binding-label">简单绑定（内容）：</text>
+      <text class="binding-value">{{message}}</text>
+    </view>
+    
+    <!-- 2. 组件属性绑定（需要在双引号之内） -->
+    <view class="binding-item">
+      <text class="binding-label">组件属性绑定：</text>
+      <view id="item-{{itemId}}" class="binding-box">
+        <text class="binding-value">id = "item-{{itemId}}"</text>
+      </view>
+    </view>
+    
+    <!-- 3. 控制属性绑定 -->
+    <view class="binding-item">
+      <text class="binding-label">控制属性绑定：</text>
+      <view wx:if="{{condition}}" class="binding-box highlight">
+        <text class="binding-value">condition = true，此元素显示</text>
+      </view>
+    </view>
+    
+    <!-- 4. 关键字绑定 -->
+    <view class="binding-item">
+      <text class="binding-label">关键字绑定：</text>
+      <view class="binding-box">
+        <text class="binding-value">checked = {{false}}（布尔值false）</text>
+      </view>
+    </view>
+    
+    <!-- 5. 三元运算 -->
+    <view class="binding-item">
+      <text class="binding-label">三元运算：</text>
+      <view class="binding-box" hidden="{{flag ? false : true}}">
+        <text class="binding-value">flag ? true : false → {{flag ? '显示' : '隐藏'}}</text>
+      </view>
+    </view>
+    
+    <!-- 6. 算数运算 -->
+    <view class="binding-item">
+      <text class="binding-label">算数运算：</text>
+      <view class="binding-box">
+        <text class="binding-value">{{a}} + {{b}} = {{a + b}}，{{a + b}} + {{c}} + d = {{a + b + c}}d</text>
+      </view>
+    </view>
+    
+    <!-- 7. 逻辑判断 -->
+    <view class="binding-item">
+      <text class="binding-label">逻辑判断：</text>
+      <view class="binding-box" wx:if="{{length > 5}}">
+        <text class="binding-value">length = {{length}}，{{length}} > 5 为真</text>
+      </view>
+    </view>
+    
+    <!-- 8. 字符串运算 -->
+    <view class="binding-item">
+      <text class="binding-label">字符串运算：</text>
+      <view class="binding-box">
+        <text class="binding-value">{{greeting + name}}</text>
+      </view>
+    </view>
+    
+    <!-- 9. 数据路径运算 -->
+    <view class="binding-item">
+      <text class="binding-label">数据路径运算：</text>
+      <view class="binding-box">
+        <text class="binding-value">{{object.key}} | {{array[0]}}</text>
+      </view>
+    </view>
+    
+    <!-- 10. 数组组合 -->
+    <view class="binding-item">
+      <text class="binding-label">数组组合：</text>
+      <view class="binding-box">
+        <text class="binding-value">[{{zero}}, 1, 2, 3, 4]</text>
+      </view>
+    </view>
+    
+    <!-- 11. 对象组合 -->
+    <view class="binding-item">
+      <text class="binding-label">对象组合：</text>
+      <view class="binding-box">
+        <text class="binding-value">{foo: {{foo}}, bar: {{bar}}}</text>
+      </view>
+    </view>
+    
+    <!-- 12. 对象扩展运算 -->
+    <view class="binding-item">
+      <text class="binding-label">对象扩展运算：</text>
+      <view class="binding-box">
+        <text class="binding-value">{a: {{obj1.a}}, b: {{obj1.b}}, c: {{obj2.c}}, d: {{obj2.d}}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模块九：列表渲染示例（微信官方文档列表渲染用法展示） -->
+  <view class="content-section">
+    <view class="section-header">
+      <text class="section-title">列表渲染示例</text>
+      <view class="title-line"></view>
+    </view>
+    
+    <!-- 1. 默认列表渲染（index 和 item） -->
+    <view class="binding-item">
+      <text class="binding-label">默认列表渲染（index + item）：</text>
+      <view class="binding-box">
+        <view wx:for="{{defaultArray}}" class="list-item">
+          <text class="list-text">{{index}}: {{item.message}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 2. 自定义变量名（wx:for-index + wx:for-item） -->
+    <view class="binding-item">
+      <text class="binding-label">自定义变量名（idx + book）：</text>
+      <view class="binding-box">
+        <view wx:for="{{customArray}}" wx:for-index="idx" wx:for-item="book" class="list-item">
+          <text class="list-text">{{idx}}: {{book.title}}（{{book.year}}）</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 3. 嵌套列表渲染（书籍评分矩阵） -->
+    <view class="binding-item">
+      <text class="binding-label">嵌套列表渲染（书籍评分矩阵）：</text>
+      <view class="binding-box">
+        <view wx:for="{{bookScores}}" wx:for-item="book" class="score-row">
+          <text class="score-book-name">{{book.name}}：</text>
+          <view wx:for="{{book.ratings}}" wx:for-item="rating" class="score-cell">
+            <text class="score-text">{{rating}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 4. block wx:for（书籍信息块） -->
+    <view class="binding-item">
+      <text class="binding-label">block wx:for（书籍信息块）：</text>
+      <view class="binding-box">
+        <block wx:for="{{bookInfoBlocks}}">
+          <view class="block-item">
+            <text class="block-index">第{{index + 1}}项：</text>
+            <text class="block-value">{{item.label}} - {{item.value}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+    
+    <!-- 5. wx:key（对象数组，使用 property 作为 key） -->
+    <view class="binding-item">
+      <text class="binding-label">wx:key（对象数组，key="unique"）：</text>
+      <view class="binding-box">
+        <view wx:for="{{objectArray}}" wx:key="unique" class="key-item">
+          <text class="key-text">{{item.id}} ({{item.unique}})</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 6. wx:key（数字数组，使用 *this 作为 key） -->
+    <view class="binding-item">
+      <text class="binding-label">wx:key（数字数组，key="*this"）：</text>
+      <view class="binding-box">
+        <view wx:for="{{numberArray}}" wx:key="*this" class="key-item">
+          <text class="key-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 7. 字符串解析示例 -->
+    <view class="binding-item">
+      <text class="binding-label">字符串解析（wx:for="array"）：</text>
+      <view class="binding-box">
+        <view wx:for="{{stringFor}}" class="list-item">
+          <text class="list-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模块十：条件渲染示例（微信官方文档条件渲染用法展示） -->
+  <view class="content-section">
+    <view class="section-header">
+      <text class="section-title">条件渲染示例</text>
+      <view class="title-line"></view>
+    </view>
+    
+    <!-- 1. wx:if 基本用法 -->
+    <view class="binding-item">
+      <text class="binding-label">wx:if 基本用法：</text>
+      <view class="binding-box">
+        <view wx:if="{{condition}}">
+          <text class="list-text">condition = true，此元素渲染</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 2. wx:if / wx:elif / wx:else（简·爱人生阶段） -->
+    <view class="binding-item">
+      <text class="binding-label">wx:if / wx:elif / wx:else（简·爱年龄={{janeAge}}）：</text>
+      <view class="binding-box">
+        <view wx:if="{{janeAge < 10}}" class="cond-box cond-childhood">
+          <text class="list-text">盖茨黑德府的童年时光</text>
+        </view>
+        <view wx:elif="{{janeAge < 18}}" class="cond-box cond-school">
+          <text class="list-text">洛伍德学校的求学岁月</text>
+        </view>
+        <view wx:else class="cond-box cond-adult">
+          <text class="list-text">桑菲尔德庄园的成年生活</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 3. block wx:if -->
+    <view class="binding-item">
+      <text class="binding-label">block wx:if（包装多个组件）：</text>
+      <view class="binding-box">
+        <block wx:if="{{hasEbook}}">
+          <view class="block-cond-item">
+            <text class="list-text">📖 本书有电子版可供阅读</text>
+          </view>
+          <view class="block-cond-item">
+            <text class="list-text">📱 支持手机端在线阅读</text>
+          </view>
+        </block>
+      </view>
+    </view>
+    
+    <!-- 4. wx:if vs hidden 对比 -->
+    <view class="binding-item">
+      <text class="binding-label">wx:if vs hidden 对比：</text>
+      <view class="binding-box">
+        <view class="compare-row">
+          <text class="compare-label">wx:if="{{false}}":</text>
+          <view wx:if="{{false}}" class="compare-box">
+            <text class="list-text">此元素不存在于DOM</text>
+          </view>
+          <text class="compare-note" wx:else>（元素未渲染）</text>
+        </view>
+        <view class="compare-row">
+          <text class="compare-label">hidden="{{true}}":</text>
+          <view hidden="{{true}}" class="compare-box">
+            <text class="list-text">此元素存在但隐藏</text>
+          </view>
+          <text class="compare-note">（元素已渲染但隐藏）</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模块十一：模板示例（微信官方文档模板用法展示） -->
+  <view class="content-section">
+    <view class="section-header">
+      <text class="section-title">模板示例</text>
+      <view class="title-line"></view>
+    </view>
+    
+    <!-- 定义模板 -->
+    <template name="bookItem">
+      <view class="template-item">
+        <text class="template-index">第{{index + 1}}章：</text>
+        <text class="template-msg">{{chapter}}</text>
+        <text class="template-time">{{year}}年</text>
+      </view>
+    </template>
+    
+    <template name="characterInfo">
+      <view class="template-character">
+        <text class="template-name">👤 {{name}}</text>
+        <text class="template-role">角色：{{role}}</text>
+      </view>
+    </template>
+    
+    <template name="maleCharacter">
+      <view class="template-male">
+        <text class="template-name">👨 {{name}}（{{role}}）</text>
+      </view>
+    </template>
+    
+    <template name="femaleCharacter">
+      <view class="template-female">
+        <text class="template-name">👩 {{name}}（{{role}}）</text>
+      </view>
+    </template>
+    
+    <!-- 1. 使用模板（is + data） -->
+    <view class="binding-item">
+      <text class="binding-label">使用模板（is="bookItem"）：</text>
+      <view class="binding-box">
+        <template is="bookItem" data="{{index: 0, chapter: '盖茨黑德府的童年', year: 1847}}"/>
+      </view>
+    </view>
+    
+    <!-- 2. 动态模板（is 使用 Mustache 语法） -->
+    <view class="binding-item">
+      <text class="binding-label">动态模板（按性别切换）：</text>
+      <view class="binding-box">
+        <block wx:for="{{characters}}" wx:for-item="char">
+          <template is="{{char.gender === 'female' ? 'femaleCharacter' : 'maleCharacter'}}" data="{{name: char.name, role: char.role}}"/>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部留白 -->
+  <view class="bottom-space"></view>
+
+</view>
