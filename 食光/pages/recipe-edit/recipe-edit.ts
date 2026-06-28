@@ -336,9 +336,14 @@ Page({
       draft: true,
       source: 'diy',
     }
-    saveDraft(recipe)
-    wx.showToast({ title: '草稿已保存 📝', icon: 'success' })
-    setTimeout(() => wx.navigateBack(), 1200)
+    try {
+      saveDraft(recipe)
+      wx.showToast({ title: '草稿已保存 📝', icon: 'success' })
+      setTimeout(() => wx.navigateBack(), 1200)
+    } catch(e) {
+      console.error('[saveDraft] 保存失败:', e)
+      wx.showModal({ title: '保存失败', content: '存储空间可能不足', showCancel: false })
+    }
   },
 
   // 完成保存
@@ -379,10 +384,20 @@ Page({
       return
     }
 
-    if (this.data.editId) {
-      updateRecipe(recipe)
-    } else {
-      addRecipe(recipe)
+    try {
+      if (this.data.editId) {
+        updateRecipe(recipe)
+      } else {
+        addRecipe(recipe)
+      }
+    } catch(e) {
+      console.error('[saveRecipe] 保存失败:', e)
+      wx.showModal({
+        title: '保存失败',
+        content: '可能是存储空间不足，请尝试清理小程序数据后重试。',
+        showCancel: false
+      })
+      return
     }
 
     // 同步云端

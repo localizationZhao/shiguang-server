@@ -14,6 +14,14 @@ App<IAppOption>({
     wx.cloud.init({ env: 'prod-d0g68hmay4c8d10e3' })
     // WebSocket: 部署server/后再启用
     // const { wsConnect } = require('./utils/api'); wsConnect()
+    // 清理临时文件释放空间
+    try {
+      const fs = wx.getFileSystemManager()
+      const files = fs.readdirSync(wx.env.USER_DATA_PATH)
+      files.filter((f: string) => f.startsWith('qr_')).forEach((f: string) => {
+        try { fs.unlinkSync(`${wx.env.USER_DATA_PATH}/${f}`) } catch(e) {}
+      })
+    } catch(e) {}
     // 云连通测试（5秒超时，失败不影响功能）
     const app = this
     wx.cloud.callContainer({
