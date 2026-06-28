@@ -19,9 +19,9 @@
 
 /* 便签卡片——像素双层边框 */
 .sticky{background:#ffecda;overflow:hidden;position:relative;
-  box-shadow:3rpx 0 #FF9A56,-3rpx 0 #FF9A56,0 -3rpx #FF9A56,0 3rpx #FF9A56,
-    6rpx 0 #FF9A56,-6rpx 0 #FF9A56,0 -6rpx #FF9A56,0 6rpx #FF9A56,
-    0 0 0 3rpx #FF9A56,0 0 0 6rpx #fff,
+  box-shadow:3rpx 0 var(--hl,#FF9A56),-3rpx 0 var(--hl,#FF9A56),0 -3rpx var(--hl,#FF9A56),0 3rpx var(--hl,#FF9A56),
+    6rpx 0 var(--hl,#FF9A56),-6rpx 0 var(--hl,#FF9A56),0 -6rpx var(--hl,#FF9A56),0 6rpx var(--hl,#FF9A56),
+    0 0 0 3rpx var(--hl,#FF9A56),0 0 0 6rpx #fff,
     6rpx 0 0 3rpx #fff,-6rpx 0 0 3rpx #fff,0 -6rpx 0 3rpx #fff,0 6rpx 0 3rpx #fff}
 .sticky:active{transform:scale(.97)}
 .sticky-img{width:100%;display:block}
@@ -59,3 +59,9 @@
 .btn-save{width:100%;padding:16rpx;background:#FF9A56;color:#fff;font-size:28rpx;font-weight:700;border:none;
   box-shadow:4rpx 4rpx 0 #e07d3a;margin-top:8rpx}
 .btn-save:active{transform:translate(2rpx,2rpx);box-shadow:2rpx 2rpx 0 #e07d3a}
+/* 便签颜色选择 */
+.color-row{display:flex;gap:16rpx}
+.color-dot{width:48rpx;height:48rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2rpx 8rpx rgba(0,0,0,0.15);transition:transform .15s}
+.color-dot:active{transform:scale(.88)}
+.color-dot.on{box-shadow:0 0 0 4rpx #fff,0 0 0 7rpx currentColor}
+.color-dot text{color:#fff;font-size:22rpx;font-weight:700;text-shadow:0 1rpx 2rpx rgba(0,0,0,0.3)}

@@ -18,9 +18,11 @@ Page({
       img: '',
       notes: '',
       voice: '',
+      color: '#FF9A56',
     },
     diyRecipes: [] as any[],
     recording: false,
+    noteColors: ['#FF9A56','#79bcff','#6de192','#d18bff','#ff8baa'],
   },
 
   onShow() {
@@ -30,10 +32,9 @@ Page({
   preventClose() {},
 
   refresh() {
-    const colors = ['n1','n2','n3','n4','n5']
     const records = getCookingRecords().sort((a, b) =>
       new Date(b.cookedAt).getTime() - new Date(a.cookedAt).getTime()
-    ).map((r: any, i: number) => ({ ...r, color: colors[i % 5] }))
+    ).map((r: any) => ({ ...r, color: r.color || '#FF9A56' }))
     this.setData({ records })
   },
 
@@ -49,6 +50,7 @@ Page({
         cookedAt: formatDateOnly(new Date()),
         img: '',
         notes: '',
+        color: '#FF9A56',
       },
       diyRecipes: recipes,
     })
@@ -69,6 +71,7 @@ Page({
         img: record.img || '',
         notes: record.notes || '',
         voice: (record as any).voice || '',
+        color: (record as any).color || '#FF9A56',
       },
       diyRecipes: getRecipes().filter(r => !r.draft),
     })
@@ -108,6 +111,11 @@ Page({
     this.setData({ 'form.notes': e.detail.value })
   },
 
+  // 选择颜色
+  pickColor(e: any) {
+    this.setData({ 'form.color': e.currentTarget.dataset.color })
+  },
+
   // 保存
   saveRecord() {
     const f = this.data.form
@@ -116,7 +124,7 @@ Page({
       return
     }
 
-    const record: CookingRecord = {
+    const record: any = {
       id: this.data.editId || generateId(),
       recipeId: f.recipeId,
       recipeName: f.recipeName || '食光日记',
@@ -124,6 +132,7 @@ Page({
       img: f.img,
       notes: f.notes,
       voice: f.voice || '',
+      color: f.color || '#FF9A56',
     }
 
     const records = getCookingRecords()

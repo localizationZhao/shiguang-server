@@ -13,7 +13,7 @@
   <view class="masonry" wx:if="{{records.length > 0}}">
     <view class="masonry-col">
       <block wx:for="{{records}}" wx:key="id" wx:if="{{index % 2 === 0}}">
-        <view class="sticky" data-id="{{item.id}}" bindtap="editRecord" data-id="{{item.id}}">
+        <view class="sticky" style="--hl:{{item.color || '#FF9A56'}}" data-id="{{item.id}}" bindtap="editRecord" data-id="{{item.id}}">
           <image wx:if="{{item.img}}" src="{{item.img}}" mode="aspectFill" class="sticky-img" data-src="{{item.img}}" catchtap="previewImg"></image>
           <view class="sticky-bd">
             <text class="sticky-title">{{item.recipeName}}</text>
@@ -80,6 +80,13 @@
         <view class="img-pick" bindtap="pickImg">
           <image wx:if="{{form.img}}" src="{{form.img}}" mode="aspectFill" class="img-inner"></image>
           <text wx:else>📸 拍照</text>
+        </view>
+      </view>
+      <view class="fg"><text class="fl">🎨 便签颜色</text>
+        <view class="color-row">
+          <view class="color-dot {{form.color === item ? 'on' : ''}}" wx:for="{{noteColors}}" wx:key="*this" style="background:{{item}}" data-color="{{item}}" bindtap="pickColor">
+            <text wx:if="{{form.color === item}}">✓</text>
+          </view>
         </view>
       </view>
       <view class="fg"><text class="fl">备注</text>
