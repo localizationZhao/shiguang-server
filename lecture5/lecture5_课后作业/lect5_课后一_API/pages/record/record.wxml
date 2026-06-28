@@ -1,0 +1,177 @@
+<!-- 
+  record.wxml - 录音与播放页面结构文件
+  功能：三大模块 - 录音操作区、录音文件列表区、音频播放控制区
+  知识点：wx:for循环渲染、wx:if条件渲染、事件绑定bindtouchstart/bindtouchend
+-->
+<view class="container">
+  
+  <!-- ==================== 模块一：录音操作区（录音API） ==================== -->
+  <view class="section">
+    <view class="section-title">模块一：录音操作 (录音API)</view>
+    <view class="section-desc">按住下方按钮开始录音，松开结束录音</view>
+    
+    <!-- 录音按钮 - 按住录音交互 -->
+    <!-- 
+      知识点：bindtouchstart（按下开始录音）、bindtouchend（松开结束录音）
+      API：wx.startRecord、wx.stopRecord
+    -->
+    <view class="recordClass">
+      <button 
+        class="recordButtonClass"
+        bindtouchstart="handleTouchStart"
+        bindtouchend="handleTouchEnd"
+        hover-class="recordButtonHover">
+        按住录音
+      </button>
+    </view>
+    
+    <!-- 音量动画区域 - 录音过程中显示 -->
+    <!-- 
+      知识点：通过isSpeaking变量控制显隐，picId变量循环切换音量图片
+      使用5档音量图片模拟音量波动效果
+    -->
+    <view class="speakPicViewClass" wx:if="{{isSpeaking}}">
+      <!-- 音量图标，根据picId动态切换显示不同音量级别的图片 -->
+      <!-- 知识点：imageClass样式类，src动态绑定图片路径 -->
+      <image class="imageClass" src="{{'../../images/sound' + picId + '.svg'}}" mode="aspectFit"></image>
+      <text class="speakText">正在录音...</text>
+    </view>
+    
+    <!-- 录音状态提示 -->
+    <view class="recordStatus" wx:if="{{recordStatus}}">
+      <text>{{recordStatus}}</text>
+    </view>
+  </view>
+  
+  <!-- 分割线 -->
+  <view class="divider"></view>
+  
+  <!-- ==================== 模块二：录音文件列表区（文件管理API） ==================== -->
+  <view class="section">
+    <view class="section-title">模块二：录音文件列表 (文件管理API)</view>
+    <view class="section-desc">已保存的录音文件，点击可播放</view>
+    
+    <!-- 滚动视图容器 - 支持列表滚动 -->
+    <!-- 
+      知识点：scroll-view组件、scroll-y属性启用垂直滚动
+      API：wx.saveFile、wx.getFileInfo、wx.setStorageSync
+    -->
+    <scroll-view scroll-y="true" class="scrollClass" enable-flex="true">
+      
+      <!-- 录音列表 - 使用wx:for循环渲染 -->
+      <!-- 
+        知识点：wx:for循环渲染voices数组，wx:key指定唯一标识
+        每条记录显示：文件路径、录音时间、文件大小
+      -->
+      <view wx:if="{{voices.length > 0}}">
+        <block wx:for="{{voices}}" wx:key="filePath" wx:for-item="voice">
+          
+          <!-- 列表项单元格 -->
+          <!-- 
+            知识点：cellClass样式类，cellRowClass行样式，dateClass时间样式
+            data-key自定义属性传递文件路径，用于点击播放
+          -->
+          <view 
+            class="cellClass {{currentPlayPath === voice.filePath ? 'cellActive' : ''}}"
+            bindtap="handlePlayVoice"
+            data-key="{{voice.filePath}}">
+            
+            <!-- 第一行：录音时间 -->
+            <view class="cellRowClass">
+              <text class="dateClass">{{voice.createTime}}</text>
+            </view>
+            
+            <!-- 第二行：文件大小 -->
+            <view class="cellRowClass">
+              <text class="sizeClass">{{voice.fileSize}}</text>
+            </view>
+            
+            <!-- 第三行：文件路径（截取显示） -->
+            <view class="cellRowClass">
+              <text class="pathClass">{{voice.filePathShort}}</text>
+            </view>
+          </view>
+          
+        </block>
+      </view>
+      
+      <!-- 无录音文件时的提示 -->
+      <view wx:else class="emptyTip">
+        <text>暂无录音文件，请开始录音</text>
+      </view>
+      
+    </scroll-view>
+    
+    <!-- 列表统计信息 -->
+    <view class="listInfo" wx:if="{{voices.length > 0}}">
+      <text>共 {{voices.length}} 条录音</text>
+    </view>
+  </view>
+  
+  <!-- 分割线 -->
+  <view class="divider"></view>
+  
+  <!-- ==================== 模块三：音频播放控制区（音频控制API） ==================== -->
+  <view class="section">
+    <view class="section-title">模块三：音频播放控制 (音频控制API)</view>
+    <view class="section-desc">控制当前录音的播放状态</view>
+    
+    <!-- 播放控制按钮组 -->
+    <!-- 
+      知识点：四个核心播放控制按钮
+      API：wx.playVoice、wx.pauseVoice、继续播放、wx.stopVoice
+    -->
+    <view class="btn-group">
+      
+      <!-- 开始播放按钮 -->
+      <!-- API：wx.playVoice - 播放指定录音文件 -->
+      <button 
+        class="btn btn-primary"
+        bindtap="handleStartPlay"
+        disabled="{{!currentPlayPath}}">
+        开始播放
+      </button>
+      
+      <!-- 暂停播放按钮 -->
+      <!-- API：wx.pauseVoice - 暂停当前播放 -->
+      <button 
+        class="btn btn-warning"
+        bindtap="handlePausePlay"
+        disabled="{{!isPlaying}}">
+        暂停播放
+      </button>
+      
+      <!-- 继续播放按钮 -->
+      <!-- 知识点：暂停后再次调用播放即可继续 -->
+      <button 
+        class="btn btn-success"
+        bindtap="handleResumePlay"
+        disabled="{{!isPaused}}">
+        继续播放
+      </button>
+      
+      <!-- 结束播放按钮 -->
+      <!-- API：wx.stopVoice - 停止播放并重置状态 -->
+      <button 
+        class="btn btn-danger"
+        bindtap="handleStopPlay"
+        disabled="{{!isPlaying && !isPaused}}">
+        结束播放
+      </button>
+      
+    </view>
+    
+    <!-- 播放状态显示 -->
+    <view class="playStatus">
+      <text wx:if="{{isPlaying}}">状态：正在播放</text>
+      <text wx:elif="{{isPaused}}">状态：已暂停</text>
+      <text wx:else>状态：未播放</text>
+    </view>
+    
+    <!-- 当前播放文件信息 -->
+    <view class="currentPlayInfo" wx:if="{{currentPlayPath}}">
+      <text>当前播放：{{currentPlayPathShort}}</text>
+    </view>
+  </view>
+  
+</view>

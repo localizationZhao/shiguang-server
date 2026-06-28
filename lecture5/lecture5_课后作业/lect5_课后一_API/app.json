@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/record/record"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#07C160",
+    "navigationBarTitleText": "录音与播放",
+    "navigationBarTextStyle": "white"
+  },
+  "permission": {
+    "scope.record": {
+      "desc": "您的麦克风权限将用于录音功能"
+    }
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
