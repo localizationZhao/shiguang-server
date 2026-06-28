@@ -28,7 +28,7 @@
   <scroll-view class="rest-tabs-scroll" scroll-x enhanced show-scrollbar="{{false}}" enable-flex>
     <view class="rest-tab {{item.owner ? 'owner-tab' : 'join-tab'}} {{activeRestIdx === idx ? 'active' : ''}}"
       wx:for="{{restaurants}}" wx:key="id" wx:for-index="idx"
-      data-index="{{idx}}" bindtap="switchRest">
+      data-index="{{idx}}" bindtap="switchRest" bindlongpress="longPressRest">
       <view class="rest-tab-dot {{item.owner ? 'dot-owner' : 'dot-join'}}"></view>
       <text>{{item.name}}</text>
       <text class="rest-tab-role">{{item.owner ? '店' : '客'}}</text>
@@ -383,7 +383,7 @@
           <text>{{item.online ? '🟢 在线' : '⚫ 离线'}}</text>
         </view>
         <text class="kick-btn" wx:if="{{activeRest && activeRest.owner}}" data-nick="{{item.nickname}}" catchtap="kickMember">踢出</text>
-        <text class="leave-btn" wx:if="{{activeRest && !activeRest.owner && item.nickname === joinNickname}}" catchtap="leaveRestaurant">退出</text>
+        <text class="leave-btn" wx:if="{{activeRest && !activeRest.owner && item.nickname === myNick}}" catchtap="leaveRestaurant">退出</text>
       </view>
     </view>
   </view>

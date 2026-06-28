@@ -76,6 +76,7 @@ Page({
     birdTypes: BIRD_TYPES,
     selectedBird: 'bluebird',
     joinNickname: '',
+    myNick: '', // 当前用户昵称（用于退出按钮比对）
 
     // ===== 新增：配饰 =====
     accessories: ACCESSORIES,
@@ -259,6 +260,49 @@ Page({
     this.refreshAll()
   },
 
+  // ===== 长按餐厅标签 → 管理菜单 =====
+  longPressRest(e: any) {
+    const idx = parseInt(e.currentTarget.dataset.index)
+    const rests = this.data.restaurants
+    const rest = rests[idx]
+    if (!rest) return
+    // 先切换到该餐厅
+    if (this.data.activeRestIdx !== idx) {
+      this.setData({ activeRestIdx: idx, tab: 'menu' })
+      this.refreshAll()
+    }
+    const that = this
+    if (rest.owner) {
+      // 店主菜单
+      wx.showActionSheet({
+        itemList: ['✏️ 编辑名称', '🔄 刷新邀请码', '📋 邀请码复制', '💀 闭店', 'ℹ️ 查看详情'],
+        success(res: any) {
+          switch (res.tapIndex) {
+            case 0: that.openEditRest(); break
+            case 1: that.refreshInviteCode(); break
+            case 2:
+              wx.setClipboardData({ data: rest.inviteCode || '' })
+              wx.showToast({ title: '邀请码已复制', icon: 'success' })
+              break
+            case 3: that.deleteRestaurant(); break
+            case 4: that.openRestDetail(); break
+          }
+        }
+      })
+    } else {
+      // 食客菜单
+      wx.showActionSheet({
+        itemList: ['🚪 退出餐厅', 'ℹ️ 查看详情'],
+        success(res: any) {
+          switch (res.tapIndex) {
+            case 0: that.leaveRestaurant(); break
+            case 1: that.openRestDetail(); break
+          }
+        }
+      })
+    }
+  },
+
   switchTab(e: any) {
     const t = e.currentTarget.dataset.tab
     this.setData({ tab: t })
@@ -435,11 +479,13 @@ Page({
     const members = rest.members || []
     const online = members.filter((m: Member) => m.online).length
     const offline = members.length - online
+    const profile = getUserProfile()
     this.setData({
       showStatus: true,
       statusMembers: members,
       statusOnline: online,
-      statusOffline: offline
+      statusOffline: offline,
+      myNick: profile.nick || '美食家'
     })
   },
   closeStatus() { this.setData({ showStatus: false }) },
