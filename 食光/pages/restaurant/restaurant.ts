@@ -238,7 +238,7 @@ Page({
     this.setData({
       hasRestaurant: has, restaurants: rests, activeRest, menu, menuAll,
       orders: filteredOrders, filteredOrders: filteredOrders, feeds: this.filterFeeds(feeds), activeRestIdx: idx,
-      allRestsForOrder: allRests,
+      allRestsForOrder: allRests.filter((r: any) => !r.closed),
     })
     this.updateAvgRating()
   },
