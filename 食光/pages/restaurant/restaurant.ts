@@ -230,9 +230,12 @@ Page({
     const r = this.data.role
     const rests = (r === 'owner' ? allRests.filter((x: any) => x.owner) : allRests.filter((x: any) => !x.owner)).filter((x: any) => !x.closed)
     const has = rests.length > 0
-    const idx = this.data.activeRestIdx < rests.length ? this.data.activeRestIdx : 0
+    // 用上次的餐厅ID匹配，避免索引错位导致闪跳
+    const prevId = (this as any)._lastRestId || (this.data.activeRest ? this.data.activeRest.id : 0)
+    let idx = rests.findIndex((x: any) => x.id === prevId || x.originalId === prevId)
+    if (idx < 0) idx = this.data.activeRestIdx < rests.length ? this.data.activeRestIdx : 0
     const activeRest = has ? rests[idx] : null
-    const menuAll = activeRest ? (activeRest.menu || []) : []
+    if (activeRest) (this as any)._lastRestId = activeRest.id
     const menu = menuAll.filter((m: any) => m.onShelf)
     const restId = activeRest ? (activeRest.originalId || activeRest.id) : 0
     // 收集当前餐厅的所有关联ID（自身+originalId+关联副本）
