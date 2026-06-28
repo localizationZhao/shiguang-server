@@ -83,8 +83,12 @@ Page({
       header: { 'X-WX-SERVICE': 'express-rtm4' }, method: 'GET',
       success: (res: any) => {
         if (res.data?.code === 0 && res.data.data?.length > 0) {
-          const recipes = res.data.data.map((r: any) => ({...r,color:r.color||CAT_COLORS[r.category_id]||'#ff8baa'}))
-          this.setData({ allRecipes: recipes, displayRecipes: recipes, scrollNames: recipes.map((r: any, i: number) => ({id: i, text: (r.cover_emoji || ':)') + ' ' + r.name})) })
+          const recipes = res.data.data
+            .filter((r: any) => r.is_public == 1) // 只显示公开菜谱，过滤掉用户DIY的
+            .map((r: any) => ({...r,color:r.color||CAT_COLORS[r.category_id]||'#ff8baa'}))
+          if (recipes.length > 0) {
+            this.setData({ allRecipes: recipes, displayRecipes: recipes, scrollNames: recipes.map((r: any, i: number) => ({id: i, text: (r.cover_emoji || ':)') + ' ' + r.name})) })
+          }
         }
       }, fail: () => {}
     })
