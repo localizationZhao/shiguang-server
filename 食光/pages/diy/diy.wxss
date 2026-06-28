@@ -35,29 +35,31 @@
 .btn-new-recipe{padding:14rpx 28rpx;background:var(--hl);color:var(--bg);font-size:26rpx;font-weight:800;border:none;font-family:monospace;box-shadow:4rpx 4rpx 0 #e892b5}
 .btn-new-recipe:active{transform:translate(2rpx,2rpx);box-shadow:2rpx 2rpx 0 #e892b5}
 
-/* ===== 便签卡片网格 ===== */
-.recipe-grid{flex:1;padding:6rpx 12rpx 16rpx;display:grid;grid-template-columns:repeat(2,1fr);gap:16rpx;align-content:start}
-.sticky-note{background:#ffecda;position:relative;border-radius:4rpx;overflow:hidden;
+/* ===== 便签卡片网格（参照首页） ===== */
+.recipe-grid{flex:1;padding:6rpx 12rpx 16rpx;display:flex;flex-wrap:wrap;justify-content:space-between;align-content:flex-start}
+.sticky-note{width:calc(50% - 10rpx);margin-bottom:22rpx;background:#ffecda;position:relative;overflow:hidden;
   box-shadow:2rpx 0 var(--hl),-2rpx 0 var(--hl),0 -2rpx var(--hl),0 2rpx var(--hl),
     4rpx 0 var(--hl),-4rpx 0 var(--hl),0 -4rpx var(--hl),0 4rpx var(--hl),
     0 0 0 2rpx var(--hl),0 0 0 4rpx #fff,
     4rpx 0 0 2rpx #fff,-4rpx 0 0 2rpx #fff,
     0 -4rpx 0 2rpx #fff,0 4rpx 0 2rpx #fff;
   transition:transform .15s}
-.sticky-note:active{transform:scale(.96)}
+.sticky-note:active{transform:scale(.97)}
 .sticky-note.selected{filter:drop-shadow(0 0 10rpx var(--hl))}
-.sticky-hd{background:var(--hl);padding:8rpx 16rpx;text-align:center;font-size:22rpx;font-weight:700;color:#fff;
-  box-shadow:0 2rpx 0 rgba(0,0,0,0.08)}
+/* 彩色标题栏 */
+.sticky-hd{background:var(--hl);padding:10rpx 14rpx;text-align:center;font-size:22rpx;font-weight:700;color:#fff}
 .sticky-hd text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.sticky-bd{padding:12rpx 14rpx 16rpx;display:flex;flex-direction:column;align-items:center;gap:8rpx}
-.sticky-cover{width:100%;aspect-ratio:4/3;border-radius:6rpx}
-.sticky-emoji{font-size:64rpx;text-align:center}
-.sticky-meta{display:flex;justify-content:space-between;align-items:center;width:100%}
-.sticky-price{font-size:26rpx;font-weight:800;color:var(--hl)}
-.sticky-price.free{font-size:20rpx;color:rgba(63,44,21,0.3);font-weight:400}
-.sticky-cat{font-size:18rpx;color:rgba(63,44,21,0.4);background:rgba(0,0,0,0.04);padding:2rpx 10rpx;border-radius:4rpx}
+/* 内容区（封面+信息） */
+.sticky-bd{background:#fff;padding:12rpx}
+.sticky-cover{width:100%;aspect-ratio:4/3;border-radius:4rpx}
+.sticky-emoji{font-size:52rpx;text-align:center;display:block;padding:16rpx 0}
+.sticky-meta{display:flex;align-items:center;justify-content:space-between;padding:8rpx 4rpx 0}
+.sticky-price{font-size:24rpx;font-weight:800;color:var(--hl)}
+.sticky-price.free{font-size:18rpx;color:rgba(63,44,21,0.3);font-weight:400}
+.sticky-cat{font-size:18rpx;color:rgba(63,44,21,0.4);border:1rpx solid var(--hl);padding:2rpx 8rpx}
+/* 勾选 */
 .sticky-check{position:absolute;top:6rpx;right:6rpx;z-index:5}
-.check-circle{width:30rpx;height:30rpx;border-radius:50%;border:3rpx solid #fff;background:rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;font-size:18rpx;color:transparent;font-weight:700}
+.check-circle{width:28rpx;height:28rpx;border-radius:50%;border:2rpx solid #fff;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;font-size:16rpx;color:transparent;font-weight:700}
 .check-circle.checked{background:#fff;color:var(--hl)}
 
 /* ===== 空状态 - 像素卡 ===== */
