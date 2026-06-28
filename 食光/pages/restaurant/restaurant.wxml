@@ -123,10 +123,13 @@
   <scroll-view class="glass content-area" scroll-y enable-flex wx:if="{{tab === 'orders'}}">
     <text class="section-t">📦 订单</text>
 
-    <!-- 订单餐厅筛选 -->
-    <view class="order-rest-filters" wx:if="{{allRestsForOrder.length > 1}}">
-      <view class="of-chip {{orderRestFilter === item.id ? 'active' : ''}} {{item.closed ? 'closed' : ''}}"
-        wx:for="{{allRestsForOrder}}" wx:key="id" data-id="{{item.id}}" bindtap="filterOrdersByRest">{{item.name}}{{item.closed ? '🏚️' : '🈺'}}</view>
+    <!-- 订单餐厅筛选——折叠 -->
+    <view class="order-rest-toggle" wx:if="{{allRestsForOrder.length > 1}}" bindtap="toggleRestFilter">
+      <text>🏪 {{orderRestFilter ? '已筛选' : '全部餐厅'}}</text><text class="toggle-arrow">{{showRestFilter ? '▲' : '▼'}}</text>
+    </view>
+    <view class="order-rest-filters {{showRestFilter ? 'show' : ''}}" wx:if="{{allRestsForOrder.length > 1}}">
+      <view class="of-chip {{orderRestFilter === item.id ? 'active' : ''}}"
+        wx:for="{{allRestsForOrder}}" wx:key="id" data-id="{{item.id}}" bindtap="filterOrdersByRest">{{item.name}}</view>
     </view>
     <view class="order-filters pipeline">
       <view class="of-chip {{orderFilter === 'pending' ? 'active' : ''}}" data-filter="pending" bindtap="filterOrders">📥 待接单</view>

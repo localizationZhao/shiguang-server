@@ -49,6 +49,7 @@ Page({
     filteredOrders: [] as any[],
     allRestsForOrder: [] as any[],
     orderRestFilter: 0,
+    showRestFilter: false,
     menuAll: [] as any[],
     showMsgModal: false,
     msgTargetId: 0,
