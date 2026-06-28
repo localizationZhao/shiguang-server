@@ -7,7 +7,7 @@
 .search-bar{display:flex;align-items:center;gap:10rpx;flex-shrink:0;padding:0;background:transparent;box-shadow:none}
 .search-wrap{flex:1;display:flex;align-items:center;background:var(--bg);border:2rpx solid var(--th);padding:0 14rpx;height:68rpx;
   box-shadow:var(--border) 0 var(--th),var(--neg-border) 0 var(--th),0 calc(var(--neg-border)) var(--th),0 var(--border) var(--th)}
-.search-input{flex:1;border:none;background:none;font-size:24rpx;font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;color:#3f2c15;height:100%}.search-icon{font-size:24rpx}
+.search-input{flex:1;border:none;background:none;font-size:28rpx;font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;color:#3f2c15;height:100%}.search-icon{font-size:28rpx}
 .search-clear{font-size:22rpx;color:rgba(63,44,21,0.3);padding:4rpx 8rpx}
 .search-clear:active{transform:scale(.85);color:#f85149}
 .btn-search{height:68rpx;padding:0 24rpx;background:var(--th);color:#fff;border:none;font-family:monospace;font-size:24rpx;font-weight:800;box-shadow:4rpx 4rpx 0 var(--thd);display:flex;align-items:center;flex-shrink:0}
@@ -26,8 +26,8 @@
   box-shadow:var(--border) 0 var(--th),var(--neg-border) 0 var(--th),0 calc(var(--neg-border)) var(--th),0 var(--border) var(--th),calc(var(--border)*2) 0 var(--th),calc(var(--neg-border)*2) 0 var(--th),0 calc(var(--neg-border)*2) var(--th),0 calc(var(--border)*2) var(--th),0 0 0 var(--border) var(--th),0 0 0 calc(var(--border)*2) #fff,calc(var(--border)*2) 0 0 var(--border) #fff,calc(var(--neg-border)*2) 0 0 var(--border) #fff,0 calc(var(--neg-border)*2) 0 var(--border) #fff,0 calc(var(--border)*2) 0 var(--border) #fff}
 .blind-pet{width:48rpx;height:48rpx;border-radius:50%;background:rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border:2rpx solid var(--th)}
 .pet-face{width:100%;height:100%;border-radius:50%}.pet-badge{position:absolute;bottom:-2rpx;right:-2rpx;width:20rpx;height:20rpx;border-radius:50%;background:var(--th);color:#fff;font-size:12rpx;display:flex;align-items:center;justify-content:center}
-.blind-info{flex:1}.blind-title{font-size:24rpx;font-weight:700;color:#3f2c15;display:block}.blind-result{font-size:22rpx;color:var(--th);font-weight:600}
-.blind-btn{width:40rpx;height:40rpx;border-radius:50%;background:var(--th);display:flex;align-items:center;justify-content:center;font-size:24rpx;color:#fff;box-shadow:3rpx 3rpx 0 var(--thd)}
+.blind-info{flex:1}.blind-title{font-size:28rpx;font-weight:700;color:#3f2c15;display:block}.blind-result{font-size:26rpx;color:var(--thd);font-weight:600}
+.blind-btn{width:40rpx;height:40rpx;border-radius:50%;background:var(--th);display:flex;align-items:center;justify-content:center;font-size:26rpx;color:#fff;box-shadow:3rpx 3rpx 0 var(--thd)}
 .blind-btn:active{transform:translate(2rpx,2rpx);box-shadow:1rpx 1rpx 0 var(--thd)}
 
 /* ===== 滚动菜名 - 绿色双层边框 + 悬浮感 ===== */
@@ -40,13 +40,12 @@
 @keyframes scrollNames{0%{transform:translateY(60rpx)}100%{transform:translateY(-1600rpx)}}
 
 /* ===== 标签便签按钮 ===== */
-.pref-tags{display:flex;flex-wrap:wrap;gap:10rpx;flex-shrink:0;padding:4rpx 0;justify-content:flex-start}
+.pref-tags{display:flex;flex-wrap:wrap;gap:10rpx;flex-shrink:0;padding:4rpx 0}
 .pref-tag{
-  display:inline-flex;padding:12rpx 0;font-size:23rpx;font-weight:700;
+  display:flex;padding:12rpx 16rpx;font-size:26rpx;font-weight:700;
   background:#ffecda;color:var(--thd);border:3rpx solid var(--th);
   box-shadow:3rpx 3rpx 0 var(--thd);
   transition:all .15s;font-family:monospace;align-items:center;justify-content:center;
-  width:calc(25% - 7.5rpx);text-align:center;
 }
 .pref-tag.active{
   background:var(--thl);color:var(--thd);font-weight:800;
