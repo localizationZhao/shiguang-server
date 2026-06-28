@@ -8,7 +8,7 @@ page {
   --gap: 20rpx;
 
   font-family: -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-  background: linear-gradient(180deg, #66b0ff, #bfbbff);
+  background: linear-gradient(180deg, #8db8e8, #c8c0e8);
   background-attachment: fixed;
   color: #3f2c15;
   font-size: 28rpx;

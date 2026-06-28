@@ -40,7 +40,7 @@
 @keyframes scrollNames{0%{transform:translateY(60rpx)}100%{transform:translateY(-1600rpx)}}
 
 /* ===== 标签便签按钮 ===== */
-.pref-tags{display:flex;flex-wrap:wrap;gap:14rpx;flex-shrink:0;padding:4rpx 0}
+.pref-tags{display:flex;flex-wrap:wrap;gap:20rpx;flex-shrink:0;padding:4rpx 0}
 .pref-tag{
   display:flex;padding:14rpx 20rpx;font-size:32rpx;font-weight:700;
   background:#ffecda;color:var(--thd);

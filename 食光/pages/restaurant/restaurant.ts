@@ -171,7 +171,7 @@ Page({
       const code = app.globalData.pendingInviteCode
       app.globalData.pendingInviteCode = ''
       const rests = getRestaurants()
-      let target = rests.find((r: any) => r.inviteCode === code)
+      let target = rests.find((r: any) => r.inviteCode === code && !r.closed)
       if (!target) {
         // 本地没找到，从云端查（离线模式跳过）
         const app2 = getApp<IAppOption>()
@@ -270,8 +270,11 @@ Page({
 
   switchRest(e: any) {
     const idx = parseInt(e.currentTarget.dataset.index)
-    // 切换餐厅时重置_lastRestId让refreshAll用idx定位
-    ;(this as any)._lastRestId = 0
+    // 先算出目标餐厅ID，让refreshAll用ID匹配
+    const allRests = getRestaurants()
+    const r = this.data.role
+    const rests = (r === 'owner' ? allRests.filter((x: any) => x.owner) : allRests.filter((x: any) => !x.owner)).filter((x: any) => !x.closed)
+    if (rests[idx]) (this as any)._lastRestId = rests[idx].id
     this.setData({ activeRestIdx: idx, tab: 'menu', orderRestFilter: 0, orderFilter: 'all' })
     this.refreshAll()
   },
@@ -712,7 +715,7 @@ Page({
     const input = (this.data.joinCode || '').trim().toUpperCase()
     if (!input) { wx.showToast({ title: '请输入邀请码', icon: 'none' }); return }
     const rests = getRestaurants()
-    let target = rests.find((r: any) => r.owner && r.inviteCode === input)
+    let target = rests.find((r: any) => r.owner && r.inviteCode === input && !r.closed)
     if (!target) {
       // 本地没有，查云端
       const app = getApp<IAppOption>()
@@ -779,9 +782,9 @@ Page({
     if (target.owner) {
       const isOwn = target.id === this.data.activeRest?.id
       if (!isOwn) {
-        const joined = rests.filter((r: any) => !r.owner)
+        const joined = rests.filter((r: any) => !r.owner && !r.closed)
         if (joined.length >= 3) { wx.showToast({ title: '最多加入3个', icon: 'none' }); return }
-        if (rests.find((r: any) => !r.owner && r.originalId === target.id)) {
+        if (rests.find((r: any) => !r.owner && !r.closed && r.originalId === target.id)) {
           wx.showToast({ title: '已加入过了', icon: 'none' }); return
         }
       }
@@ -1490,7 +1493,7 @@ Page({
   _joinByCloudRest(cloudRest: any, code: string) {
     const rests = getRestaurants()
     // 检查是否已经加入过
-    const existing = rests.filter((r: any) => !r.owner)
+    const existing = rests.filter((r: any) => !r.owner && !r.closed)
     if (existing.find((r: any) => r.originalId === cloudRest.id)) {
       // 已加入，直接进入
       this.setData({ role: 'customer' })
