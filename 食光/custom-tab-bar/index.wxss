@@ -48,23 +48,39 @@
   transition: all .2s;
 }
 
-/* ===== 选中态（每个Tab用自己的颜色） ===== */
+/* ===== 未选中态：淡色 ===== */
+.tab-item .tab-icon-img {
+  opacity: .5;
+}
+.tab-item .tab-text {
+  color: #a8b0c0;
+  font-weight: 500;
+}
+
+/* ===== 选中态——纯色加深填充 ===== */
 .tab-item.active {
-  background: rgba(255,73,151,0.08);
+  background: var(--tab-color, #ff4997);
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.15), 0 2rpx 0 rgba(0,0,0,0.1);
+  margin: 2rpx 6rpx;
 }
 .tab-item.active .tab-icon-img {
-  width: 56rpx; height: 56rpx;
-  transform: translateY(-6rpx);
+  width: 50rpx; height: 50rpx;
+  transform: translateY(-4rpx);
+  opacity: 1;
+  background: rgba(255,255,255,0.25);
+  border-radius: 50%;
+  padding: 6rpx;
 }
 .tab-item.active .tab-text {
   font-size: 26rpx; font-weight: 800;
-  color: var(--tab-color, #ff4997);
+  color: #fff;
+  text-shadow: 0 1rpx 2rpx rgba(0,0,0,0.15);
 }
 
-/* 选中指示线用各自颜色 */
+/* 选中指示线——白色短线 */
 .tab-line {
   width: 36rpx; height: 6rpx;
   border-radius: 3rpx;
-  background: var(--tab-color, #ff4997);
+  background: rgba(255,255,255,0.8);
   margin-top: 2rpx;
 }
