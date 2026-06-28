@@ -55,11 +55,10 @@
       </view>
 
 
-      <!-- 菜谱卡片网格——便签风 -->
+      <!-- 正方形菜谱卡片网格 -->
       <scroll-view class="recipe-grid" scroll-y enhanced show-scrollbar="{{false}}" wx:if="{{!isEmpty}}">
         <view
           class="sticky-note {{isManageMode && selectedIds.indexOf(item.id) >= 0 ? 'selected' : ''}}"
-          style="--hl:{{item.color || '#ff8baa'}}"
           wx:for="{{filteredRecipes}}"
           wx:key="id"
           data-id="{{item.id}}"
@@ -71,17 +70,13 @@
               <text wx:if="{{selectedIds.indexOf(item.id) >= 0}}">✓</text>
             </view>
           </view>
-          <!-- 彩色标题栏 -->
-          <view class="sticky-hd"><text>{{item.name}}</text></view>
-          <!-- 奶油色内容区 -->
+          <!-- 封面 -->
           <view class="sticky-bd">
             <image class="sticky-cover" wx:if="{{item.coverImg}}" src="{{item.coverImg}}" mode="aspectFill"></image>
             <text wx:else class="sticky-emoji">{{item.coverEmoji || '🍽️'}}</text>
-            <view class="sticky-meta">
-              <text class="sticky-price {{item.price ? '' : 'free'}}">{{item.price ? '¥' + item.price : '免费'}}</text>
-              <text class="sticky-cat">{{item.category}}</text>
-            </view>
           </view>
+          <!-- 名字 -->
+          <view class="sticky-hd"><text>{{item.name}}</text></view>
         </view>
       </scroll-view>
 
