@@ -26,10 +26,10 @@
 
   <!-- 餐厅标签 -->
   <scroll-view class="rest-tabs-scroll" scroll-x enhanced show-scrollbar="{{false}}" enable-flex>
-    <view class="rest-tab {{item.owner ? 'owner-tab' : 'join-tab'}} {{activeRestIdx === idx ? 'active' : ''}}"
+    <view class="rest-tab {{activeRestIdx === idx ? 'active' : ''}}"
       wx:for="{{restaurants}}" wx:key="id" wx:for-index="idx"
       data-index="{{idx}}" bindtap="switchRest" bindlongpress="longPressRest">
-      <view class="rest-tab-dot {{item.owner ? 'dot-owner' : 'dot-join'}}"></view>
+      <view class="rest-tab-dot"></view>
       <text>{{item.name}}</text>
       <text class="rest-tab-role">{{item.owner ? '店' : '客'}}</text>
     </view>
