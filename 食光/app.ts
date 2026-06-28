@@ -108,17 +108,21 @@ App<IAppOption>({
 
     // 处理扫码进入（小程序码 scene 参数）
     const launchOptions = wx.getLaunchOptionsSync()
-    if (launchOptions.scene) {
-      this.globalData.pendingInviteCode = decodeURIComponent(launchOptions.scene)
-      console.log('[扫码进店] invite:', this.globalData.pendingInviteCode)
+    const launchScene = launchOptions.scene ? decodeURIComponent(launchOptions.scene) : ''
+    if (launchScene) {
+      this.globalData._lastScene = launchScene
+      this.globalData.pendingInviteCode = launchScene
+      console.log('[扫码进店] invite:', launchScene)
     }
   },
 
   onShow() {
-    // 每次切回前台检查扫码参数
+    // 只在有新扫码参数时才设置（避免每次切Tab都触发）
     const enterOptions = wx.getEnterOptionsSync()
-    if (enterOptions.scene) {
-      this.globalData.pendingInviteCode = decodeURIComponent(enterOptions.scene)
+    const scene = enterOptions.scene ? decodeURIComponent(enterOptions.scene) : ''
+    if (scene && scene !== this.globalData._lastScene) {
+      this.globalData._lastScene = scene
+      this.globalData.pendingInviteCode = scene
     }
   },
 
