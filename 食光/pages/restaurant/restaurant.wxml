@@ -286,7 +286,7 @@
       <view class="form-group">
         <text class="form-label">输入邀请码</text>
         <input class="form-input" placeholder="店主分享的邀请码" value="{{joinCode}}" bindinput="onJoinCodeInput" bindblur="checkAvailableSeats"/>
-        <text style="font-size:20rpx;color:rgba(63,44,21,0.3);margin-top:8rpx;display:block">邀请码10分钟有效，输入后点空白处查看空位</text>
+        <text style="font-size:20rpx;color:rgba(63,44,21,0.3);margin-top:8rpx;display:block">邀请码24小时有效，输入后点空白处查看空位</text>
       </view>
 
       <!-- 神秘食客开关 -->
@@ -517,7 +517,7 @@
       </view>
 
       <view style="background:rgba(0,0,0,0.03);padding:14rpx;margin:12rpx 0;border:2rpx dashed var(--hl)">
-        <text style="font-size:20rpx;color:rgba(63,44,21,0.4);display:block">邀请码（10分钟有效）</text>
+        <text style="font-size:20rpx;color:rgba(63,44,21,0.4);display:block">邀请码（24小时有效）</text>
         <text style="font-size:36rpx;font-weight:800;color:var(--hl);font-family:monospace">{{activeRest ? activeRest.inviteCode || '---' : '---'}}</text>
       </view>
       <view style="display:flex;gap:8rpx">
@@ -641,7 +641,7 @@
       <view class="rest-info-row"><text class="rir-l">食客人数</text><text class="rir-v">{{activeRest ? activeRest.members.length : 0}} 位</text></view>
       <view class="rest-info-row"><text class="rir-l">评分</text><text class="rir-v">⭐ {{avgRating}}</text></view>
       <view class="rest-code-box">
-        <text class="rcb-label">邀请码（10分钟有效）</text>
+        <text class="rcb-label">邀请码（24小时有效）</text>
         <text class="rcb-code">{{activeRest ? activeRest.inviteCode || '---' : '---'}}</text>
       </view>
       <view class="rcb-btns">
@@ -659,4 +659,4 @@
 </view>
 
 <!-- 口袋小鸟 -->
-<pocket-bird hidden="{{!showPocketBird || birdInteriorOnly}}" pixelSize="3" pageTargets="{{birdTargets}}" />
+<pocket-bird wx:if="{{showPocketBird && !birdInteriorOnly}}" pixelSize="3" pageTargets="{{birdTargets}}" />

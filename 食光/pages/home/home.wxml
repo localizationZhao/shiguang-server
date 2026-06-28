@@ -182,4 +182,4 @@
 <view class="float-food" style="left:78%;animation-delay:-18s">🍲</view>
 
 <!-- 口袋小鸟 -->
-<pocket-bird hidden="{{!showPocketBird}}" pixelSize="3" pageTargets="{{birdTargets}}" scrollTop="{{birdScrollTop}}" />
+<pocket-bird wx:if="{{showPocketBird}}" pixelSize="3" pageTargets="{{birdTargets}}" scrollTop="{{birdScrollTop}}" />

@@ -114,4 +114,4 @@
 </view>
 
 <!-- 口袋小鸟 -->
-<pocket-bird hidden="{{!showPocketBird}}" pixelSize="3" pageTargets="{{birdTargets}}" />
+<pocket-bird wx:if="{{showPocketBird}}" pixelSize="3" pageTargets="{{birdTargets}}" />

@@ -738,9 +738,9 @@ Page({
       })
       return
     }
-    // 邀请码有效期延长到24小时
-    if (target.codeExpire && Date.now() > target.codeExpire + 86400000) {
-      wx.showToast({ title: '邀请码已过期，请联系店主刷新', icon: 'none' }); return
+    // 邀请码有效期24小时
+    if (target.codeExpire && Date.now() > target.codeExpire) {
+      wx.showToast({ title: '邀请码已过期，请联系店主刷新~', icon: 'none' }); return
     }
     if (target.owner) {
       this.doJoinRest(rests, target)
@@ -1430,7 +1430,7 @@ Page({
     const rest = rests[this.data.activeRestIdx]
     if (!rest || !rest.owner) return
     rest.inviteCode = 'SG' + Date.now().toString(36).toUpperCase().slice(-8)
-    rest.codeExpire = Date.now() + 600000
+    rest.codeExpire = Date.now() + 86400000 // 24小时有效
     saveRestaurants(rests)
     this.refreshAll()
     wx.showToast({ title: '邀请码已刷新', icon: 'success' })
