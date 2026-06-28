@@ -1,6 +1,6 @@
 /* 餐厅 - 像素便签风 */
 
-.page{height:100vh;display:flex;flex-direction:column;padding:0 14rpx;gap:6rpx;padding-bottom:150rpx}
+.page{height:100vh;display:flex;flex-direction:column;padding:0 16rpx;gap:10rpx;padding-bottom:150rpx}
 
 /* ===== 空状态 ===== */
 .empty-rest{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16rpx;background:var(--bg);margin:8rpx;padding:40rpx;
@@ -15,14 +15,15 @@
 .hint-text{font-size:20rpx;color:rgba(63,44,21,0.3);text-align:center}
 
 /* ===== 餐厅标签 ===== */
-.rest-tabs-scroll{display:flex;flex-shrink:0;gap:6rpx;white-space:nowrap;padding:2rpx 2rpx}
-.rest-tab{display:inline-flex;align-items:center;gap:4rpx;padding:6rpx 14rpx;font-size:21rpx;color:rgba(63,44,21,0.55);border-radius:6rpx;margin-right:2rpx;position:relative;
+.rest-tabs-scroll{display:flex;flex-shrink:0;gap:10rpx;white-space:nowrap;padding:4rpx 4rpx}
+.rest-tab{display:inline-flex;align-items:center;gap:6rpx;padding:8rpx 18rpx;font-size:22rpx;color:rgba(63,44,21,0.55);border-radius:6rpx;margin-right:4rpx;position:relative;
   background:rgba(255,255,255,0.7);
   box-shadow:2rpx 0 var(--hl),-2rpx 0 var(--hl),0 -2rpx var(--hl),0 2rpx var(--hl),
     4rpx 0 var(--hl),-4rpx 0 var(--hl),0 -4rpx var(--hl),0 4rpx var(--hl),
     0 0 0 2rpx var(--hl),0 0 0 4rpx #fff,
     4rpx 0 0 2rpx #fff,-4rpx 0 0 2rpx #fff,
     0 -4rpx 0 2rpx #fff,0 4rpx 0 2rpx #fff}
+/* 选中态——奶油色填充 */
 .rest-tab.active{font-weight:700;color:#3f2c15;
   background:#ffecda;
   box-shadow:2rpx 0 var(--hl),-2rpx 0 var(--hl),0 -2rpx var(--hl),0 2rpx var(--hl),
@@ -30,7 +31,7 @@
     0 0 0 2rpx var(--hl),0 0 0 4rpx #fff,
     4rpx 0 0 2rpx #fff,-4rpx 0 0 2rpx #fff,
     0 -4rpx 0 2rpx #fff,0 4rpx 0 2rpx #fff;
-  transform:translateY(-1rpx)}
+  transform:translateY(-2rpx)}
 /* 店主/食客颜色跟随用户主题 */
 .rest-tab.owner-tab{--tab-accent:var(--hl)}
 .rest-tab.join-tab{--tab-accent:var(--hl)}
@@ -50,49 +51,50 @@
   border-radius:6rpx}
 
 /* ===== 操作栏 ===== */
-.top-bar{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:8rpx 14rpx;background:var(--bg);
+.top-bar{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:12rpx 16rpx;background:var(--bg);
   box-shadow:var(--border) 0 var(--hl),var(--neg-border) 0 var(--hl),0 calc(var(--neg-border)) var(--hl),0 var(--border) var(--hl)}
-.role-switch{display:flex;align-items:center;gap:4rpx;font-size:20rpx;color:rgba(63,44,21,0.5)}
-.role-tag{padding:4rpx 12rpx;font-weight:600;color:#3f2c15;background:rgba(255,255,255,0.5);border:2rpx solid var(--hl)}
+.role-switch{display:flex;align-items:center;gap:6rpx;font-size:22rpx;color:rgba(63,44,21,0.5)}
+.role-tag{padding:6rpx 14rpx;font-weight:600;color:#3f2c15;background:rgba(255,255,255,0.5);border:2rpx solid var(--hl)}
 .role-tag.owner{color:var(--hl);background:rgba(255,163,203,0.08)}
-.role-hint{font-size:16rpx;color:rgba(63,44,21,0.3)}.top-btns{display:flex;gap:8rpx;flex-wrap:wrap}
-.top-btn{font-size:20rpx;color:var(--hl);font-weight:600;padding:4rpx 6rpx}
-.theme-dots{display:flex;gap:6rpx;align-items:center}
-.theme-dot{width:22rpx;height:22rpx;border:2rpx solid transparent}
+.role-hint{font-size:18rpx;color:rgba(63,44,21,0.3)}.top-btns{display:flex;gap:12rpx;flex-wrap:wrap}
+.top-btn{font-size:22rpx;color:var(--hl);font-weight:600;padding:4rpx 8rpx}
+.theme-dots{display:flex;gap:8rpx;align-items:center}
+.theme-dot{width:24rpx;height:24rpx;border:2rpx solid transparent}
 .theme-dot.active{border-color:#3f2c15;box-shadow:0 0 0 3rpx rgba(0,0,0,0.1)}
 .theme-dot:active{transform:scale(1.2)}
 
-.owner-actions{display:flex;gap:12rpx;margin-bottom:10rpx;padding:6rpx 0}
+/* 店主操作按钮 */
+.owner-actions{display:flex;gap:16rpx;margin-bottom:14rpx;padding:10rpx 0}
 .enter-btn{color:#ffb37c;border:2rpx solid #ffb37c;padding:4rpx 12rpx}
 .del-btn{color:#f85149;border:2rpx solid #f85149;padding:4rpx 8rpx}
 
 /* ===== Tab导航 - 像素风 ===== */
-.tab-nav{display:flex;flex-shrink:0;gap:6rpx;padding:6rpx;background:var(--bg);
+.tab-nav{display:flex;flex-shrink:0;gap:8rpx;padding:8rpx;background:var(--bg);
   box-shadow:var(--border) 0 var(--hl),var(--neg-border) 0 var(--hl),0 calc(var(--neg-border)) var(--hl),0 var(--border) var(--hl)}
-.tab-nav-item{flex:1;text-align:center;padding:12rpx 6rpx;font-size:22rpx;font-weight:700;color:rgba(63,44,21,0.4);font-family:monospace;background:#ffecda;border:3rpx solid var(--hl);box-shadow:3rpx 3rpx 0 var(--rhl);transition:all .12s}
+.tab-nav-item{flex:1;text-align:center;padding:16rpx 8rpx;font-size:24rpx;font-weight:700;color:rgba(63,44,21,0.4);font-family:monospace;background:#ffecda;border:3rpx solid var(--hl);box-shadow:3rpx 3rpx 0 var(--rhl);transition:all .12s}
 .tab-nav-item:active{transform:translate(2rpx,2rpx);box-shadow:1rpx 1rpx 0 var(--rhl)}
 .tab-nav-item.active{background:var(--hl);color:var(--bg);font-weight:800;box-shadow:4rpx 4rpx 0 var(--rhd);transform:scale(1.03)}
 
 /* ===== 内容区 ===== */
-.content-area{flex:1;margin-bottom:6rpx;background:var(--bg);padding:12rpx 14rpx;
+.content-area{flex:1;margin-bottom:8rpx;background:var(--bg);padding:16rpx;
   box-shadow:var(--border) 0 var(--hl),var(--neg-border) 0 var(--hl),0 calc(var(--neg-border)) var(--hl),0 var(--border) var(--hl)}
-.section-t{font-size:24rpx;font-weight:700;color:#3f2c15;display:block;margin-bottom:10rpx}
+.section-t{font-size:26rpx;font-weight:700;color:#3f2c15;display:block;margin-bottom:14rpx;font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif}
 
 /* ===== 菜单 ===== */
-.menu-item{display:flex;align-items:center;gap:12rpx;padding:16rpx 14rpx;background:rgba(255,255,255,0.5);border:2rpx solid var(--hl);margin-bottom:8rpx}
+.menu-item{display:flex;align-items:center;gap:14rpx;padding:14rpx;background:rgba(255,255,255,0.5);border:2rpx solid var(--hl);margin-bottom:10rpx}
 .menu-item:active{transform:scale(.98)}
-.mi-emoji{width:48rpx;height:48rpx;display:flex;align-items:center;justify-content:center;font-size:26rpx;background:linear-gradient(135deg,var(--hl),var(--rhl));border:2rpx solid var(--hl);flex-shrink:0}
-.mi-info{flex:1;display:flex;flex-direction:column;justify-content:center}.mi-name{font-size:24rpx;font-weight:600;color:#3f2c15;display:block}.mi-price{font-size:22rpx;font-weight:700;color:var(--hl)}
-.mi-check{width:32rpx;height:32rpx;border-radius:50%;border:3rpx solid var(--hl);display:flex;align-items:center;justify-content:center;font-size:18rpx;font-weight:700;color:transparent;flex-shrink:0}
+.mi-emoji{width:52rpx;height:52rpx;display:flex;align-items:center;justify-content:center;font-size:28rpx;background:linear-gradient(135deg,var(--hl),var(--rhl));border:2rpx solid var(--hl)}
+.mi-info{flex:1}.mi-name{font-size:24rpx;font-weight:600;color:#3f2c15;display:block}.mi-price{font-size:26rpx;font-weight:700;color:var(--hl)}
+.mi-check{width:30rpx;height:30rpx;border-radius:50%;border:3rpx solid var(--hl);display:flex;align-items:center;justify-content:center;font-size:18rpx;font-weight:700;color:transparent}
 .mi-check.checked{background:var(--hl);color:var(--bg)}
-.submit-btn{width:calc(100% - 28rpx);margin:16rpx 14rpx 8rpx}
+.submit-btn{width:100%;margin-top:14rpx}
 
 /* 店主下架按钮 */
 .mi-unshelf{padding:4rpx 12rpx;font-size:18rpx;color:#f85149;border:2rpx solid #f85149;font-weight:600;flex-shrink:0}
 .mi-unshelf:active{background:#f85149;color:#fff}
 
 /* 悬浮上架按钮 */
-.float-shelf-btn{position:sticky;bottom:0;text-align:center;padding:14rpx;background:var(--hl);color:var(--bg);font-weight:700;font-size:24rpx;margin:12rpx 14rpx 8rpx;z-index:10}
+.float-shelf-btn{position:sticky;bottom:0;text-align:center;padding:16rpx;background:var(--hl);color:var(--bg);font-weight:700;font-size:26rpx;margin-top:12rpx;z-index:10}
 
 /* 已下架菜品 */
 .menu-item.off-shelf{opacity:0.45;position:relative;overflow:hidden}
@@ -263,15 +265,14 @@
 .custom-toast.show{opacity:0.95;pointer-events:auto}
 
 /* 催单次数 */
-.oc-urge{display:block;font-size:18rpx;color:#f85149;margin-top:2rpx;font-weight:600}
-.urge-hint{font-size:16rpx;color:rgba(63,44,21,0.25);display:block;margin-top:4rpx}
+.oc-urge{display:block;font-size:20rpx;color:#f85149;margin-top:4rpx;font-weight:600}
 
 /* 交流记录 */
-.oc-chat{margin-top:8rpx;padding-top:8rpx;border-top:1rpx dashed rgba(0,0,0,0.08)}
-.oc-chat-title{font-size:18rpx;color:rgba(63,44,21,0.4);display:block;margin-bottom:4rpx}
-.oc-chat-msg{display:flex;align-items:center;gap:6rpx;padding:2rpx 0;font-size:19rpx}
-.oc-chat-from{flex-shrink:0}.oc-chat-txt{flex:1;color:#3f2c15}.oc-chat-time{font-size:17rpx;color:rgba(63,44,21,0.3);flex-shrink:0;text-align:right}
-.oc-chat-del{font-size:17rpx;color:rgba(63,44,21,0.3);padding:2rpx 4rpx;flex-shrink:0}
+.oc-chat{margin-top:12rpx;padding-top:10rpx;border-top:2rpx dashed rgba(0,0,0,0.06)}
+.oc-chat-title{font-size:20rpx;color:rgba(63,44,21,0.4);display:block;margin-bottom:6rpx}
+.oc-chat-msg{display:flex;align-items:center;gap:8rpx;padding:4rpx 0;font-size:20rpx}
+.oc-chat-from{flex-shrink:0}.oc-chat-txt{flex:1;color:#3f2c15}.oc-chat-time{font-size:18rpx;color:rgba(63,44,21,0.3);flex-shrink:0}
+.oc-chat-del{font-size:18rpx;color:rgba(63,44,21,0.3);padding:2rpx 6rpx;flex-shrink:0}
 
 /* 星级评分 */
 .star-row{display:flex;justify-content:center;gap:8rpx}
@@ -280,9 +281,9 @@
 .hs-btn{padding:6rpx 18rpx;font-size:22rpx;background:rgba(0,0,0,0.03);color:rgba(63,44,21,0.4);border-radius:8rpx;border:2rpx solid transparent}.hs-btn.on{border-color:#e3b341;color:#e3b341;font-weight:700}
 
 /* 评价展示 */
-.oc-review{margin-top:8rpx;padding:8rpx 12rpx;background:rgba(255,255,255,0.5);border:1rpx solid rgba(0,0,0,0.04)}
-.oc-review-stars{font-size:20rpx;color:#e3b341;display:block}
-.oc-review-txt{font-size:19rpx;color:rgba(63,44,21,0.5);display:block;font-style:italic;margin:2rpx 0}
+.oc-review{margin-top:10rpx;padding:10rpx;background:rgba(255,255,255,0.5);border:1rpx solid rgba(0,0,0,0.04)}
+.oc-review-stars{font-size:22rpx;color:#e3b341;display:block}
+.oc-review-txt{font-size:20rpx;color:rgba(63,44,21,0.5);display:block;font-style:italic;margin:4rpx 0}
 .oa-btn.sm{padding:4rpx 12rpx;font-size:18rpx;border:1rpx solid var(--hl);background:transparent;color:var(--hl)}.oa-btn.sm.on{background:var(--hl);color:var(--bg)}
 
 /* ===== 餐厅详情便签 - 橙色 ===== */
@@ -302,23 +303,22 @@
 .rest-review{padding:12rpx;background:rgba(255,255,255,0.5);border:1rpx solid rgba(0,0,0,0.04);margin-bottom:8rpx}.rr-stars{font-size:22rpx;color:#e3b341;display:block}.rr-text{font-size:20rpx;color:rgba(63,44,21,0.5);font-style:italic;margin-top:4rpx;display:block}
 
 /* ===== 订单 ===== */
-.order-card{background:rgba(255,255,255,0.5);border:2rpx solid var(--hl);padding:16rpx 14rpx;margin-bottom:10rpx;box-shadow:3rpx 3rpx 0 var(--rhl)}
-.order-filters{display:flex;gap:6rpx;margin-bottom:10rpx;flex-wrap:wrap;align-items:center;justify-content:center}
-.order-filters.pipeline{gap:2rpx}
-.order-rest-filters{display:flex;gap:6rpx;margin-bottom:6rpx;flex-wrap:wrap}
+.order-filters{display:flex;gap:8rpx;margin-bottom:14rpx;flex-wrap:wrap;align-items:center}
+.order-filters.pipeline{gap:4rpx}
+.order-rest-filters{display:flex;gap:8rpx;margin-bottom:8rpx;flex-wrap:wrap}
 .of-chip.closed{opacity:0.5;text-decoration:line-through}
-.pipe-arrow{font-size:16rpx;color:rgba(63,44,21,0.25);font-weight:700}
-.of-chip{padding:8rpx 16rpx;font-size:19rpx;background:#ffecda;color:rgba(63,44,21,0.5);border:3rpx solid var(--hl);font-weight:600;font-family:monospace;box-shadow:3rpx 3rpx 0 var(--rhl);transition:all .12s;text-align:center;min-width:100rpx}
+.pipe-arrow{font-size:20rpx;color:rgba(63,44,21,0.3);font-weight:700}
+.of-chip{padding:10rpx 18rpx;font-size:20rpx;background:#ffecda;color:rgba(63,44,21,0.5);border:3rpx solid var(--hl);font-weight:600;font-family:monospace;box-shadow:3rpx 3rpx 0 var(--rhl);transition:all .12s}
 .of-chip:active{transform:translate(2rpx,2rpx);box-shadow:1rpx 1rpx 0 var(--rhl)}
 .of-chip.active{background:var(--hl);color:var(--bg);font-weight:800;box-shadow:4rpx 4rpx 0 var(--rhd)}
-.oc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6rpx}
-.oc-user{font-size:23rpx;font-weight:600;color:#3f2c15}
-.oc-status{font-size:18rpx;padding:2rpx 8rpx;border:2rpx solid;font-weight:600;border-radius:6rpx;flex-shrink:0}
+.oc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8rpx}
+.oc-user{font-size:24rpx;font-weight:600;color:#3f2c15}
+.oc-status{font-size:20rpx;padding:3rpx 10rpx;border:2rpx solid;font-weight:600}
 .st-pending{border-color:#e3b341;color:#856404;background:rgba(255,243,205,0.4)}.st-cooking{border-color:#79c0ff;color:#0c5460;background:rgba(209,236,241,0.4)}.st-done{border-color:#7ee787;color:#155724;background:rgba(212,237,218,0.4)}.st-rating{border-color:#ffb37c;color:#8a5a20;background:rgba(255,179,124,0.15)}.st-rejected{border-color:#f85149;color:#8b0000;background:rgba(248,81,73,0.1)}
-.oc-items{font-size:21rpx;color:rgba(63,44,21,0.5);display:block;margin-bottom:4rpx}
-.oc-time{font-size:18rpx;color:rgba(63,44,21,0.4);display:block;margin-bottom:8rpx}
-.oc-actions{display:flex;gap:6rpx;justify-content:flex-end}
-.oa-btn{padding:5rpx 14rpx;font-size:19rpx;font-weight:600;border:none}
+.oc-items{font-size:22rpx;color:rgba(63,44,21,0.5);display:block;margin-bottom:4rpx}
+.oc-time{font-size:20rpx;color:rgba(63,44,21,0.4);display:block;margin-bottom:10rpx}
+.oc-actions{display:flex;gap:8rpx;justify-content:flex-end}
+.oa-btn{padding:6rpx 16rpx;font-size:20rpx;font-weight:600;border:none;font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif}
 .oa-btn.accept{background:#7ee787;color:#fff;box-shadow:2rpx 2rpx 0 #5aaf5a}
 .oa-btn.reject{background:transparent;color:#f85149;border:2rpx solid #f85149}
 .oa-btn.finish{background:var(--hl);color:var(--bg)}
