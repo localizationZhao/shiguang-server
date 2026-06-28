@@ -7,12 +7,12 @@
   box-shadow:var(--border) 0 var(--hl),var(--neg-border) 0 var(--hl),0 calc(var(--neg-border)) var(--hl),0 var(--border) var(--hl),calc(var(--border)*2) 0 var(--hl),calc(var(--neg-border)*2) 0 var(--hl),0 calc(var(--neg-border)*2) var(--hl),0 calc(var(--border)*2) var(--hl),0 0 0 var(--border) var(--hl),0 0 0 calc(var(--border)*2) #fff,calc(var(--border)*2) 0 0 var(--border) #fff,calc(var(--neg-border)*2) 0 0 var(--border) #fff,0 calc(var(--neg-border)*2) 0 var(--border) #fff,0 calc(var(--border)*2) 0 var(--border) #fff)}
 
 /* ===== 左侧分类 ===== */
-.cat-sidebar{width:120rpx;flex-shrink:0;background:rgba(255,236,218,0.6);border-right:3rpx solid var(--hl);padding:5rpx 0}
-.cat-item{padding:18rpx 5rpx;text-align:center;font-size:22rpx;font-weight:700;font-family:monospace;margin:4rpx 5rpx;background:#ffecda;color:#e0a0b8;border:3rpx solid #f5c8d8;box-shadow:3rpx 3rpx 0 #e8c0d0;transition:all .15s}
+.cat-sidebar{width:155rpx;flex-shrink:0;background:rgba(255,236,218,0.6);border-right:3rpx solid var(--hl);padding:6rpx 0}
+.cat-item{padding:22rpx 6rpx;text-align:center;font-size:26rpx;font-weight:700;font-family:monospace;margin:4rpx 6rpx;background:#ffecda;color:#e0a0b8;border:3rpx solid #f5c8d8;box-shadow:3rpx 3rpx 0 #e8c0d0;transition:all .15s}
 .cat-item:active{transform:translate(2rpx,2rpx);box-shadow:1rpx 1rpx 0 #e8c0d0}
 .cat-item.active{background:#fce4ec;color:#d4809a;font-weight:800}
-.cat-count{font-size:18rpx;color:rgba(63,44,21,0.3);display:block;margin-top:2rpx}
-.cat-manage-btn{margin:10rpx 14rpx;padding:8rpx;text-align:center;font-size:20rpx;color:rgba(63,44,21,0.4);border:2rpx dashed var(--hl)}
+.cat-count{font-size:20rpx;color:rgba(63,44,21,0.3);display:block;margin-top:2rpx}
+.cat-manage-btn{margin:10rpx 14rpx;padding:10rpx;text-align:center;font-size:22rpx;color:rgba(63,44,21,0.4);border:2rpx dashed var(--hl)}
 
 /* ===== 右侧内容 ===== */
 .diy-content{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -50,7 +50,7 @@
 .sticky-hd{background:var(--hl,#FF9A56);padding:8rpx 14rpx;text-align:center;font-size:22rpx;font-weight:700;color:#fff}
 .sticky-hd text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 /* 封面区——撑满剩余空间 */
-.sticky-bd{flex:1;display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden}
+.sticky-bd{flex:1;display:flex;align-items:center;justify-content:center;background:#ffecda;overflow:hidden}
 .sticky-cover{width:100%;height:100%}
 .sticky-emoji{font-size:68rpx}
 /* 勾选 */
