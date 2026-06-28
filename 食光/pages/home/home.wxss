@@ -42,7 +42,7 @@
 /* ===== 标签便签按钮 ===== */
 .pref-tags{display:flex;flex-wrap:wrap;gap:10rpx;flex-shrink:0;padding:4rpx 0}
 .pref-tag{
-  display:flex;padding:12rpx 16rpx;font-size:26rpx;font-weight:700;
+  display:flex;padding:14rpx 20rpx;font-size:32rpx;font-weight:700;
   background:#ffecda;color:var(--thd);border:3rpx solid var(--th);
   box-shadow:3rpx 3rpx 0 var(--thd);
   transition:all .15s;font-family:monospace;align-items:center;justify-content:center;
