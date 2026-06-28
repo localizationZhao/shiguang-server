@@ -110,8 +110,8 @@ Component({
         var st = self.properties.scrollTop || 0;
         self.setData({ birdLeft: x - hw / 2, birdBottom: y + st });
       }
-      // 每60帧自动保存位置（约1秒一次）
-      if (self._fc % 60 === 0) self._saveState();
+      // 每180帧自动保存位置（约3秒一次，减少存储写入）
+      if (self._fc % 180 === 0) self._saveState();
       if (self.data.showFeather) self._updFeather();
       // 帽子自动掉落：每60秒20%概率
       if (self._fc % 3600 === 0 && Math.random() < 0.2) self._spawnHat();

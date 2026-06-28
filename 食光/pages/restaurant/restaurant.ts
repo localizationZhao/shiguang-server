@@ -74,7 +74,7 @@ Page({
     // ===== 新增：选鸟 =====
     showBirdPicker: false,
     birdTypes: BIRD_TYPES,
-    selectedBird: 'bluebird',
+    selectedBird: '32x32x1',
     joinNickname: '',
     myNick: '', // 当前用户昵称（用于退出按钮比对）
 
@@ -193,7 +193,7 @@ Page({
       this.setData({
         joinCode: code,
         selectedSeat: autoSeat,
-        selectedBird: 'bluebird',
+        selectedBird: '32x32x1',
         selectedAccessory: '',
         selectedSoulColor: randomSoulColor()
       })
@@ -260,23 +260,23 @@ Page({
     this.refreshAll()
   },
 
-  // ===== 长按餐厅标签 → 管理菜单 =====
+  // ===== 长按餐厅标签 → 管理菜单（不切换餐厅） =====
   longPressRest(e: any) {
     const idx = parseInt(e.currentTarget.dataset.index)
     const rests = this.data.restaurants
     const rest = rests[idx]
     if (!rest) return
-    // 先切换到该餐厅
-    if (this.data.activeRestIdx !== idx) {
-      this.setData({ activeRestIdx: idx, tab: 'menu' })
-      this.refreshAll()
-    }
+    // 不自动切换！避免误触导致闪跳
     const that = this
     if (rest.owner) {
-      // 店主菜单
       wx.showActionSheet({
-        itemList: ['✏️ 编辑名称', '🔄 刷新邀请码', '📋 邀请码复制', '💀 闭店', 'ℹ️ 查看详情'],
+        itemList: ['✏️ 编辑名称', '🔄 刷新邀请码', '📋 复制邀请码', '💀 闭店', 'ℹ️ 查看详情', '📍 切换到此店'],
         success(res: any) {
+          // 先切换到该餐厅再执行操作
+          if (that.data.activeRestIdx !== idx) {
+            that.setData({ activeRestIdx: idx, tab: 'menu' })
+            that.refreshAll()
+          }
           switch (res.tapIndex) {
             case 0: that.openEditRest(); break
             case 1: that.refreshInviteCode(); break
@@ -286,17 +286,22 @@ Page({
               break
             case 3: that.deleteRestaurant(); break
             case 4: that.openRestDetail(); break
+            case 5: break // 已切换，无需额外操作
           }
         }
       })
     } else {
-      // 食客菜单
       wx.showActionSheet({
-        itemList: ['🚪 退出餐厅', 'ℹ️ 查看详情'],
+        itemList: ['🚪 退出餐厅', 'ℹ️ 查看详情', '📍 切换到此店'],
         success(res: any) {
+          if (that.data.activeRestIdx !== idx) {
+            that.setData({ activeRestIdx: idx, tab: 'menu' })
+            that.refreshAll()
+          }
           switch (res.tapIndex) {
             case 0: that.leaveRestaurant(); break
             case 1: that.openRestDetail(); break
+            case 2: break
           }
         }
       })
@@ -531,7 +536,7 @@ Page({
         const seat = freeSeats.length > 0 ? freeSeats[0].id : 0
         member = {
           nickname: nick,
-          birdType: this.data.selectedBird || 'bluebird',
+          birdType: this.data.selectedBird || '32x32x1',
           birdColor: (BIRD_TYPES.find((b: any) => b.key === this.data.selectedBird) || {} as any).color || '#639bff',
           online: true,
           joinedAt: new Date().toISOString(),
@@ -610,7 +615,7 @@ Page({
     const profile = getUserProfile()
     this.setData({
       showJoinRest: true, joinCode: '',
-      showBirdPicker: true, selectedBird: 'bluebird',
+      showBirdPicker: true, selectedBird: '32x32x1',
       joinNickname: profile.nick || '美食家',
       selectedSeat: 0, availableSeats: [],
       selectedAccessory: '',
@@ -1468,7 +1473,7 @@ Page({
     this.setData({
       joinCode: code,
       selectedSeat: autoSeat,
-      selectedBird: 'bluebird',
+      selectedBird: '32x32x1',
       selectedAccessory: '',
       selectedSoulColor: randomSoulColor(),
       isMystery: false

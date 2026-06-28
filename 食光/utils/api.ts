@@ -106,7 +106,13 @@ export function generateQRCode(inviteCode: string): Promise<string> {
           const fs = wx.getFileSystemManager()
           const path = `${wx.env.USER_DATA_PATH}/qr_${Date.now()}.png`
           try {
-            // res.data 可能是 arrayBuffer
+            // 先清理旧QR文件（防止存储超限）
+            try {
+              const files = fs.readdirSync(wx.env.USER_DATA_PATH)
+              files.filter((f: string) => f.startsWith('qr_')).forEach((f: string) => {
+                try { fs.unlinkSync(`${wx.env.USER_DATA_PATH}/${f}`) } catch(e) {}
+              })
+            } catch(e) {}
             const arrayBuffer = res.data
             fs.writeFileSync(path, arrayBuffer, 'binary')
             resolve(path)
