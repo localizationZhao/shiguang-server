@@ -65,7 +65,11 @@ Page({
   setBirdMode(e: any) {
     const m = e.currentTarget.dataset.m
     wx.setStorageSync('birdDisplayMode', m)
-    this.setData({ birdMode: m, showPocketBird: m !== 'none' })
+    let show = false
+    if (m === 'all') show = true
+    else if (m === 'custom') show = this.data.birdPages.indexOf('profile') >= 0
+    else show = false // none/restaurant/interior
+    this.setData({ birdMode: m, showPocketBird: show })
   },
   toggleBirdPage(e: any) {
     const p = e.currentTarget.dataset.p
@@ -74,7 +78,9 @@ Page({
     if (idx >= 0) pages.splice(idx, 1)
     else pages.push(p)
     wx.setStorageSync('birdPages', pages)
-    this.setData({ birdPages: pages })
+    // 如果当前在自定义模式，即时更新本页小鸟显示
+    const show = this.data.birdMode === 'all' || (this.data.birdMode === 'custom' && pages.indexOf('profile') >= 0)
+    this.setData({ birdPages: pages, showPocketBird: this.data.birdMode === 'none' ? false : show })
   },
 
   _refresh() {
