@@ -1,0 +1,92 @@
+.admin-page {
+  height: 100vh;
+  background: #ffecda;
+  padding: 20rpx;
+}
+
+.admin-header {
+  text-align: center;
+  padding: 30rpx 0 20rpx;
+}
+
+.admin-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #1a1a2e;
+  display: block;
+}
+
+.admin-sub {
+  font-size: 26rpx;
+  color: #999;
+  margin-top: 8rpx;
+  display: block;
+}
+
+.admin-list {
+  padding-bottom: 60rpx;
+}
+
+.admin-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 3rpx 3rpx 0 #e8c8d8;
+  border: 3rpx solid #f5c8d8;
+}
+
+.admin-item:active {
+  background: #fce4ec;
+}
+
+.admin-cover {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 16rpx;
+  background: #ffecda;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.admin-thumb {
+  width: 100%;
+  height: 100%;
+}
+
+.admin-emoji {
+  font-size: 48rpx;
+}
+
+.admin-info {
+  flex: 1;
+}
+
+.admin-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #1a1a2e;
+  display: block;
+}
+
+.admin-status {
+  font-size: 24rpx;
+  color: #ff9a56;
+  margin-top: 4rpx;
+}
+
+.admin-status.done {
+  color: #6bcb77;
+}
+
+.admin-arrow {
+  font-size: 40rpx;
+  color: #ccc;
+  margin-left: 10rpx;
+}

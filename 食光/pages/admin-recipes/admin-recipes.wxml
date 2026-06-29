@@ -1,0 +1,23 @@
+<!-- 管理员配图页面 -->
+<navigation-bar title="🔐 管理公共菜谱" color="#1a1a2e" background="rgba(255,255,255,0.85)" back="{{true}}"></navigation-bar>
+
+<scroll-view class="admin-page" scroll-y enhanced show-scrollbar="{{false}}">
+  <view class="admin-header">
+    <text class="admin-title">📸 69道公共菜谱配图</text>
+    <text class="admin-sub">已配图：{{doneCount}} / {{recipes.length}}</text>
+  </view>
+
+  <view class="admin-list">
+    <view class="admin-item" wx:for="{{recipes}}" wx:key="id" bindtap="uploadCover" data-id="{{item.id}}" data-name="{{item.name}}">
+      <view class="admin-cover">
+        <image wx:if="{{item.cover_img}}" src="{{item.cover_img}}" mode="aspectFill" class="admin-thumb"></image>
+        <text wx:else class="admin-emoji">{{item.cover_emoji || '🍽️'}}</text>
+      </view>
+      <view class="admin-info">
+        <text class="admin-name">{{item.name}}</text>
+        <text class="admin-status {{item.cover_img ? 'done' : ''}}">{{item.cover_img ? '✅ 已配图' : '📷 点击上传'}}</text>
+      </view>
+      <text class="admin-arrow">›</text>
+    </view>
+  </view>
+</scroll-view>

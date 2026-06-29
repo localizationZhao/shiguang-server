@@ -3,9 +3,9 @@
 
 <scroll-view class="detail-page" scroll-y enhanced show-scrollbar="{{false}}" wx:if="{{recipe}}">
 
-  <!-- 封面图 -->
-  <view class="cover-wrap">
-    <image wx:if="{{recipe.coverImg}}" src="{{recipe.coverImg}}" mode="aspectFill" class="cover-img" bindtap="previewImg" data-src="{{recipe.coverImg}}"></image>
+  <!-- 封面图（双击进入管理员） -->
+  <view class="cover-wrap" bindtap="onCoverTap">
+    <image wx:if="{{recipe.coverImg}}" src="{{recipe.coverImg}}" mode="aspectFill" class="cover-img" data-src="{{recipe.coverImg}}"></image>
     <view wx:else class="cover-placeholder">
       <text class="cover-emoji">{{recipe.coverEmoji || '🍽️'}}</text>
     </view>
@@ -103,6 +103,31 @@
       <view class="ex-menu-item" hover-class="ex-menu-active" bindtap="exportAsText"><text class="ex-mi-icon">📋</text><text>纯文字列表</text></view>
       <view class="ex-menu-item" hover-class="ex-menu-active" bindtap="exportAsImage"><text class="ex-mi-icon">🖼️</text><text>以长图导出</text></view>
       <view class="ex-menu-item" hover-class="ex-menu-active" bindtap="exportAsSQL"><text class="ex-mi-icon">🗄️</text><text>以SQL导出</text></view>
+    </view>
+  </view>
+</view>
+
+<!-- 管理员登录弹窗 -->
+<view class="export-overlay {{showAdminLogin ? 'show' : ''}}" bindtap="closeAdminLogin">
+  <view class="export-window" catchtap="preventClose" style="max-width:560rpx">
+    <view class="export-hd">
+      <text class="export-title">🔐 管理员验证</text>
+      <view class="export-close" bindtap="closeAdminLogin">✕</view>
+    </view>
+    <view class="export-bd" style="padding:30rpx">
+      <view style="margin-bottom:20rpx">
+        <text style="font-size:26rpx;color:#666">手机号</text>
+        <input style="border:3rpx solid #ddd;border-radius:12rpx;padding:16rpx;margin-top:8rpx;font-size:28rpx" value="{{adminPhone}}" bindinput="onAdminPhone" type="number" maxlength="11" placeholder="输入手机号"/>
+      </view>
+      <view style="margin-bottom:20rpx">
+        <text style="font-size:26rpx;color:#666">密码</text>
+        <input style="border:3rpx solid #ddd;border-radius:12rpx;padding:16rpx;margin-top:8rpx;font-size:28rpx" value="{{adminPwd}}" bindinput="onAdminPwd" password placeholder="输入密码"/>
+      </view>
+      <view style="margin-bottom:20rpx">
+        <text style="font-size:22rpx;color:#999">📧 验证邮箱：zwl666268@qq.com</text>
+      </view>
+      <button style="background:#ffa3cb;color:#fff;border-radius:16rpx;font-weight:bold" bindtap="adminLogin" loading="{{adminLogging}}">验证进入</button>
+      <text wx:if="{{adminError}}" style="color:#f85149;font-size:24rpx;margin-top:12rpx;text-align:center;display:block">{{adminError}}</text>
     </view>
   </view>
 </view>

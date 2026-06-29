@@ -76,7 +76,7 @@ Page({
     const CAT_ID_TO_NAME: Record<number,string>={1:'荤菜',2:'素菜',3:'凉菜',4:'汤羹',5:'主食',6:'甜点',7:'酒水'}
     const normCloud = (r: any) => {
       const cat = CAT_ID_TO_NAME[r.category_id] || r.category || ''
-      return { ...r, category: cat, color: r.color || CAT_COLORS[cat] || '#ff8baa' }
+      return { ...r, category: cat, coverImg: r.cover_img || r.coverImg || '', color: r.color || CAT_COLORS[cat] || '#ff8baa' }
     }
     const useLocal = () => {
       const recipes = PUBLIC_RECIPES.map((r:any)=>({...r,color:r.color||CAT_COLORS[r.category]||'#ff8baa'}))

@@ -12,7 +12,8 @@
     "pages/my-orders/my-orders",
     "pages/settings/settings",
     "pages/my-recipes/my-recipes",
-    "pages/my-restaurants/my-restaurants"
+    "pages/my-restaurants/my-restaurants",
+    "pages/admin-recipes/admin-recipes"
   ],
   "window": {
     "navigationBarTextStyle": "black",

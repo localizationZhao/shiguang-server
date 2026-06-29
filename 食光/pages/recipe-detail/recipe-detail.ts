@@ -10,7 +10,15 @@ Page({
     faved: false,
     isPublic: false,
     showExport: false,
+    // 管理员
+    showAdminLogin: false,
+    adminPhone: '',
+    adminPwd: '',
+    adminError: '',
+    adminLogging: false,
   },
+  _lastCoverTap: 0,
+  _adminToken: '',
   preventClose() {},
 
 
@@ -26,13 +34,18 @@ Page({
           this.setData({ isPublic: true })
         }
       }
+      // 云端数据规范化：cover_img → coverImg, 解析 JSON
+      const normCloud = (r: any) => {
+        try { r.ingredients = typeof r.ingredients === 'string' ? JSON.parse(r.ingredients) : (r.ingredients || []) } catch (e) { r.ingredients = [] }
+        try { r.steps = typeof r.steps === 'string' ? JSON.parse(r.steps) : (r.steps || []) } catch (e) { r.steps = [] }
+        r.coverImg = r.cover_img || r.coverImg || ''
+        return r
+      }
       // 还没找到就从云端加载
       if (!recipe) {
         api.getRecipe(id).then((r: any) => {
           if (r) {
-            try { r.ingredients = typeof r.ingredients === 'string' ? JSON.parse(r.ingredients) : (r.ingredients || []) } catch (e) { r.ingredients = [] }
-            try { r.steps = typeof r.steps === 'string' ? JSON.parse(r.steps) : (r.steps || []) } catch (e) { r.steps = [] }
-            this.setData({ recipe: r, isPublic: true })
+            this.setData({ recipe: normCloud(r), isPublic: true })
           }
         }).catch(() => {})
         return
@@ -42,13 +55,12 @@ Page({
           recipe,
           faved: isFavorite(id),
         })
-        // 公共菜谱本地数据不完整（steps/ingredients为空），从云端补全
+        // 公共菜谱本地数据不完整（steps/ingredients/coverImg为空），从云端补全
         if (this.data.isPublic) {
           api.getRecipe(id).then((r: any) => {
             if (r) {
-              try { r.ingredients = typeof r.ingredients === 'string' ? JSON.parse(r.ingredients) : (r.ingredients || []) } catch (e) { r.ingredients = [] }
-              try { r.steps = typeof r.steps === 'string' ? JSON.parse(r.steps) : (r.steps || []) } catch (e) { r.steps = [] }
-              const merged = { ...recipe, ingredients: r.ingredients, steps: r.steps }
+              const nr = normCloud(r)
+              const merged = { ...recipe, ingredients: nr.ingredients, steps: nr.steps, coverImg: nr.coverImg }
               this.setData({ recipe: merged })
             }
           }).catch(() => {})
@@ -307,5 +319,55 @@ Page({
   onShareAppMessage() {
     const r = this.data.recipe
     return { title: r ? '食光 · ' + r.name : '食光美食', path: '/pages/recipe-detail/recipe-detail?id=' + (r?.id || ''), imageUrl: r?.coverImg || '' }
+  },
+
+  // ============ 管理员入口（双击封面） ============
+  onCoverTap() {
+    const now = Date.now()
+    if (this._lastCoverTap && now - this._lastCoverTap < 400) {
+      // 双击 → 弹出管理员登录
+      this._lastCoverTap = 0
+      const token = wx.getStorageSync('admin_token')
+      if (token) {
+        // 已登录，直接跳转管理页
+        wx.navigateTo({ url: '/pages/admin-recipes/admin-recipes?token=' + token })
+      } else {
+        this.setData({ showAdminLogin: true, adminPhone: '', adminPwd: '', adminError: '' })
+      }
+    } else {
+      this._lastCoverTap = now
+      // 单击 → 预览图片（如果有）
+      if (this.data.recipe?.coverImg) {
+        wx.previewImage({ urls: [this.data.recipe.coverImg], current: this.data.recipe.coverImg })
+      }
+    }
+  },
+  onAdminPhone(e: any) { this.setData({ adminPhone: e.detail.value }) },
+  onAdminPwd(e: any) { this.setData({ adminPwd: e.detail.value }) },
+  closeAdminLogin() { this.setData({ showAdminLogin: false }) },
+
+  async adminLogin() {
+    const phone = this.data.adminPhone.trim()
+    const pwd = this.data.adminPwd.trim()
+    if (!phone) { this.setData({ adminError: '请输入手机号' }); return }
+    if (!pwd) { this.setData({ adminError: '请输入密码' }); return }
+    this.setData({ adminLogging: true, adminError: '' })
+    try {
+      const res = await wx.cloud.callContainer({
+        config: { env: 'prod-d0g68hmay4c8d10e3' },
+        path: '/api/admin/login', header: { 'X-WX-SERVICE': 'express-rtm4' },
+        method: 'POST', data: { phone, password: pwd }, timeout: 8000
+      })
+      if ((res.data as any)?.code === 0) {
+        const token = (res.data as any).data.token
+        wx.setStorageSync('admin_token', token)
+        this.setData({ showAdminLogin: false, adminLogging: false })
+        wx.navigateTo({ url: '/pages/admin-recipes/admin-recipes?token=' + token })
+      } else {
+        this.setData({ adminError: (res.data as any)?.msg || '验证失败', adminLogging: false })
+      }
+    } catch (e) {
+      this.setData({ adminError: '网络错误，请重试', adminLogging: false })
+    }
   },
 })
