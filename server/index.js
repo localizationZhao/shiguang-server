@@ -114,8 +114,8 @@ app.delete('/api/recipes/:id', async (req, res) => {
 })
 
 // ===== 管理员接口 =====
-const ADMIN_PHONE = process.env.ADMIN_PHONE || '19234224985'
-const ADMIN_PWD = process.env.ADMIN_PWD || 'zwlx7070'
+const ADMIN_PHONE = process.env.ADMIN_PHONE || ''
+const ADMIN_PWD = process.env.ADMIN_PWD || ''
 const ADMIN_TOKEN = 'sg_admin_' + Date.now().toString(36)
 let adminTokenExpire = 0
 
