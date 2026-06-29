@@ -123,9 +123,6 @@
         <text style="font-size:26rpx;color:#666">密码</text>
         <input style="border:3rpx solid #ddd;border-radius:12rpx;padding:16rpx;margin-top:8rpx;font-size:28rpx" value="{{adminPwd}}" bindinput="onAdminPwd" password placeholder="输入密码"/>
       </view>
-      <view style="margin-bottom:20rpx">
-        <text style="font-size:22rpx;color:#999">📧 验证邮箱：zwl666268@qq.com</text>
-      </view>
       <button style="background:#ffa3cb;color:#fff;border-radius:16rpx;font-weight:bold" bindtap="adminLogin" loading="{{adminLogging}}">验证进入</button>
       <text wx:if="{{adminError}}" style="color:#f85149;font-size:24rpx;margin-top:12rpx;text-align:center;display:block">{{adminError}}</text>
     </view>
