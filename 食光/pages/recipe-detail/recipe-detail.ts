@@ -356,7 +356,7 @@ Page({
       const res = await wx.cloud.callContainer({
         config: { env: 'prod-d0g68hmay4c8d10e3' },
         path: '/api/admin/login', header: { 'X-WX-SERVICE': 'express-rtm4' },
-        method: 'POST', data: { phone, password: pwd }, timeout: 8000
+        method: 'POST', data: { phone, password: pwd }, timeout: 30000
       })
       if ((res.data as any)?.code === 0) {
         const token = (res.data as any).data.token
