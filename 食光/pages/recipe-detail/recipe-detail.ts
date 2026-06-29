@@ -42,6 +42,17 @@ Page({
           recipe,
           faved: isFavorite(id),
         })
+        // 公共菜谱本地数据不完整（steps/ingredients为空），从云端补全
+        if (this.data.isPublic) {
+          api.getRecipe(id).then((r: any) => {
+            if (r) {
+              try { r.ingredients = typeof r.ingredients === 'string' ? JSON.parse(r.ingredients) : (r.ingredients || []) } catch (e) { r.ingredients = [] }
+              try { r.steps = typeof r.steps === 'string' ? JSON.parse(r.steps) : (r.steps || []) } catch (e) { r.steps = [] }
+              const merged = { ...recipe, ingredients: r.ingredients, steps: r.steps }
+              this.setData({ recipe: merged })
+            }
+          }).catch(() => {})
+        }
       }
     }
   },
